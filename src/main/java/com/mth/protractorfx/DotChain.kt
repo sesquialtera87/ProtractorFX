@@ -4,29 +4,35 @@ import javafx.geometry.Point2D
 import javafx.scene.layout.Pane
 import javafx.scene.shape.Line
 import java.util.*
+import kotlin.math.ceil
 
 class DotChain(private val container: Pane) {
 
     /**
      * A connection line between two graph nodes
      */
-    class Connection(dot1: Dot, dot2: Dot) {
-        private val line = Line()
+    data class Connection(val dot1: Dot, val dot2: Dot) : Line() {
 
         init {
-            line.apply {
-                startXProperty().bind(dot1.centerXProperty())
-                startYProperty().bind(dot1.centerYProperty())
+            startXProperty().bind(dot1.centerXProperty())
+            startYProperty().bind(dot1.centerYProperty())
 
-                endXProperty().bind(dot2.centerXProperty())
-                endYProperty().bind(dot2.centerYProperty())
+            endXProperty().bind(dot2.centerXProperty())
+            endYProperty().bind(dot2.centerYProperty())
 
-                val pane = dot1.parent as Pane
-                pane.children.add(line)
-                isVisible = true
-                toBack()
-            }
+            // add the line to the parent Pane
+            val pane = dot1.parent as Pane
+            pane.children.add(this)
+            isVisible = true
+            toBack()
         }
+
+        /**
+         * Returns `true` if this line connect the two graph nodes
+         */
+        fun match(dot1: Dot, dot2: Dot) =
+            (dot1 == this.dot1 && dot2 == this.dot2)
+                    || (dot1 == this.dot2 && dot2 == this.dot1)
     }
 
     val selection: HashSet<Dot> = HashSet()
@@ -73,6 +79,29 @@ class DotChain(private val container: Pane) {
             dot.isVisible = true
             dot.toFront()
             true
+        }
+    }
+
+    fun addToSelection(dot: Dot) {
+        selection.add(dot)
+    }
+
+    fun select(dot: Dot) {
+        clearSelection()
+        selection.add(dot)
+        dot.selected = true
+    }
+
+    fun removeDot(dot: Dot) {
+        if (dot.isLeaf()) {
+            val parent = adjacencyList[dot]!!.first()
+            adjacencyList[parent]?.remove(dot)
+            adjacencyList.remove(dot)
+
+            val dotConnection = connections.first { it.match(dot, parent) }
+            container.children.removeAll(dot, dotConnection)
+
+            container.requestFocus()
         }
     }
 

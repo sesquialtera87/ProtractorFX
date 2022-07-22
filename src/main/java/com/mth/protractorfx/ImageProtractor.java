@@ -28,8 +28,6 @@ import java.net.URL;
 import java.util.*;
 
 import static java.lang.Double.parseDouble;
-import static java.lang.Math.atan2;
-import static java.lang.Math.toDegrees;
 
 public class ImageProtractor implements Initializable {
 
@@ -60,7 +58,6 @@ public class ImageProtractor implements Initializable {
 
     DotChain chain;
     boolean dotInsertionEnabled = false;
-    boolean dotDeletionEnabled = false;
     boolean angleMeasureEnabled = false;
 
     @Override
@@ -81,52 +78,52 @@ public class ImageProtractor implements Initializable {
                 angleMeasureEnabled = false;
             } else if (dotInsertionEnabled)
                 addDot(evt.getX(), evt.getY());
-            else if (dotDeletionEnabled)
-                ;
             else
                 chain.clearSelection();
         });
         container.setOnKeyPressed(evt -> {
-            if (evt.getCode() == KeyCode.A) {
-                container.setCursor(Cursor.CROSSHAIR);
+            if (UtilsKt.SHORTCUT_DELETE.match(evt)) {
+                deleteSelectedDots();
+            } else if (evt.getCode() == KeyCode.A) {
+                container.setCursor(UtilsKt.CURSOR_INSERT_DOT);
                 dotInsertionEnabled = true;
-            } else if (evt.getCode() == KeyCode.X) {
-                container.setCursor(Cursor.HAND);
-                dotDeletionEnabled = true;
+            } else if (UtilsKt.SHORTCUT_DELETE_SWITCH.match(evt)) {
+                container.setCursor(UtilsKt.CURSOR_REMOVE_DOT);
+                UtilsKt.dotDeletionEnabled = true;
             }
         });
         container.setOnKeyReleased(evt -> {
             if (evt.getCode() == KeyCode.A) {
                 container.setCursor(Cursor.DEFAULT);
                 dotInsertionEnabled = false;
-            } else if (evt.getCode() == KeyCode.X) {
+            } else if (UtilsKt.SHORTCUT_DELETE_SWITCH.match(evt)) {
                 container.setCursor(Cursor.DEFAULT);
-                dotDeletionEnabled = false;
+                UtilsKt.dotDeletionEnabled = false;
             }
         });
         container.setOnMouseMoved(evt -> {
-            Dot nearestDot = chain.getNearestDot(new Point2D(evt.getX(), evt.getY()), true);
-            nearestDot.highLight();
-
-            if (chain.neighborsCount(nearestDot) < 2)
-                return;
-
-            List<Double> angles = new ArrayList<>(10);
-
-            for (Dot neighbor : chain.neighbors(nearestDot)) {
-                double dx1 = neighbor.getCenterX() - nearestDot.getCenterX();
-                double dy1 = neighbor.getCenterY() - nearestDot.getCenterY();
-                double dx2 = evt.getX() - nearestDot.getCenterX();
-                double dy2 = evt.getY() - nearestDot.getCenterY();
-
-                double dot = dx1 * dx2 + dy1 * dy2;
-                double det = dx1 * dy2 - dx2 * dy1;
-                double angle = toDegrees(atan2(det, dot));
-
-                System.out.print(angle + " ");
-                angles.add(angle);
-            }
-            System.out.println();
+//            Dot nearestDot = chain.getNearestDot(new Point2D(evt.getX(), evt.getY()), true);
+//            nearestDot.highLight();
+//
+//            if (chain.neighborsCount(nearestDot) < 2)
+//                return;
+//
+//            List<Double> angles = new ArrayList<>(10);
+//
+//            for (Dot neighbor : chain.neighbors(nearestDot)) {
+//                double dx1 = neighbor.getCenterX() - nearestDot.getCenterX();
+//                double dy1 = neighbor.getCenterY() - nearestDot.getCenterY();
+//                double dx2 = evt.getX() - nearestDot.getCenterX();
+//                double dy2 = evt.getY() - nearestDot.getCenterY();
+//
+//                double dot = dx1 * dx2 + dy1 * dy2;
+//                double det = dx1 * dy2 - dx2 * dy1;
+//                double angle = toDegrees(atan2(det, dot));
+//
+//                System.out.print(angle + " ");
+//                angles.add(angle);
+//            }
+//            System.out.println();
         });
 
         imageView.setPreserveRatio(true);
@@ -135,6 +132,11 @@ public class ImageProtractor implements Initializable {
 //        imageView.fitHeightProperty().bind(container.heightProperty());
 
         chain = new DotChain(container);
+    }
+
+    private void deleteSelectedDots() {
+        chain.getSelection().forEach(Dot::delete);
+        chain.clearSelection();
     }
 
     private void measureAngle(Point2D mouseLocation) {
@@ -168,6 +170,12 @@ public class ImageProtractor implements Initializable {
         nearestDot.addAngleMeasure(dot1, dot2);
     }
 
+    /**
+     * Insert a new graph-node at the specified position
+     *
+     * @param x Horizontal mouse coordinate
+     * @param y Vertical mouse coordinate
+     */
     private void addDot(double x, double y) {
         Optional<Dot> selectedDot = chain.getSelectedDot();
 
@@ -175,6 +183,7 @@ public class ImageProtractor implements Initializable {
             Dot newDot = new Dot(x, y, chain);
             chain.addDot(newDot);
             chain.connect(newDot, dot);
+            chain.select(newDot);
         });
     }
 

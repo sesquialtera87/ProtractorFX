@@ -71,8 +71,11 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
             selected = true
             requestFocus()
 
-            if (it.isShiftDown) {
+            if (dotDeletionEnabled) {
+                delete()
+            } else if (it.isShiftDown) {
                 chain.selection.add(this)
+                it.consume()
             } else {
                 chain.selection.forEach { dot ->
                     if (dot != this)
@@ -80,9 +83,15 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                 }
                 chain.selection.clear()
                 chain.selection.add(this)
+                it.consume()
             }
-            it.consume()
         }
+    }
+
+    fun delete() {
+        println("Deletion")
+        chain.removeDot(this)
+        chain.clearSelection()
     }
 
     fun isLeaf() = neighbors().size < 2
