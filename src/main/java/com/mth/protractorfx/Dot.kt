@@ -1,6 +1,7 @@
 package com.mth.protractorfx
 
 import javafx.animation.FillTransition
+import javafx.beans.value.ChangeListener
 import javafx.geometry.Point2D
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Pane
@@ -47,7 +48,7 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
         }
     }
 
-    var chainColor: Color = Color.BLACK
+    private val chainColor: Color get() = chain.chainColor.get()
     var selected: Boolean = false
         set(value) {
             field = value
@@ -61,10 +62,14 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
 
 
     init {
+        // listen for color changes
+        chain.chainColor.addListener { _, _, _ -> fill = chainColor }
+
         radius = DOT_RADIUS
         centerX = x
         centerY = y
-//        fill = chainColor
+        fill = chainColor
+
         DragSupport(this)
 
         addEventHandler(MouseEvent.MOUSE_CLICKED) {

@@ -1,10 +1,11 @@
 package com.mth.protractorfx
 
+import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Point2D
 import javafx.scene.layout.Pane
+import javafx.scene.paint.Color
 import javafx.scene.shape.Line
 import java.util.*
-import kotlin.math.ceil
 
 class DotChain(private val container: Pane) {
 
@@ -12,6 +13,9 @@ class DotChain(private val container: Pane) {
      * A connection line between two graph nodes
      */
     data class Connection(val dot1: Dot, val dot2: Dot) : Line() {
+
+        // The Pane container this Line belongs to
+        private val parent get() = dot1.parent as Pane
 
         init {
             startXProperty().bind(dot1.centerXProperty())
@@ -21,8 +25,7 @@ class DotChain(private val container: Pane) {
             endYProperty().bind(dot2.centerYProperty())
 
             // add the line to the parent Pane
-            val pane = dot1.parent as Pane
-            pane.children.add(this)
+            parent.children.add(this)
             isVisible = true
             toBack()
         }
@@ -38,7 +41,7 @@ class DotChain(private val container: Pane) {
     val selection: HashSet<Dot> = HashSet()
     private val adjacencyList: MutableMap<Dot, HashSet<Dot>> = mutableMapOf()
     private val connections: HashSet<Connection> = HashSet()
-
+    val chainColor = SimpleObjectProperty(Color.BLACK)
     val size: Int get() = adjacencyList.size
 
     init {
@@ -49,6 +52,10 @@ class DotChain(private val container: Pane) {
         addDots(dot1, dot2, dot3)
         connect(dot1, dot2)
         connect(dot2, dot3)
+    }
+
+    fun setColor(color: Color) {
+        chainColor.set(color)
     }
 
     fun neighborsCount(dot: Dot) = adjacencyList[dot]!!.size
@@ -98,9 +105,11 @@ class DotChain(private val container: Pane) {
             adjacencyList[parent]?.remove(dot)
             adjacencyList.remove(dot)
 
+            // get the connection and removes it from Pane
             val dotConnection = connections.first { it.match(dot, parent) }
             container.children.removeAll(dot, dotConnection)
 
+            // Move focus on the Pane, to handle correctly the key-released event (X)
             container.requestFocus()
         }
     }

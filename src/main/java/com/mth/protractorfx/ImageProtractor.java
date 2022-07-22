@@ -7,6 +7,8 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -15,11 +17,14 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.Pair;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -55,6 +60,8 @@ public class ImageProtractor implements Initializable {
     TextField widthField;
     @FXML
     TextField heightField;
+    @FXML
+    Menu chainColorMenu;
 
     DotChain chain;
     boolean dotInsertionEnabled = false;
@@ -130,6 +137,13 @@ public class ImageProtractor implements Initializable {
 
 //        imageView.fitWidthProperty().bind(container.widthProperty());
 //        imageView.fitHeightProperty().bind(container.heightProperty());
+
+        Arrays.asList(Color.BLACK, Color.SLATEBLUE, Color.ORANGERED, Color.MAGENTA, Color.PLUM, Color.OLIVEDRAB, Color.TAN, Color.PEACHPUFF).forEach(color -> {
+            MenuItem colorMenuItem = new MenuItem();
+            colorMenuItem.setGraphic(new Rectangle(14, 14, color));
+            colorMenuItem.setOnAction(evt -> chain.setColor(color));
+            chainColorMenu.getItems().add(colorMenuItem);
+        });
 
         chain = new DotChain(container);
     }

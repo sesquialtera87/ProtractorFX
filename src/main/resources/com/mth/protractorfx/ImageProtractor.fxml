@@ -19,11 +19,16 @@
             </Menu>
             <Menu text="Image">
                 <MenuItem accelerator="Shortcut+O" onAction="#openImage" text="Open image..."/>
-                <MenuItem text="Crop image" accelerator="Shortcut+K" onAction="#showCropArea"/>
+                <MenuItem accelerator="Shortcut+K" onAction="#showCropArea" text="Crop image"/>
                 <Menu text="Zoom">
                     <MenuItem accelerator="Shortcut+2" onAction="#zoomIn" text="Zoom in"/>
                     <MenuItem accelerator="Shortcut+1" onAction="#zoomOut" text="Zoom out"/>
                 </Menu>
+            </Menu>
+            <Menu mnemonicParsing="false" text="View">
+                <items>
+                    <Menu fx:id="chainColorMenu" mnemonicParsing="false" text="Chain color"/>
+                </items>
             </Menu>
         </MenuBar>
     </top>
