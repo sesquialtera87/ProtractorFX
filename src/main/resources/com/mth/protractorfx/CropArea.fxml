@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.shape.Rectangle?>
+
+<GridPane fx:id="cropArea" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+          prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+          fx:controller="com.mth.protractorfx.CropArea" style="-fx-background-color: blue;">
+    <columnConstraints>
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="9.0" minWidth="10.0" prefWidth="100.0"/>
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="9.0" minWidth="10.0" prefWidth="100.0"/>
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints minHeight="10.0" prefHeight="9.0" vgrow="NEVER"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints maxHeight="9.0" minHeight="9.0" prefHeight="9.0" vgrow="SOMETIMES"/>
+    </rowConstraints>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="9.0" strokeType="INSIDE" width="9.0"/>
+    <Rectangle fx:id="NE" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="9.0" stroke="BLACK"
+               strokeType="INSIDE" width="9.0" GridPane.columnIndex="2" GridPane.hgrow="NEVER" GridPane.vgrow="NEVER"/>
+    <Rectangle fx:id="NW" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="9.0" stroke="BLACK"
+               strokeType="INSIDE" width="9.0"/>
+    <Rectangle fx:id="SW" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="9.0" stroke="BLACK"
+               strokeType="INSIDE" width="9.0" GridPane.rowIndex="2"/>
+    <Rectangle fx:id="SE" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="9.0" stroke="BLACK"
+               strokeType="INSIDE" width="9.0" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+    <Pane fx:id="W" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: red;" GridPane.rowIndex="1"/>
+    <Pane fx:id="E" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+    <Pane fx:id="N" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1"/>
+    <Pane fx:id="S" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+</GridPane>

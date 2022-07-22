@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.mth.protractorfx.ImageProtractor">
+
+    <top>
+        <MenuBar>
+            <Menu text="Measure">
+                <MenuItem accelerator="Shortcut+M" onAction="#putAngleMeasure" text="Put measure"/>
+            </Menu>
+            <Menu text="Image">
+                <MenuItem accelerator="Shortcut+O" onAction="#openImage" text="Open image..."/>
+                <MenuItem text="Crop image" accelerator="Shortcut+K" onAction="#showCropArea"/>
+                <Menu text="Zoom">
+                    <MenuItem accelerator="Shortcut+2" onAction="#zoomIn" text="Zoom in"/>
+                    <MenuItem accelerator="Shortcut+1" onAction="#zoomOut" text="Zoom out"/>
+                </Menu>
+            </Menu>
+        </MenuBar>
+    </top>
+
+    <center>
+        <Pane fx:id="container" prefHeight="800" prefWidth="800" style="-fx-background-color: orange;">
+            <!--        <ScrollPane>-->
+            <ImageView fx:id="imageView"/>
+            <!--        </ScrollPane>-->
+        </Pane>
+    </center>
+
+    <right>
+        <VBox>
+            <TextField fx:id="xField"/>
+            <TextField fx:id="yField"/>
+            <TextField fx:id="widthField"/>
+            <TextField fx:id="heightField" onAction="#viewport"/>
+        </VBox>
+    </right>
+
+</BorderPane>

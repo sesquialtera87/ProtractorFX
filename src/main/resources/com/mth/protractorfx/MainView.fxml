@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Copyright (c) 2015, 2019, Gluon and/or its affiliates.
+  All rights reserved. Use is subject to license terms.
+
+  This file is available and licensed under the following license:
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+
+  - Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+  - Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in
+    the documentation and/or other materials provided with the distribution.
+  - Neither the name of Oracle Corporation nor the names of its
+    contributors may be used to endorse or promote products derived
+    from this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
+
+<BorderPane prefHeight="398.0" prefWidth="942.0" style="-fx-background-color: transparent;"
+            xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.mth.protractorfx.MainViewController">
+    <top>
+        <MenuBar BorderPane.alignment="CENTER">
+            <Menu mnemonicParsing="false" text="File">
+                <MenuItem mnemonicParsing="false" text="New"/>
+                <MenuItem mnemonicParsing="false" text="Open…"/>
+                <Menu mnemonicParsing="false" text="Open Recent"/>
+                <SeparatorMenuItem mnemonicParsing="false"/>
+                <MenuItem mnemonicParsing="false" text="Clear" onAction="#clearChains" accelerator="Shortcut N"/>
+                <MenuItem mnemonicParsing="false" text="Save"/>
+                <MenuItem mnemonicParsing="false" text="Save As…"/>
+                <MenuItem mnemonicParsing="false" text="Revert"/>
+                <SeparatorMenuItem mnemonicParsing="false"/>
+                <MenuItem mnemonicParsing="false" text="Preferences…"/>
+                <SeparatorMenuItem mnemonicParsing="false"/>
+                <MenuItem accelerator="Shortcut+Q" mnemonicParsing="false" onAction="#quit" text="Quit"/>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Edit">
+                <MenuItem mnemonicParsing="false" text="Undo"/>
+                <MenuItem mnemonicParsing="false" text="Redo"/>
+                <SeparatorMenuItem mnemonicParsing="false"/>
+                <MenuItem mnemonicParsing="false" text="Cut"/>
+                <MenuItem mnemonicParsing="false" text="Copy"/>
+                <MenuItem mnemonicParsing="false" text="Paste"/>
+                <MenuItem mnemonicParsing="false" text="Delete"/>
+                <SeparatorMenuItem mnemonicParsing="false"/>
+                <MenuItem mnemonicParsing="false" text="Select All"/>
+                <MenuItem mnemonicParsing="false" text="Unselect All"/>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Help">
+                <MenuItem mnemonicParsing="false" text="About MyHelloApp"/>
+                <Menu mnemonicParsing="false" text="Colors">
+                    <MenuItem mnemonicParsing="false" text="Action 1"/>
+                </Menu>
+                <Menu fx:id="transparencyMenu" mnemonicParsing="false" text="Background transparency">
+
+                </Menu>
+            </Menu>
+        </MenuBar>
+    </top>
+    <center>
+        <Pane fx:id="pane" onKeyPressed="#onKeyPressed" onKeyReleased="#onKeyReleased" onMouseClicked="#onMouseClicked"
+              onMouseMoved="#onMouseMoved" prefHeight="200.0" prefWidth="200.0"
+              style="-fx-background-color: transparent;" BorderPane.alignment="CENTER">
+            <Canvas fx:id="canvas" height="373.0" width="628.0"/>
+            <TitledPane fx:id="measuresPane" collapsible="false" layoutX="726.0" layoutY="14.0" prefHeight="225.0"
+                        prefWidth="302.0" text="Measures">
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="300">
+                    <BorderPane prefHeight="200.0">
+                        <center>
+                            <TableView fx:id="measureTable" prefHeight="234.0" prefWidth="300"
+                                       BorderPane.alignment="CENTER">
+                                <columns>
+                                    <TableColumn fx:id="idColumn" prefWidth="53.0" text="#"/>
+                                    <TableColumn fx:id="degreeColumn" prefWidth="80" text="Degree"/>
+                                    <TableColumn fx:id="secondaryAngleColumn" prefWidth="80.0" text="C"/>
+                                </columns>
+                            </TableView>
+                        </center>
+                    </BorderPane>
+                </AnchorPane>
+            </TitledPane>
+        </Pane>
+    </center>
+</BorderPane>
