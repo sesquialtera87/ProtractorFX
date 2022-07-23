@@ -39,6 +39,9 @@ var dotDeletionEnabled = false
 @JvmField
 var angleMeasureEnabled = false
 
+@JvmField
+var ANGLE_LABEL_PRECISION = 1
+
 
 fun angleBetween(p1: Point2D, p2: Point2D, degree: Boolean = false): Double {
     val dot = p1.x * p2.x + p1.y * p2.y

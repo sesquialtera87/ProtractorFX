@@ -1,7 +1,6 @@
 package com.mth.protractorfx
 
 import javafx.animation.FillTransition
-import javafx.beans.value.ChangeListener
 import javafx.geometry.Point2D
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Pane
@@ -9,15 +8,86 @@ import javafx.scene.paint.Color
 import javafx.scene.shape.Arc
 import javafx.scene.shape.ArcType
 import javafx.scene.shape.Circle
+import javafx.scene.text.Text
+import javafx.scene.transform.Transform
 import javafx.util.Duration
-import java.lang.Math.toDegrees
+import java.lang.Math.toRadians
+import kotlin.math.cos
 import kotlin.math.max
+import kotlin.math.sin
 
 class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
 
-    data class AngleMeasure(val neighbor1: Dot, val neighbor2: Dot, val arc: Arc) {
+    /**
+     * @param neighbor1 The first vertex of the oriented angle
+     * @param neighbor2 The second vertex of the oriented angle
+     */
+    data class AngleDescriptor(val neighbor1: Dot, val neighbor2: Dot) {
+
+        private val angleLabel = Text()
+        private val arc: Arc = Arc()
+
+        fun build(dot: Dot, pane: Pane) {
+            // create the arc
+            arc.apply {
+                centerXProperty().bind(dot.centerXProperty())
+                centerYProperty().bind(dot.centerYProperty())
+                radiusX = 20.0
+                radiusY = 20.0
+                type = ArcType.ROUND
+                fill = Color.TRANSPARENT
+                stroke = Color.DARKGREEN
+                strokeWidth = 1.5
+                length = getMeasure()
+                startAngle = getInitialAngle()
+                toBack()
+            }
+
+            angleLabel.apply {
+                xProperty().bind(dot.centerXProperty())
+                yProperty().bind(dot.centerYProperty())
+                text = "%.${ANGLE_LABEL_PRECISION}f".format(getMeasure())
+                isVisible = true
+                toBack()
+            }
+
+            val alpha = -toRadians(getMeasure()) / 2
+            val widthTranslation = Point2D(-angleLabel.layoutBounds.width / 2 + 4, angleLabel.layoutBounds.height / 2)
+            var translationVector = neighbor1.getCenter().subtract(arc.centerX, arc.centerY).normalize()
+            translationVector = translationVector.multiply(40.0)
+            translationVector = Point2D(
+                translationVector.x * cos(alpha) - translationVector.y * sin(alpha),
+                translationVector.y * cos(alpha) + translationVector.x * sin(alpha)
+            )
+
+            val initialAngle = getInitialAngle()
+
+            angleLabel.apply {
+                transforms.addAll(
+                    Transform.translate(widthTranslation.x, widthTranslation.y),
+                    Transform.translate(translationVector.x, translationVector.y)
+                )
+//                rotate = if (initialAngle <= 180) 180 - initialAngle else 360 - initialAngle
+            }
+
+            pane.children.addAll(arc, angleLabel)
+        }
+
+        fun update() {
+            val angleMeasure = getMeasure()
+
+            arc.apply {
+                length = angleMeasure
+                startAngle = getInitialAngle()
+            }
+
+            angleLabel.apply {
+                text = "%.${ANGLE_LABEL_PRECISION}f".format(angleMeasure)
+            }
+        }
+
         override fun equals(other: Any?): Boolean {
-            return if (other == null || other !is AngleMeasure)
+            return if (other == null || other !is AngleDescriptor)
                 false
             else {
                 other.neighbor1 == neighbor1 && other.neighbor2 == neighbor2
@@ -32,23 +102,27 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
         }
 
         fun getMeasure(): Double {
-            val p1 = Point2D(neighbor1.centerX, neighbor1.centerY)
-            val p2 = Point2D(neighbor2.centerX, neighbor2.centerY)
+            val p1 = neighbor1.getCenter()
+            val p2 = neighbor2.getCenter()
             val arcCenter = Point2D(arc.centerX, arc.centerY)
 
             return angleBetween(p2.subtract(arcCenter), p1.subtract(arcCenter), degree = true)
         }
 
         fun getInitialAngle(): Double {
-            val p1 = Point2D(neighbor1.centerX, neighbor1.centerY)
-            val p2 = Point2D(neighbor2.centerX, neighbor2.centerY)
+            val p1 = neighbor1.getCenter()
             val arcCenter = Point2D(arc.centerX, arc.centerY)
 
+            println("Initial angle = " + angleBetween(p1.subtract(arcCenter), Point2D(1.0, 0.0), degree = true))
             return angleBetween(p1.subtract(arcCenter), Point2D(1.0, 0.0), degree = true)
         }
     }
 
+    /**
+     * Get the color of the parent chain
+     */
     private val chainColor: Color get() = chain.chainColor.get()
+
     var selected: Boolean = false
         set(value) {
             field = value
@@ -58,7 +132,7 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                 chainColor
         }
 
-    private val angleArcs = mutableListOf<AngleMeasure>()
+    private val angleArcs = mutableListOf<AngleDescriptor>()
 
 
     init {
@@ -93,6 +167,8 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
         }
     }
 
+    fun getCenter() = Point2D(centerX, centerY)
+
     fun delete() {
         println("Deletion")
         chain.removeDot(this)
@@ -112,39 +188,16 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
     }
 
     fun updateNeighboringAngles() {
-        angleArcs.forEach {
-            it.arc.apply {
-                startAngle = it.getInitialAngle()
-                length = it.getMeasure()
-            }
-        }
+        angleArcs.forEach { it.update() }
     }
 
     fun addAngleMeasure(dot1: Dot, dot2: Dot) {
-        // create the arc
-        val arc = Arc().apply {
-            centerXProperty().bind(this@Dot.centerXProperty())
-            centerYProperty().bind(this@Dot.centerYProperty())
-            radiusX = 20.0
-            radiusY = 20.0
-            type = ArcType.ROUND
-            fill = Color.TRANSPARENT
-            stroke = Color.DARKGREEN
-            strokeWidth = 1.5
-        }
+        val pane = parent as Pane
+        val angleDescriptor = AngleDescriptor(dot1, dot2)
 
-
-        val angleMeasure = AngleMeasure(dot1, dot2, arc)
-
-        if (!angleArcs.contains(angleMeasure)) {
-            angleArcs.add(angleMeasure)
-            (parent as Pane).children.add(arc)
-
-            arc.apply {
-                length = angleMeasure.getMeasure()
-                startAngle = angleMeasure.getInitialAngle()
-                toBack()
-            }
+        if (!angleArcs.contains(angleDescriptor)) {
+            angleArcs.add(angleDescriptor)
+            angleDescriptor.build(this, pane)
         } else {
             println("Angle already measured")
         }

@@ -24,7 +24,6 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.Pair;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -138,12 +137,13 @@ public class ImageProtractor implements Initializable {
 //        imageView.fitWidthProperty().bind(container.widthProperty());
 //        imageView.fitHeightProperty().bind(container.heightProperty());
 
-        Arrays.asList(Color.BLACK, Color.SLATEBLUE, Color.ORANGERED, Color.MAGENTA, Color.PLUM, Color.OLIVEDRAB, Color.TAN, Color.PEACHPUFF).forEach(color -> {
-            MenuItem colorMenuItem = new MenuItem();
-            colorMenuItem.setGraphic(new Rectangle(14, 14, color));
-            colorMenuItem.setOnAction(evt -> chain.setColor(color));
-            chainColorMenu.getItems().add(colorMenuItem);
-        });
+        Arrays.asList(Color.BLACK, Color.SLATEBLUE, Color.ORANGERED, Color.MAGENTA, Color.PLUM, Color.OLIVEDRAB, Color.TAN, Color.PEACHPUFF)
+                .forEach(color -> {
+                    MenuItem colorMenuItem = new MenuItem();
+                    colorMenuItem.setGraphic(new Rectangle(14, 14, color));
+                    colorMenuItem.setOnAction(evt -> chain.setColor(color));
+                    chainColorMenu.getItems().add(colorMenuItem);
+                });
 
         chain = new DotChain(container);
     }
@@ -174,7 +174,7 @@ public class ImageProtractor implements Initializable {
             System.out.println(angle);
         }
 
-        // sort angles in ascending order, from the nearest to the farthest node (anticlockwise)
+        // sort angles in ascending order, from the nearest to the farthest node (counterclockwise)
         anglesFromMouse.sort(Comparator.comparing(Pair::getValue));
 
         // get the farthest and the nearest nodes as the delimiters for the user-chosen angle
