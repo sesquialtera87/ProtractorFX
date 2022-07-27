@@ -19,6 +19,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.transform.Transform;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.Pair;
@@ -250,8 +251,11 @@ public class ImageProtractor implements Initializable {
 
         if (imageFile != null) {
             try {
+                zoomValue.set(1.0);
+
                 image = new Image(new FileInputStream(imageFile));
 
+                imageView.getTransforms().clear();
                 imageView.setImage(image);
                 imageView.setViewport(new Rectangle2D(0, 0, image.getWidth(), image.getHeight()));
                 imageView.setFitWidth(image.getWidth());
@@ -281,8 +285,8 @@ public class ImageProtractor implements Initializable {
 
         zoomValue.set(zoomValue.getValue() + 0.1);
 
-        imageView.setScaleX(zoomValue.get());
-        imageView.setScaleY(zoomValue.getValue());
+        imageView.getTransforms().clear();
+        imageView.getTransforms().add(Transform.scale(zoomValue.get(), zoomValue.get()));
     }
 
     @FXML
@@ -292,8 +296,8 @@ public class ImageProtractor implements Initializable {
         if (zoomValue.get() > 0.1) {
             zoomValue.set(zoomValue.getValue() - 0.1);
 
-            imageView.setScaleX(zoomValue.get());
-            imageView.setScaleY(zoomValue.getValue());
+            imageView.getTransforms().clear();
+            imageView.getTransforms().addAll(Transform.scale(zoomValue.get(), zoomValue.get()));
         }
     }
 
