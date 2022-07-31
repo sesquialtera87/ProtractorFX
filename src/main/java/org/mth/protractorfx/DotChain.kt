@@ -1,4 +1,4 @@
-package com.mth.protractorfx
+package org.mth.protractorfx
 
 import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Point2D

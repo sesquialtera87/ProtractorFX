@@ -1,4 +1,4 @@
-package com.mth.protractorfx;
+package org.mth.protractorfx;
 
 import javafx.geometry.Point2D;
 import javafx.scene.control.TitledPane;

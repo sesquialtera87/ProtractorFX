@@ -1,4 +1,4 @@
-package com.mth.protractorfx;
+package org.mth.protractorfx;
 
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.EventHandler;
@@ -9,6 +9,7 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -19,7 +20,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.transform.Transform;
+import javafx.scene.transform.Scale;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.Pair;
@@ -43,11 +44,17 @@ public class ImageProtractor implements Initializable {
         }
     };
 
+    /**
+     * The current zoom value
+     */
     SimpleDoubleProperty zoomValue = new SimpleDoubleProperty(1.0);
+    Scale zoomScaling = new Scale();
     File imageFile = null;
     Image image = null;
     CropArea cropArea;
 
+    @FXML
+    ScrollPane imageScrollPane;
     @FXML
     ImageView imageView;
     @FXML
@@ -69,6 +76,12 @@ public class ImageProtractor implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        // bind zoom update with the related transform
+        zoomValue.addListener((observableValue, number, t1) -> {
+            zoomScaling.setX(zoomValue.get());
+            zoomScaling.setY(zoomValue.get());
+        });
+
         cropArea = new CropArea(imageView, cropKeyEventHandler);
         cropArea = CropArea.getInstance();
         cropArea.install(container, imageView);
@@ -134,10 +147,17 @@ public class ImageProtractor implements Initializable {
         });
 
         imageView.setPreserveRatio(true);
+        imageView.getTransforms().add(zoomScaling);
 
-//        imageView.fitWidthProperty().bind(container.widthProperty());
-//        imageView.fitHeightProperty().bind(container.heightProperty());
+        imageScrollPane.toBack();
 
+        imageScrollPane.minWidthProperty().bind(container.widthProperty());
+        imageScrollPane.maxWidthProperty().bind(container.widthProperty());
+
+        imageScrollPane.minHeightProperty().bind(container.heightProperty());
+        imageScrollPane.maxHeightProperty().bind(container.heightProperty());
+
+        // color menu initialization
         Arrays.asList(Color.BLACK, Color.SLATEBLUE, Color.ORANGERED, Color.MAGENTA, Color.PLUM, Color.OLIVEDRAB, Color.TAN, Color.PEACHPUFF)
                 .forEach(color -> {
                     MenuItem colorMenuItem = new MenuItem();
@@ -255,7 +275,6 @@ public class ImageProtractor implements Initializable {
 
                 image = new Image(new FileInputStream(imageFile));
 
-                imageView.getTransforms().clear();
                 imageView.setImage(image);
                 imageView.setViewport(new Rectangle2D(0, 0, image.getWidth(), image.getHeight()));
                 imageView.setFitWidth(image.getWidth());
@@ -284,9 +303,6 @@ public class ImageProtractor implements Initializable {
         System.out.println("zoom in");
 
         zoomValue.set(zoomValue.getValue() + 0.1);
-
-        imageView.getTransforms().clear();
-        imageView.getTransforms().add(Transform.scale(zoomValue.get(), zoomValue.get()));
     }
 
     @FXML
@@ -295,9 +311,6 @@ public class ImageProtractor implements Initializable {
 
         if (zoomValue.get() > 0.1) {
             zoomValue.set(zoomValue.getValue() - 0.1);
-
-            imageView.getTransforms().clear();
-            imageView.getTransforms().addAll(Transform.scale(zoomValue.get(), zoomValue.get()));
         }
     }
 

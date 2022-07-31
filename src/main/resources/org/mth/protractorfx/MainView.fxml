@@ -46,7 +46,7 @@
 
 <BorderPane prefHeight="398.0" prefWidth="942.0" style="-fx-background-color: transparent;"
             xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.mth.protractorfx.MainViewController">
+            fx:controller="org.mth.protractorfx.MainViewController">
     <top>
         <MenuBar BorderPane.alignment="CENTER">
             <Menu mnemonicParsing="false" text="File">

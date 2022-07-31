@@ -1,7 +1,6 @@
-package com.mth.protractorfx
+package org.mth.protractorfx
 
 import javafx.geometry.Point2D
-import javafx.scene.Cursor
 import javafx.scene.ImageCursor
 import javafx.scene.image.Image
 import javafx.scene.input.KeyCode

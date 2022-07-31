@@ -1,4 +1,4 @@
-package com.mth.protractorfx;
+package org.mth.protractorfx;
 
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;

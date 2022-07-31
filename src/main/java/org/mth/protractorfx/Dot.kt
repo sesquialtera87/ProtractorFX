@@ -1,4 +1,4 @@
-package com.mth.protractorfx
+package org.mth.protractorfx
 
 import javafx.animation.FillTransition
 import javafx.geometry.Point2D
@@ -11,7 +11,9 @@ import javafx.scene.shape.Circle
 import javafx.scene.text.Text
 import javafx.scene.transform.Transform
 import javafx.util.Duration
+import org.mth.protractorfx.log.LogFactory
 import java.lang.Math.toRadians
+import java.util.logging.Logger
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.sin
@@ -40,7 +42,6 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                 strokeWidth = 1.5
                 length = getMeasure()
                 startAngle = getInitialAngle()
-                toBack()
             }
 
             angleLabel.apply {
@@ -48,9 +49,18 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                 yProperty().bind(dot.centerYProperty())
                 text = "%.${ANGLE_LABEL_PRECISION}f".format(getMeasure())
                 isVisible = true
-                toBack()
             }
 
+            updateAngleLabelPosition()
+
+            // add the nodes to the Pane and move them to background
+            pane.children.addAll(arc, angleLabel)
+
+            arc.toBack()
+            angleLabel.toBack()
+        }
+
+        private fun updateAngleLabelPosition() {
             val alpha = -toRadians(getMeasure()) / 2
             val widthTranslation = Point2D(-angleLabel.layoutBounds.width / 2 + 4, angleLabel.layoutBounds.height / 2)
             var translationVector = neighbor1.getCenter().subtract(arc.centerX, arc.centerY).normalize()
@@ -60,29 +70,31 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                 translationVector.y * cos(alpha) + translationVector.x * sin(alpha)
             )
 
-            val initialAngle = getInitialAngle()
-
             angleLabel.apply {
+                transforms.clear()
                 transforms.addAll(
                     Transform.translate(widthTranslation.x, widthTranslation.y),
                     Transform.translate(translationVector.x, translationVector.y)
                 )
 //                rotate = if (initialAngle <= 180) 180 - initialAngle else 360 - initialAngle
             }
-
-            pane.children.addAll(arc, angleLabel)
         }
 
         fun update() {
+            // the updated angle measure
             val angleMeasure = getMeasure()
 
+            // update arc properties
             arc.apply {
                 length = angleMeasure
                 startAngle = getInitialAngle()
             }
 
-            angleLabel.apply {
-                text = "%.${ANGLE_LABEL_PRECISION}f".format(angleMeasure)
+            // update label position and text
+            if (angleLabel.isVisible) {
+                angleLabel.text = "%.${ANGLE_LABEL_PRECISION}f°".format(angleMeasure)
+
+                updateAngleLabelPosition()
             }
         }
 
@@ -113,7 +125,6 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
             val p1 = neighbor1.getCenter()
             val arcCenter = Point2D(arc.centerX, arc.centerY)
 
-            println("Initial angle = " + angleBetween(p1.subtract(arcCenter), Point2D(1.0, 0.0), degree = true))
             return angleBetween(p1.subtract(arcCenter), Point2D(1.0, 0.0), degree = true)
         }
     }
@@ -127,7 +138,7 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
         set(value) {
             field = value
             fill = if (value)
-                Color.GRAY
+                SELECTED_COLOR
             else
                 chainColor
         }
@@ -205,9 +216,11 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
 
     companion object {
         const val DOT_RADIUS = 6.0
+        val SELECTED_COLOR: Color = Color.GRAY
     }
 
     internal class DragSupport(dot: Dot) {
+
         private val anchorMap: MutableMap<Dot, Point2D> = mutableMapOf()
         private var anchorPoint = Point2D(.0, .0)
         private var dr = Point2D(.0, .0)
@@ -215,15 +228,21 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
 
         init {
             dot.setOnDragDetected {
+                log.fine("Drag detected")
+
                 dot.radius = 3.0
                 dot.toBack()
             }
+
             dot.setOnMouseReleased {
                 dot.radius = DOT_RADIUS
                 dot.toFront()
             }
+
             dot.setOnMousePressed { event ->
                 anchorMap.clear()
+                anchorMap[dot] = Point2D(dot.centerX, dot.centerY)
+
                 dot.chain.selection.forEach {
                     anchorMap[it] = Point2D(it.centerX, it.centerY)
                 }
@@ -231,13 +250,21 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                 anchorPoint = Point2D(event.screenX, event.screenY)
                 dragAnchorPoint = Point2D(dot.centerX, dot.centerY)
                 event.consume()
+
+                log.fine("Mouse pressed. \n\tAnchor point = $anchorPoint \n\tDrag anchor = $dragAnchorPoint")
             }
+
             dot.setOnMouseDragged {
-                val dragPoint = Point2D(it.screenX, it.screenY)
+                val currentDragPoint = Point2D(it.screenX, it.screenY)
+
+                // set of nodes for which update the angle measures
                 val updateList: HashSet<Dot> = HashSet()
 
                 anchorMap.forEach { (dot, oldCenter) ->
-                    dr = dragPoint.subtract(anchorPoint)
+                    // calculate the delta from the anchor point
+                    dr = currentDragPoint.subtract(anchorPoint)
+
+                    // get the new center coordinates of the node
                     val newCenter = oldCenter.add(dr)
 
                     dot.apply {
@@ -245,6 +272,7 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                         centerY = max(newCenter.y, DOT_RADIUS)
                     }
 
+                    // add the node and its neighbors to the update-set
                     updateList.add(dot)
                     updateList.addAll(dot.neighbors())
                 }
@@ -253,6 +281,10 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                     dot.updateNeighboringAngles()
                 }
             }
+        }
+
+        companion object {
+            private val log: Logger = LogFactory.configureLog(DragSupport::class.java)!!
         }
 
     }

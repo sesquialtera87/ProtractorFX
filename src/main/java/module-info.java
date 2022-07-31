@@ -8,7 +8,8 @@ module com.mth.protractorfx {
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.ikonli.fontawesome;
     requires kotlin.stdlib;
+    requires java.logging;
 
-    opens com.mth.protractorfx to javafx.fxml;
-    exports com.mth.protractorfx;
+    opens org.mth.protractorfx to javafx.fxml;
+    exports org.mth.protractorfx;
 }

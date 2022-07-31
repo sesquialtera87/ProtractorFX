@@ -1,4 +1,4 @@
-package com.mth.protractorfx;
+package org.mth.protractorfx;
 
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -15,7 +15,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 import java.io.IOException;

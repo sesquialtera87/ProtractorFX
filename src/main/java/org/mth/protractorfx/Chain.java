@@ -1,12 +1,10 @@
-package com.mth.protractorfx;
+package org.mth.protractorfx;
 
-import com.mth.protractorfx.MainViewController.AnchorNode;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 
 import java.util.Iterator;
@@ -14,30 +12,30 @@ import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-class Chain implements Iterable<AnchorNode> {
+class Chain implements Iterable<MainViewController.AnchorNode> {
 
     IntegerProperty sizeProperty = new SimpleIntegerProperty(0);
 
-    private final ObservableList<AnchorNode> nodes = FXCollections.observableArrayList();
+    private final ObservableList<MainViewController.AnchorNode> nodes = FXCollections.observableArrayList();
     private final Pane pane;
 
     public Chain(Pane pane) {
         this.pane = pane;
 
-        nodes.addListener((ListChangeListener<AnchorNode>) change -> sizeProperty.set(nodes.size()));
+        nodes.addListener((ListChangeListener<MainViewController.AnchorNode>) change -> sizeProperty.set(nodes.size()));
     }
 
-    public ObservableList<AnchorNode> getNodes() {
+    public ObservableList<MainViewController.AnchorNode> getNodes() {
         return nodes;
     }
 
-    public AnchorNode addNode(double x, double y) {
-        AnchorNode node = new AnchorNode(this, size(), pane);
+    public MainViewController.AnchorNode addNode(double x, double y) {
+        MainViewController.AnchorNode node = new MainViewController.AnchorNode(this, size(), pane);
         node.setCenterX(x);
         node.setCenterY(y);
 
         if (!nodes.isEmpty()) {
-            AnchorNode lastNode = nodes.get(nodes.size() - 1);
+            MainViewController.AnchorNode lastNode = nodes.get(nodes.size() - 1);
             lastNode.nextNodeConnector.endXProperty().bind(node.centerXProperty());
             lastNode.nextNodeConnector.endYProperty().bind(node.centerYProperty());
         }
@@ -50,15 +48,15 @@ class Chain implements Iterable<AnchorNode> {
         return node;
     }
 
-    public AnchorNode first() {
+    public MainViewController.AnchorNode first() {
         return nodes.get(0);
     }
 
-    public AnchorNode last() {
+    public MainViewController.AnchorNode last() {
         return nodes.get(size() - 1);
     }
 
-    public AnchorNode get(int index) {
+    public MainViewController.AnchorNode get(int index) {
         return nodes.get(index);
     }
 
@@ -66,10 +64,10 @@ class Chain implements Iterable<AnchorNode> {
         return nodes.size();
     }
 
-    public void remove(AnchorNode node) {
+    public void remove(MainViewController.AnchorNode node) {
         if (node.isInner()) {
-            AnchorNode previous = node.getPrevious();
-            AnchorNode next = node.getNext();
+            MainViewController.AnchorNode previous = node.getPrevious();
+            MainViewController.AnchorNode next = node.getNext();
             previous.nextNodeConnector.endXProperty().bind(next.centerXProperty());
             previous.nextNodeConnector.endYProperty().bind(next.centerYProperty());
 
@@ -95,17 +93,17 @@ class Chain implements Iterable<AnchorNode> {
     }
 
     @Override
-    public Iterator<AnchorNode> iterator() {
+    public Iterator<MainViewController.AnchorNode> iterator() {
         return nodes.iterator();
     }
 
     @Override
-    public void forEach(Consumer<? super AnchorNode> action) {
+    public void forEach(Consumer<? super MainViewController.AnchorNode> action) {
         nodes.forEach(action);
     }
 
     @Override
-    public Spliterator<AnchorNode> spliterator() {
+    public Spliterator<MainViewController.AnchorNode> spliterator() {
         return nodes.spliterator();
     }
 }
