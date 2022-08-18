@@ -1,5 +1,9 @@
 package org.mth.protractorfx
 
+import javafx.beans.property.DoubleProperty
+import javafx.beans.property.IntegerProperty
+import javafx.beans.property.Property
+import javafx.beans.value.ObservableValue
 import javafx.geometry.Point2D
 import javafx.scene.Group
 import javafx.scene.ImageCursor
@@ -11,6 +15,7 @@ import javafx.scene.paint.Color
 import javafx.stage.Stage
 import java.io.File
 import kotlin.math.atan2
+import kotlin.reflect.KProperty
 
 @JvmField
 var scene = Scene(Group())
@@ -50,11 +55,6 @@ var angleMeasureEnabled = false
 @JvmField
 var ANGLE_LABEL_PRECISION = 1
 
-@JvmField
-var ANGLE_LABEL_FONT_SIZE = 12.0
-
-@JvmField
-var ANGLE_LABEL_TEXT_COLOR: Color = Color.BLACK
 
 fun angleBetween(p1: Point2D, p2: Point2D, degree: Boolean = false): Double {
     val dot = p1.x * p2.x + p1.y * p2.y
@@ -72,3 +72,15 @@ fun angleBetween(p1: Point2D, p2: Point2D, degree: Boolean = false): Double {
 
     return angle
 }
+
+operator fun <T> ObservableValue<T>.getValue(thisRef: Any, property: KProperty<*>): T = value
+
+operator fun <T> Property<T>.setValue(thisRef: Any, property: KProperty<*>, value: T?) = setValue(value)
+
+operator fun IntegerProperty.getValue(thisRef: Any, property: KProperty<*>): Int = value
+
+operator fun IntegerProperty.setValue(thisRef: Any, property: KProperty<*>, value: Int) = setValue(value)
+
+operator fun DoubleProperty.getValue(thisRef: Any, property: KProperty<*>): Double = value
+
+operator fun DoubleProperty.setValue(thisRef: Any, property: KProperty<*>, value: Double) = setValue(value)

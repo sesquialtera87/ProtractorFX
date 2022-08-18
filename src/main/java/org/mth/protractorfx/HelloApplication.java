@@ -18,7 +18,7 @@ public class HelloApplication extends Application {
         Scene scene = new Scene(fxmlLoader.load(), 950, 600);
 
         scene.setFill(Color.rgb(255, 255, 255, 0.1));
-        scene.getStylesheets().add("/org/mth/protractorfx/style.css");
+        scene.getStylesheets().add(HelloApplication.class.getResource("style.css").toExternalForm());
 
         stage.setTitle("Hello!");
         stage.setScene(scene);

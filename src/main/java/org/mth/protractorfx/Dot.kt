@@ -1,9 +1,7 @@
 package org.mth.protractorfx
 
 import javafx.animation.FillTransition
-import javafx.event.EventHandler
 import javafx.geometry.Point2D
-import javafx.scene.control.*
 import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Pane
@@ -17,69 +15,12 @@ import javafx.scene.transform.Transform
 import javafx.util.Duration
 import org.mth.protractorfx.log.LogFactory
 import java.lang.Math.toRadians
-import java.util.*
 import java.util.logging.Logger
-import kotlin.collections.HashSet
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.sin
 
 class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
-
-    /**
-     * The popup menu shown on each measure label
-     */
-    object TextPopup : ContextMenu() {
-
-        /**
-         * The graph node the label is associated to. This has to be set before the popup is shown.
-         */
-        var dot: Dot? = null
-
-        init {
-            val fontSizeMenu = Menu("Font size")
-            val toggleGroup = ToggleGroup()
-
-            listOf(8, 10, 12, 14, 16).forEach { size ->
-                RadioMenuItem().apply {
-                    text = "$size"
-                    onAction = EventHandler { changeFontSize(size.toDouble()) }
-                    isSelected = size == ANGLE_LABEL_FONT_SIZE.toInt()
-                }.run {
-                    fontSizeMenu.items.add(this)
-                    toggleGroup.toggles.add(this)
-                }
-            }
-
-            items.addAll(fontSizeMenu)
-        }
-
-        private fun changeFontSize(fontSize: Double) {
-            if (dot == null) {
-                log.warning("Associated dot cannot be null")
-            }
-
-            val remaining = LinkedList<Dot>()
-            val visitedNodes = HashSet<Dot>()
-
-            remaining.add(dot!!)
-
-            while (remaining.isNotEmpty()) {
-                val pop = remaining.pop()
-                pop.angleArcs.forEach { angleDescriptor ->
-                    angleDescriptor.angleLabel.font = Font.font(angleDescriptor.angleLabel.font.name, fontSize)
-                }
-
-                // mark the node as visited
-                visitedNodes.add(pop)
-
-                // add to the queue the nodes not already visited
-                pop.neighbors()
-                    .filter { !visitedNodes.contains(it) }
-                    .forEach { remaining.add(it) }
-            }
-        }
-    }
 
     /**
      * @param neighbor1 The first vertex of the oriented angle
@@ -113,16 +54,38 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                 yProperty().bind(dot.centerYProperty())
                 text = "%.${ANGLE_LABEL_PRECISION}f".format(getMeasure())
                 isVisible = true
-                fill = ANGLE_LABEL_TEXT_COLOR
-                font = Font.font(font.name, ANGLE_LABEL_FONT_SIZE)
+                fill = dot.chain.measureLabelFontColor
+                font = Font.font(font.name, dot.chain.measureLabelFontSize)
             }
 
             angleLabel.setOnMouseClicked {
                 if (it.button == MouseButton.SECONDARY) {
                     // show the label context-menu
-                    TextPopup.dot = dot
-                    TextPopup.show(angleLabel, it.screenX, it.screenY)
+                    MeasureLabelPopup.show(angleLabel, dot, it.screenX, it.screenY)
                 }
+            }
+
+            // listen to changes of the font color
+            dot.chain.measureLabelFontColorProperty.addListener { _, _, color ->
+                angleLabel.fill = color
+            }
+
+            // listen to changes of the font size
+            dot.chain.measureLabelFontSizeProperty.addListener { _, _, size ->
+                angleLabel.font = Font.font(
+                    angleLabel.font.name,
+                    dot.chain.measureLabelFontWeight,
+                    size.toDouble()
+                )
+            }
+
+            // listen to changes of the font weight
+            dot.chain.measureLabelFontWeightProperty.addListener { _, _, weight ->
+                angleLabel.font = Font.font(
+                    angleLabel.font.name,
+                    weight,
+                    dot.chain.measureLabelFontSize
+                )
             }
 
             updateAngleLabelPosition()
@@ -217,7 +180,7 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                 chainColor
         }
 
-    private val angleArcs = mutableListOf<AngleDescriptor>()
+    val angleArcs = mutableListOf<AngleDescriptor>()
 
 
     init {
@@ -293,9 +256,10 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
     }
 
     companion object {
-        val log = LogFactory.configureLog(Dot::class.java)
+        val log: Logger = LogFactory.configureLog(Dot::class.java)
 
         const val DOT_RADIUS = 6.0
+        const val DOT_RADIUS_SMALL = 2.5
         val SELECTED_COLOR: Color = Color.GRAY
     }
 
@@ -304,13 +268,13 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
         private val anchorMap: MutableMap<Dot, Point2D> = mutableMapOf()
         private var anchorPoint = Point2D(.0, .0)
         private var dr = Point2D(.0, .0)
-        private var dragAnchorPoint = Point2D(0.0, 0.0)
+        private var anchorPointForDrag = Point2D(.0, .0)
 
         init {
             dot.setOnDragDetected {
                 log.fine("Drag detected")
 
-                dot.radius = 3.0
+                dot.radius = DOT_RADIUS_SMALL
                 dot.toBack()
             }
 
@@ -328,10 +292,10 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                 }
 
                 anchorPoint = Point2D(event.screenX, event.screenY)
-                dragAnchorPoint = Point2D(dot.centerX, dot.centerY)
+                anchorPointForDrag = Point2D(dot.centerX, dot.centerY)
                 event.consume()
 
-                log.fine("Mouse pressed. \n\tAnchor point = $anchorPoint \n\tDrag anchor = $dragAnchorPoint")
+                log.fine("Mouse pressed. \n\tAnchor point = $anchorPoint \n\tDrag anchor = $anchorPointForDrag")
             }
 
             dot.setOnMouseDragged {

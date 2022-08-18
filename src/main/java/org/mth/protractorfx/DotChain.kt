@@ -1,10 +1,15 @@
 package org.mth.protractorfx
 
+import animatefx.animation.FadeIn
+import animatefx.animation.FadeOut
+import animatefx.util.ParallelAnimationFX
+import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Point2D
 import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import javafx.scene.shape.Line
+import javafx.scene.text.FontWeight
 import java.util.*
 
 class DotChain(private val container: Pane) : Iterable<Dot> {
@@ -27,6 +32,12 @@ class DotChain(private val container: Pane) : Iterable<Dot> {
             // add the line to the parent Pane
             parent.children.add(this)
             isVisible = true
+
+            FadeIn(this).apply {
+                setSpeed(2.0)
+                play()
+            }
+
             toBack()
         }
 
@@ -38,10 +49,30 @@ class DotChain(private val container: Pane) : Iterable<Dot> {
                     || (dot1 == this.dot2 && dot2 == this.dot1)
     }
 
+    /**
+     * Contains the nodes of this chain that are actually selected
+     */
     val selection: HashSet<Dot> = HashSet()
+
     private val adjacencyList: MutableMap<Dot, HashSet<Dot>> = mutableMapOf()
     private val connections: HashSet<ConnectorLine> = HashSet()
+
+    /**
+     * The color of the nodes of this chain
+     */
     val chainColor = SimpleObjectProperty(Color.BLACK)
+
+    val measureLabelFontColorProperty = SimpleObjectProperty(Color.BLACK)
+    val measureLabelFontSizeProperty = SimpleDoubleProperty(12.0)
+    val measureLabelFontWeightProperty = SimpleObjectProperty(FontWeight.NORMAL)
+
+    var measureLabelFontColor: Color by measureLabelFontColorProperty
+    var measureLabelFontSize: Double by measureLabelFontSizeProperty
+    var measureLabelFontWeight: FontWeight by measureLabelFontWeightProperty
+
+    /**
+     * Get the total number of nodes in this chain
+     */
     val size: Int get() = adjacencyList.size
 
     init {
@@ -85,6 +116,10 @@ class DotChain(private val container: Pane) : Iterable<Dot> {
             container.children.add(dot)
             dot.isVisible = true
             dot.toFront()
+            FadeIn(dot).apply {
+                setSpeed(2.5)
+                play()
+            }
             true
         }
     }
@@ -102,12 +137,22 @@ class DotChain(private val container: Pane) : Iterable<Dot> {
     fun removeDot(dot: Dot) {
         if (dot.isLeaf()) {
             val parent = adjacencyList[dot]!!.first()
-            adjacencyList[parent]?.remove(dot)
+            adjacencyList[parent]!!.remove(dot)
             adjacencyList.remove(dot)
 
             // get the connection and removes it from Pane
             val dotConnection = connections.first { it.match(dot, parent) }
-            container.children.removeAll(dot, dotConnection)
+
+            ParallelAnimationFX(
+                FadeOut(dotConnection).apply {
+                    setSpeed(2.0)
+                },
+                FadeOut(dot).apply {
+                    setSpeed(2.0)
+                    setOnFinished { container.children.removeAll(dot, dotConnection) }
+                }
+            ).play()
+
 
             // Move focus on the Pane, to handle correctly the key-released event (X)
             container.requestFocus()
@@ -150,14 +195,5 @@ class DotChain(private val container: Pane) : Iterable<Dot> {
         return nearestDot
     }
 
-    override fun iterator() = object : Iterator<Dot> {
-        override fun hasNext(): Boolean {
-            TODO("Not yet implemented")
-        }
-
-        override fun next(): Dot {
-            TODO("Not yet implemented")
-        }
-
-    }
+    override fun iterator() = adjacencyList.keys.iterator()
 }

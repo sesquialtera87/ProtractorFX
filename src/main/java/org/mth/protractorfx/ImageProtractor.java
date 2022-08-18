@@ -8,8 +8,6 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
-import javafx.scene.Group;
-import javafx.scene.control.*;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -279,15 +277,21 @@ public class ImageProtractor implements Initializable {
         try {
             String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
             Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            File output = new File(UtilsKt.SNAPSHOT_DIR, "screenshot_" + timestamp + ".jpg");
+
+            // exclude from the area the top menu bar
             java.awt.Rectangle screenshotArea = new java.awt.Rectangle(
                     0,
                     (int) menuBar.getHeight(),
                     (int) screenSize.getWidth(),
                     (int) (screenSize.height - menuBar.getHeight())
             );
+
             Robot robot = new Robot();
             BufferedImage screenCapture = robot.createScreenCapture(screenshotArea);
-            ImageIO.write(screenCapture, "jpg", new File(UtilsKt.SNAPSHOT_DIR, "screenshot_" + timestamp + ".jpg"));
+            ImageIO.write(screenCapture, "jpg", output);
+
+            log.info("Screenshot taken and saved to " + output.getAbsolutePath());
         } catch (IOException e) {
             log.severe(e.getMessage());
         }

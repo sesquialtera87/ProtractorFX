@@ -53,5 +53,6 @@
     <orderEntry type="library" name="Maven: org.jetbrains:annotations:13.0" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.7.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.jetbrains.kotlin:kotlin-test:1.7.0" level="project" />
+    <orderEntry type="library" name="io.github.typhon0.AnimateFX" level="project" />
   </component>
 </module>

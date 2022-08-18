@@ -3,6 +3,7 @@ module com.mth.protractorfx {
     requires javafx.fxml;
     requires javafx.swing;
     requires jfxtras.labs;
+    requires AnimateFX;
 
     requires org.controlsfx.controls;
     requires org.kordamp.ikonli.javafx;
