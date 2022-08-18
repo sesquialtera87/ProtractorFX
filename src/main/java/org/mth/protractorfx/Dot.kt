@@ -31,7 +31,7 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
         /**
          * The label displaying the angle measure
          */
-        val angleLabel = Text()
+        private val angleLabel = Text()
         private val arc: Arc = Arc()
 
         fun build(dot: Dot, pane: Pane) {
@@ -207,11 +207,7 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                     chain.selection.add(this)
                     it.consume()
                 } else {
-                    chain.selection.forEach { dot ->
-                        if (dot != this)
-                            dot.selected = false
-                    }
-                    chain.selection.clear()
+                    chain.clearSelection()
                     chain.selection.add(this)
                     it.consume()
                 }

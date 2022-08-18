@@ -54,6 +54,8 @@ public class ImageProtractor implements Initializable {
         }
     };
 
+    short backgroundOpacity = 10;
+
     /**
      * The current zoom value
      */
@@ -134,29 +136,25 @@ public class ImageProtractor implements Initializable {
                 UtilsKt.dotDeletionEnabled = false;
             }
         });
-        container.setOnMouseMoved(evt -> {
-//            Dot nearestDot = chain.getNearestDot(new Point2D(evt.getX(), evt.getY()), true);
-//            nearestDot.highLight();
-//
-//            if (chain.neighborsCount(nearestDot) < 2)
-//                return;
-//
-//            List<Double> angles = new ArrayList<>(10);
-//
-//            for (Dot neighbor : chain.neighbors(nearestDot)) {
-//                double dx1 = neighbor.getCenterX() - nearestDot.getCenterX();
-//                double dy1 = neighbor.getCenterY() - nearestDot.getCenterY();
-//                double dx2 = evt.getX() - nearestDot.getCenterX();
-//                double dy2 = evt.getY() - nearestDot.getCenterY();
-//
-//                double dot = dx1 * dx2 + dy1 * dy2;
-//                double det = dx1 * dy2 - dx2 * dy1;
-//                double angle = toDegrees(atan2(det, dot));
-//
-//                System.out.print(angle + " ");
-//                angles.add(angle);
-//            }
-//            System.out.println();
+        container.addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
+            switch (evt.getCode()) {
+                case LEFT:
+                    moveSelectedDots(-2, Adjustable.HORIZONTAL);
+                    evt.consume();
+                    break;
+                case RIGHT:
+                    moveSelectedDots(2, Adjustable.HORIZONTAL);
+                    evt.consume();
+                    break;
+                case UP:
+                    moveSelectedDots(-2, Adjustable.VERTICAL);
+                    evt.consume();
+                    break;
+                case DOWN:
+                    moveSelectedDots(2, Adjustable.VERTICAL);
+                    evt.consume();
+                    break;
+            }
         });
 
         imageView.setPreserveRatio(true);
@@ -180,6 +178,31 @@ public class ImageProtractor implements Initializable {
                 });
 
         chain = new DotChain(container);
+    }
+
+    private void moveSelectedDots(double dr, int direction) {
+        HashSet<Dot> updateSet = new HashSet<>();
+
+        if (direction == Adjustable.VERTICAL) {
+            chain.getSelection().forEach(dot -> {
+                dot.setCenterY(dot.getCenterY() + dr);
+                updateSet.add(dot);
+                updateSet.addAll(dot.neighbors());
+            });
+
+            log.fine(String.format("Moving selected dots [Direction=%s, dr=%.2f]", direction, dr));
+        } else if (direction == Adjustable.HORIZONTAL) {
+            chain.getSelection().forEach(dot -> {
+                dot.setCenterX(dot.getCenterX() + dr);
+                updateSet.add(dot);
+                updateSet.addAll(dot.neighbors());
+            });
+
+            log.fine(String.format("Moving selected dots [Direction=%s, dr=%.2f]", direction, dr));
+        } else
+            log.warning("Something strange happened");
+
+        updateSet.forEach(Dot::updateNeighboringAngles);
     }
 
     private void deleteSelectedDots() {
@@ -270,6 +293,28 @@ public class ImageProtractor implements Initializable {
 
 //        cropArea.setVisible(false);
         cropArea.show(false);
+    }
+
+    @FXML
+    void increaseOpacity() {
+        if (backgroundOpacity <= 90) {
+            backgroundOpacity += 10;
+            UtilsKt.scene.setFill(Color.rgb(255, 255, 255, backgroundOpacity / 100.0));
+
+            log.fine("Opacity increased: " + backgroundOpacity);
+        } else
+            log.fine("Cannot increase opacity, because it has reached its maximum value");
+    }
+
+    @FXML
+    void reduceOpacity() {
+        if (backgroundOpacity >= 20) {
+            backgroundOpacity -= 10;
+            UtilsKt.scene.setFill(Color.rgb(255, 255, 255, backgroundOpacity / 100.0));
+
+            log.fine("Opacity reduced: " + backgroundOpacity);
+        } else
+            log.fine("Cannot reduce opacity, because it has reached its minimum value");
     }
 
     @FXML
@@ -386,7 +431,6 @@ public class ImageProtractor implements Initializable {
     }
 
     private double clamp(double value, double min, double max) {
-
         if (value < min)
             return min;
         if (value > max)
