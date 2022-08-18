@@ -14,21 +14,22 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.layout.HBox?>
 <BorderPane prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: transparent;"
             xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.mth.protractorfx.ImageProtractor">
 
     <center>
-        <Group fx:id="mainGroup">
-            <ScrollPane fx:id="imageScrollPane" style="-fx-background-color: transparent;" visible="false">
-                <Group>
-                    <ImageView fx:id="imageView"/>
-                </Group>
-            </ScrollPane>
-            <Pane fx:id="container" prefHeight="800" prefWidth="800" style="-fx-background-color: red;">
-            </Pane>
-        </Group>
+
+        <Pane fx:id="container" prefHeight="800" prefWidth="800">
+        </Pane>
     </center>
+
+    <bottom>
+        <ScrollPane fx:id="imageScrollPane">
+            <ImageView fx:id="imageView"/>
+        </ScrollPane>
+    </bottom>
 
     <right>
         <VBox visible="false">
@@ -67,16 +68,29 @@
                 </MenuBar>
             </center>
             <right>
-                <Button mnemonicParsing="false" onAction="#closeApp"
-                        style="-fx-border-radius: 0; -fx-background-color: white;" BorderPane.alignment="CENTER">
-                    <graphic>
-                        <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
-                            <image>
-                                <Image url="@close_x64.png"/>
-                            </image>
-                        </ImageView>
-                    </graphic>
-                </Button>
+                <HBox>
+                    <Button mnemonicParsing="false" onAction="#minimizeApp"
+                            style="-fx-border-radius: 0; -fx-background-color: white;" BorderPane.alignment="CENTER">
+                        <graphic>
+                            <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                                <image>
+                                    <Image url="@minimize_x48.png"/>
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+
+                    <Button mnemonicParsing="false" onAction="#closeApp"
+                            style="-fx-border-radius: 0; -fx-background-color: white;" BorderPane.alignment="CENTER">
+                        <graphic>
+                            <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                                <image>
+                                    <Image url="@close_x48.png"/>
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                </HBox>
             </right>
         </BorderPane>
     </top>

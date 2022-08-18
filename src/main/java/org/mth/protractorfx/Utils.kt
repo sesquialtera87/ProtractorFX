@@ -1,13 +1,22 @@
 package org.mth.protractorfx
 
 import javafx.geometry.Point2D
+import javafx.scene.Group
 import javafx.scene.ImageCursor
+import javafx.scene.Scene
 import javafx.scene.image.Image
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyCodeCombination
+import javafx.scene.paint.Color
+import javafx.stage.Stage
 import java.io.File
 import kotlin.math.atan2
 
+@JvmField
+var scene = Scene(Group())
+
+@JvmField
+var stage = Stage()
 
 @JvmField
 val SHORTCUT_DELETE = KeyCodeCombination(KeyCode.DELETE)
@@ -41,6 +50,11 @@ var angleMeasureEnabled = false
 @JvmField
 var ANGLE_LABEL_PRECISION = 1
 
+@JvmField
+var ANGLE_LABEL_FONT_SIZE = 12.0
+
+@JvmField
+var ANGLE_LABEL_TEXT_COLOR: Color = Color.BLACK
 
 fun angleBetween(p1: Point2D, p2: Point2D, degree: Boolean = false): Double {
     val dot = p1.x * p2.x + p1.y * p2.y

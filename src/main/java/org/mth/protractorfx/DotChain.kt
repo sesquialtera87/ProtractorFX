@@ -7,12 +7,12 @@ import javafx.scene.paint.Color
 import javafx.scene.shape.Line
 import java.util.*
 
-class DotChain(private val container: Pane) {
+class DotChain(private val container: Pane) : Iterable<Dot> {
 
     /**
      * A connection line between two graph nodes
      */
-    data class Connection(val dot1: Dot, val dot2: Dot) : Line() {
+    data class ConnectorLine(val dot1: Dot, val dot2: Dot) : Line() {
 
         // The Pane container this Line belongs to
         private val parent get() = dot1.parent as Pane
@@ -40,7 +40,7 @@ class DotChain(private val container: Pane) {
 
     val selection: HashSet<Dot> = HashSet()
     private val adjacencyList: MutableMap<Dot, HashSet<Dot>> = mutableMapOf()
-    private val connections: HashSet<Connection> = HashSet()
+    private val connections: HashSet<ConnectorLine> = HashSet()
     val chainColor = SimpleObjectProperty(Color.BLACK)
     val size: Int get() = adjacencyList.size
 
@@ -118,7 +118,7 @@ class DotChain(private val container: Pane) {
         adjacencyList[dot1]?.add(dot2)
         adjacencyList[dot2]?.add(dot1)
 
-        connections.add(Connection(dot1, dot2))
+        connections.add(ConnectorLine(dot1, dot2))
     }
 
     fun getSelectedDot(): Optional<Dot> {
@@ -148,5 +148,16 @@ class DotChain(private val container: Pane) {
         }
 
         return nearestDot
+    }
+
+    override fun iterator() = object : Iterator<Dot> {
+        override fun hasNext(): Boolean {
+            TODO("Not yet implemented")
+        }
+
+        override fun next(): Dot {
+            TODO("Not yet implemented")
+        }
+
     }
 }

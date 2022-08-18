@@ -1,19 +1,25 @@
 package org.mth.protractorfx
 
 import javafx.animation.FillTransition
+import javafx.event.EventHandler
 import javafx.geometry.Point2D
+import javafx.scene.control.*
+import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import javafx.scene.shape.Arc
 import javafx.scene.shape.ArcType
 import javafx.scene.shape.Circle
+import javafx.scene.text.Font
 import javafx.scene.text.Text
 import javafx.scene.transform.Transform
 import javafx.util.Duration
 import org.mth.protractorfx.log.LogFactory
 import java.lang.Math.toRadians
+import java.util.*
 import java.util.logging.Logger
+import kotlin.collections.HashSet
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.sin
@@ -21,12 +27,70 @@ import kotlin.math.sin
 class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
 
     /**
+     * The popup menu shown on each measure label
+     */
+    object TextPopup : ContextMenu() {
+
+        /**
+         * The graph node the label is associated to. This has to be set before the popup is shown.
+         */
+        var dot: Dot? = null
+
+        init {
+            val fontSizeMenu = Menu("Font size")
+            val toggleGroup = ToggleGroup()
+
+            listOf(8, 10, 12, 14, 16).forEach { size ->
+                RadioMenuItem().apply {
+                    text = "$size"
+                    onAction = EventHandler { changeFontSize(size.toDouble()) }
+                    isSelected = size == ANGLE_LABEL_FONT_SIZE.toInt()
+                }.run {
+                    fontSizeMenu.items.add(this)
+                    toggleGroup.toggles.add(this)
+                }
+            }
+
+            items.addAll(fontSizeMenu)
+        }
+
+        private fun changeFontSize(fontSize: Double) {
+            if (dot == null) {
+                log.warning("Associated dot cannot be null")
+            }
+
+            val remaining = LinkedList<Dot>()
+            val visitedNodes = HashSet<Dot>()
+
+            remaining.add(dot!!)
+
+            while (remaining.isNotEmpty()) {
+                val pop = remaining.pop()
+                pop.angleArcs.forEach { angleDescriptor ->
+                    angleDescriptor.angleLabel.font = Font.font(angleDescriptor.angleLabel.font.name, fontSize)
+                }
+
+                // mark the node as visited
+                visitedNodes.add(pop)
+
+                // add to the queue the nodes not already visited
+                pop.neighbors()
+                    .filter { !visitedNodes.contains(it) }
+                    .forEach { remaining.add(it) }
+            }
+        }
+    }
+
+    /**
      * @param neighbor1 The first vertex of the oriented angle
      * @param neighbor2 The second vertex of the oriented angle
      */
     data class AngleDescriptor(val neighbor1: Dot, val neighbor2: Dot) {
 
-        private val angleLabel = Text()
+        /**
+         * The label displaying the angle measure
+         */
+        val angleLabel = Text()
         private val arc: Arc = Arc()
 
         fun build(dot: Dot, pane: Pane) {
@@ -49,6 +113,16 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                 yProperty().bind(dot.centerYProperty())
                 text = "%.${ANGLE_LABEL_PRECISION}f".format(getMeasure())
                 isVisible = true
+                fill = ANGLE_LABEL_TEXT_COLOR
+                font = Font.font(font.name, ANGLE_LABEL_FONT_SIZE)
+            }
+
+            angleLabel.setOnMouseClicked {
+                if (it.button == MouseButton.SECONDARY) {
+                    // show the label context-menu
+                    TextPopup.dot = dot
+                    TextPopup.show(angleLabel, it.screenX, it.screenY)
+                }
             }
 
             updateAngleLabelPosition()
@@ -113,7 +187,7 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
             return result
         }
 
-        fun getMeasure(): Double {
+        private fun getMeasure(): Double {
             val p1 = neighbor1.getCenter()
             val p2 = neighbor2.getCenter()
             val arcCenter = Point2D(arc.centerX, arc.centerY)
@@ -121,7 +195,7 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
             return angleBetween(p2.subtract(arcCenter), p1.subtract(arcCenter), degree = true)
         }
 
-        fun getInitialAngle(): Double {
+        private fun getInitialAngle(): Double {
             val p1 = neighbor1.getCenter()
             val arcCenter = Point2D(arc.centerX, arc.centerY)
 
@@ -158,22 +232,26 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
         DragSupport(this)
 
         addEventHandler(MouseEvent.MOUSE_CLICKED) {
-            selected = true
-            requestFocus()
+            if (it.button == MouseButton.PRIMARY) {
+                log.fine("Click on dot with left mouse button")
 
-            if (dotDeletionEnabled) {
-                delete()
-            } else if (it.isShiftDown) {
-                chain.selection.add(this)
-                it.consume()
-            } else {
-                chain.selection.forEach { dot ->
-                    if (dot != this)
-                        dot.selected = false
+                selected = true
+                requestFocus()
+
+                if (dotDeletionEnabled) {
+                    delete()
+                } else if (it.isShiftDown) {
+                    chain.selection.add(this)
+                    it.consume()
+                } else {
+                    chain.selection.forEach { dot ->
+                        if (dot != this)
+                            dot.selected = false
+                    }
+                    chain.selection.clear()
+                    chain.selection.add(this)
+                    it.consume()
                 }
-                chain.selection.clear()
-                chain.selection.add(this)
-                it.consume()
             }
         }
     }
@@ -181,7 +259,7 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
     fun getCenter() = Point2D(centerX, centerY)
 
     fun delete() {
-        println("Deletion")
+        log.info("Deleting dot")
         chain.removeDot(this)
         chain.clearSelection()
     }
@@ -215,6 +293,8 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
     }
 
     companion object {
+        val log = LogFactory.configureLog(Dot::class.java)
+
         const val DOT_RADIUS = 6.0
         val SELECTED_COLOR: Color = Color.GRAY
     }

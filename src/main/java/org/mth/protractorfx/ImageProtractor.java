@@ -1,5 +1,6 @@
 package org.mth.protractorfx;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -7,10 +8,8 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.scene.Group;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
@@ -23,6 +22,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.StageStyle;
 import javafx.util.Pair;
 
 import javax.imageio.ImageIO;
@@ -69,6 +69,8 @@ public class ImageProtractor implements Initializable {
     TextField heightField;
     @FXML
     Menu chainColorMenu;
+    @FXML
+    MenuBar menuBar;
 
     DotChain chain;
     boolean dotInsertionEnabled = false;
@@ -76,6 +78,7 @@ public class ImageProtractor implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
         // bind zoom update with the related transform
         zoomValue.addListener((observableValue, number, t1) -> {
             zoomScaling.setX(zoomValue.get());
@@ -257,6 +260,23 @@ public class ImageProtractor implements Initializable {
 
 //        cropArea.setVisible(false);
         cropArea.show(false);
+    }
+
+    @FXML
+    void closeApp() {
+        Platform.exit();
+    }
+
+    @FXML
+    void minimizeApp() {
+        UtilsKt.stage.setIconified(true);
+    }
+
+    @FXML
+    void fullScreenMode() {
+        UtilsKt.scene.setFill(Color.rgb(255, 255, 255, 0.1));
+        UtilsKt.stage.setMaximized(true);
+        UtilsKt.stage.initStyle(StageStyle.TRANSPARENT);
     }
 
     @FXML
