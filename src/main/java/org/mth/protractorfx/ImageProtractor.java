@@ -10,6 +10,11 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.control.*;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
@@ -24,19 +29,26 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.StageStyle;
 import javafx.util.Pair;
+import org.mth.protractorfx.log.LogFactory;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.logging.Logger;
 
 import static java.lang.Double.parseDouble;
 
 public class ImageProtractor implements Initializable {
 
+    private static final Logger log = LogFactory.configureLog(ImageProtractor.class);
 
     private final EventHandler<KeyEvent> cropKeyEventHandler = evt -> {
         if (evt.getCode() == KeyCode.ENTER) {
@@ -260,6 +272,25 @@ public class ImageProtractor implements Initializable {
 
 //        cropArea.setVisible(false);
         cropArea.show(false);
+    }
+
+    @FXML
+    void takeScreenshot() throws AWTException {
+        try {
+            String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            java.awt.Rectangle screenshotArea = new java.awt.Rectangle(
+                    0,
+                    (int) menuBar.getHeight(),
+                    (int) screenSize.getWidth(),
+                    (int) (screenSize.height - menuBar.getHeight())
+            );
+            Robot robot = new Robot();
+            BufferedImage screenCapture = robot.createScreenCapture(screenshotArea);
+            ImageIO.write(screenCapture, "jpg", new File(UtilsKt.SNAPSHOT_DIR, "screenshot_" + timestamp + ".jpg"));
+        } catch (IOException e) {
+            log.severe(e.getMessage());
+        }
     }
 
     @FXML

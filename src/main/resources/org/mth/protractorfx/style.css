@@ -1,7 +1,21 @@
-.text {
-    -fx-background-color: red;
+.menu-bar {
+    -fx-background-color: burlywood;
 }
 
-.menu-bar {
-    -fx-background-color: red;
+.menu:hover {
+    -fx-background-color: derive(burlywood, 10%);
+}
+
+.window-button {
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+    -fx-background-color: white;
+}
+
+.window-button:hover {
+    -fx-background-color: lightgrey;
+}
+
+.window-button:pressed {
+    -fx-background-color: lightgrey;
 }
