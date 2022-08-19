@@ -223,8 +223,8 @@ public class ImageProtractor implements Initializable {
         for (Dot neighbor : neighbors) {
             // calculate the angle (measured anticlockwise) from the neighbor node to the mouse point
             Point2D p1 = new Point2D(neighbor.getCenterX(), neighbor.getCenterY());
-            p1 = p1.subtract(nearestDot.getCenterX(), nearestDot.getCenterY());
-            Point2D p2 = mouseLocation.subtract(nearestDot.getCenterX(), nearestDot.getCenterY());
+            p1 = p1.subtract(UtilsKt.getCenter(nearestDot));
+            Point2D p2 = mouseLocation.subtract(UtilsKt.getCenter(nearestDot));
 
             double angle = UtilsKt.angleBetween(p1, p2, true);
             anglesFromMouse.add(new Pair<>(neighbor, angle));

@@ -1,10 +1,8 @@
 package org.mth.protractorfx
 
 import javafx.event.EventHandler
-import javafx.scene.control.ContextMenu
-import javafx.scene.control.Menu
-import javafx.scene.control.RadioMenuItem
-import javafx.scene.control.ToggleGroup
+import javafx.scene.Node
+import javafx.scene.control.*
 import javafx.scene.paint.Color
 import javafx.scene.shape.Rectangle
 import javafx.scene.text.FontWeight
@@ -25,9 +23,11 @@ object MeasureLabelPopup : ContextMenu() {
      */
     private var dot: Dot? = null
 
-    private val colorMenu = Menu("Color")
+    private val colorMenu = Menu("Font color")
     private val fontSizeMenu = Menu("Font size")
     private val fontStyleMenu = Menu("Font style")
+
+    private val backgroundVisibilityMenuItem = CheckMenuItem("visible")
 
     init {
         val toggleGroup = ToggleGroup()
@@ -80,17 +80,26 @@ object MeasureLabelPopup : ContextMenu() {
         styleToggleGroup.toggles.add(menuItem)
 
 
-        items.addAll(fontSizeMenu, fontStyleMenu, colorMenu)
+        val backgroundMenu = Menu("Background").apply {
+            backgroundVisibilityMenuItem.onAction =
+                EventHandler { showLabelBackground(backgroundVisibilityMenuItem.isSelected) }
+            items.add(backgroundVisibilityMenuItem)
+        }
+
+        items.addAll(fontSizeMenu, fontStyleMenu, colorMenu, backgroundMenu)
+    }
+
+    private fun showLabelBackground(visible: Boolean) {
+        if (checkDot())
+            dot!!.chain.measureLabelBackgroundVisibility = visible
     }
 
     private fun changeFontWeight(fontWeight: FontWeight) {
-        if (dot == null) {
-            log.warning("Associated dot cannot be null")
+        if (checkDot()) {
+            dot!!.chain.measureLabelFontWeight = fontWeight
+
+            log.info("Font weight updated: $fontWeight")
         }
-
-        dot!!.chain.measureLabelFontWeight = fontWeight
-
-        log.info("Font weight updated: $fontWeight")
     }
 
     /**
@@ -98,9 +107,7 @@ object MeasureLabelPopup : ContextMenu() {
      * @param color The new font color
      */
     private fun changeFontColor(color: Color) {
-        if (dot == null) {
-            log.warning("Associated dot cannot be null")
-        }
+        checkDot()
 
         dot!!.chain.measureLabelFontColor = color
 
@@ -112,20 +119,27 @@ object MeasureLabelPopup : ContextMenu() {
      * @param fontSize The new font size
      */
     private fun changeFontSize(fontSize: Double) {
-        if (dot == null) {
-            log.warning("Associated dot cannot be null")
-        }
+        checkDot()
 
         dot!!.chain.measureLabelFontSize = fontSize
 
         log.info("Font size updated: $fontSize")
     }
 
+    private fun checkDot(): Boolean {
+        if (dot == null) {
+            log.warning("Associated dot cannot be null")
+            return false
+        }
+
+        return true
+    }
+
     /**
      * Show the context menu over the [measureLabel].
      * @param dot The graph-node related to the label
      */
-    fun show(measureLabel: Text, dot: Dot, x: Double, y: Double) {
+    fun show(measureLabel: Node, dot: Dot, x: Double, y: Double) {
         this.dot = dot
 
         // select the MenuItem related to the current font color
@@ -148,6 +162,8 @@ object MeasureLabelPopup : ContextMenu() {
             val weight = it.properties["font-weight"] as FontWeight
             menuItem.isSelected = weight == dot.chain.measureLabelFontWeight
         }
+
+        backgroundVisibilityMenuItem.isSelected = dot.chain.measureLabelBackgroundVisibility
 
         this.show(measureLabel, x, y)
     }

@@ -3,6 +3,7 @@ package org.mth.protractorfx
 import animatefx.animation.FadeIn
 import animatefx.animation.FadeOut
 import animatefx.util.ParallelAnimationFX
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Point2D
@@ -65,10 +66,12 @@ class DotChain(private val container: Pane) : Iterable<Dot> {
     val measureLabelFontColorProperty = SimpleObjectProperty(Color.BLACK)
     val measureLabelFontSizeProperty = SimpleDoubleProperty(12.0)
     val measureLabelFontWeightProperty = SimpleObjectProperty(FontWeight.NORMAL)
+    val measureLabelBackgroundVisibilityProperty = SimpleBooleanProperty(true)
 
     var measureLabelFontColor: Color by measureLabelFontColorProperty
     var measureLabelFontSize: Double by measureLabelFontSizeProperty
     var measureLabelFontWeight: FontWeight by measureLabelFontWeightProperty
+    var measureLabelBackgroundVisibility: Boolean by measureLabelBackgroundVisibilityProperty
 
     /**
      * Get the total number of nodes in this chain
@@ -142,6 +145,14 @@ class DotChain(private val container: Pane) : Iterable<Dot> {
 
             // get the connection and removes it from Pane
             val dotConnection = connections.first { it.match(dot, parent) }
+
+            val descriptors = parent.angleDecorators.filter { descriptor ->
+                descriptor.neighbor1 == dot || descriptor.neighbor2 == dot
+            }.toList()
+
+            descriptors.forEach {
+                // todo
+            }
 
             ParallelAnimationFX(
                 FadeOut(dotConnection).apply {

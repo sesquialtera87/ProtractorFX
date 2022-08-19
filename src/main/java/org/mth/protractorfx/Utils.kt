@@ -11,10 +11,14 @@ import javafx.scene.Scene
 import javafx.scene.image.Image
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyCodeCombination
-import javafx.scene.paint.Color
+import javafx.scene.shape.Arc
+import javafx.scene.shape.Circle
+import javafx.scene.shape.Shape
 import javafx.stage.Stage
 import java.io.File
 import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 import kotlin.reflect.KProperty
 
 @JvmField
@@ -72,6 +76,14 @@ fun angleBetween(p1: Point2D, p2: Point2D, degree: Boolean = false): Double {
 
     return angle
 }
+
+fun Arc.getCenter() = Point2D(centerX, centerY)
+fun Circle.getCenter() = Point2D(centerX, centerY)
+
+fun Point2D.rotate(alpha: Double) = Point2D(
+    this.dotProduct(cos(alpha), -sin(alpha)),
+    this.dotProduct(sin(alpha), cos(alpha)),
+)
 
 operator fun <T> ObservableValue<T>.getValue(thisRef: Any, property: KProperty<*>): T = value
 
