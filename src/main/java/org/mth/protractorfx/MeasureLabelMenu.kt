@@ -203,7 +203,9 @@ class MeasureLabelMenu : Initializable {
     }
 
     private fun changeBackgroundColor(color: Color) {
-
+        checkDot().ifPresent { dot ->
+            dot.chain.measureLabelBackgroundColor = color
+        }
     }
 
     companion object {

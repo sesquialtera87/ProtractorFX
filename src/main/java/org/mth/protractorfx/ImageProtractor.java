@@ -19,6 +19,7 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -54,7 +55,7 @@ public class ImageProtractor implements Initializable {
         }
     };
 
-    short backgroundOpacity = 10;
+    private short backgroundOpacity = 10;
 
     /**
      * The current zoom value
@@ -90,6 +91,7 @@ public class ImageProtractor implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        container.getChildren().add(SelectionRectangle.INSTANCE);
 
         // bind zoom update with the related transform
         zoomValue.addListener((observableValue, number, t1) -> {
@@ -103,6 +105,34 @@ public class ImageProtractor implements Initializable {
 
 //        container.getChildren().add(cropArea);
 //        cropArea.setVisible(false);
+        container.setOnMousePressed(evt -> {
+            if (evt.isPrimaryButtonDown()) {
+                log.fine("Selection event");
+
+                SelectionRectangle.INSTANCE.show(evt);
+            }
+        });
+
+        container.setOnMouseDragged(evt -> {
+            if (SelectionRectangle.INSTANCE.isVisible())
+                SelectionRectangle.INSTANCE.updateSelectionShape(evt);
+        });
+
+        container.setOnMouseReleased(evt -> {
+            if (evt.getButton() == MouseButton.PRIMARY) {
+                if (SelectionRectangle.INSTANCE.isVisible()) {
+                    chain.forEach(dot -> {
+                        if (SelectionRectangle.INSTANCE.isDotInSelection(dot)) {
+                            chain.addToSelection(dot);
+                        }
+                    });
+
+                    SelectionRectangle.INSTANCE.setVisible(false);
+                    log.fine("Hiding selection area");
+                } else
+                    chain.clearSelection();
+            }
+        });
 
         container.setOnMouseClicked(evt -> {
             cropArea.show(false);
@@ -113,8 +143,6 @@ public class ImageProtractor implements Initializable {
                 angleMeasureEnabled = false;
             } else if (dotInsertionEnabled)
                 addDot(evt.getX(), evt.getY());
-            else
-                chain.clearSelection();
         });
         container.setOnKeyPressed(evt -> {
             if (UtilsKt.SHORTCUT_DELETE.match(evt)) {
@@ -158,26 +186,43 @@ public class ImageProtractor implements Initializable {
         });
 
         imageView.setPreserveRatio(true);
-        imageView.getTransforms().add(zoomScaling);
+        imageView.getTransforms().
+
+                add(zoomScaling);
 
         imageScrollPane.toBack();
 
-        imageScrollPane.minWidthProperty().bind(container.widthProperty());
-        imageScrollPane.maxWidthProperty().bind(container.widthProperty());
+        imageScrollPane.minWidthProperty().
 
-        imageScrollPane.minHeightProperty().bind(container.heightProperty());
-        imageScrollPane.maxHeightProperty().bind(container.heightProperty());
+                bind(container.widthProperty());
+        imageScrollPane.maxWidthProperty().
+
+                bind(container.widthProperty());
+
+        imageScrollPane.minHeightProperty().
+
+                bind(container.heightProperty());
+        imageScrollPane.maxHeightProperty().
+
+                bind(container.heightProperty());
 
         // color menu initialization
         Arrays.asList(Color.BLACK, Color.SLATEBLUE, Color.ORANGERED, Color.MAGENTA, Color.PLUM, Color.OLIVEDRAB, Color.TAN, Color.PEACHPUFF)
-                .forEach(color -> {
+                        .
+
+                forEach(color ->
+
+                {
                     MenuItem colorMenuItem = new MenuItem();
                     colorMenuItem.setGraphic(new Rectangle(14, 14, color));
                     colorMenuItem.setOnAction(evt -> chain.setColor(color));
                     chainColorMenu.getItems().add(colorMenuItem);
                 });
 
-        chain = new DotChain(container);
+        chain = new
+
+                DotChain(container);
+
     }
 
     private void moveSelectedDots(double dr, int direction) {
@@ -400,14 +445,14 @@ public class ImageProtractor implements Initializable {
 
     @FXML
     void zoomIn() {
-        System.out.println("zoom in");
+        log.fine("zoom in");
 
         zoomValue.set(zoomValue.getValue() + 0.1);
     }
 
     @FXML
     void zoomOut() {
-        System.out.println("zoom out");
+        log.fine("zoom out");
 
         if (zoomValue.get() > 0.1) {
             zoomValue.set(zoomValue.getValue() - 0.1);

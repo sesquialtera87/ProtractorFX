@@ -67,11 +67,13 @@ class DotChain(private val container: Pane) : Iterable<Dot> {
     val measureLabelFontSizeProperty = SimpleDoubleProperty(12.0)
     val measureLabelFontWeightProperty = SimpleObjectProperty(FontWeight.NORMAL)
     val measureLabelBackgroundVisibilityProperty = SimpleBooleanProperty(true)
+    val measureLabelBackgroundColorProperty = SimpleObjectProperty(Color.BISQUE)
 
     var measureLabelFontColor: Color by measureLabelFontColorProperty
     var measureLabelFontSize: Double by measureLabelFontSizeProperty
     var measureLabelFontWeight: FontWeight by measureLabelFontWeightProperty
     var measureLabelBackgroundVisibility: Boolean by measureLabelBackgroundVisibilityProperty
+    var measureLabelBackgroundColor: Color by measureLabelBackgroundColorProperty
 
     /**
      * Get the total number of nodes in this chain
@@ -129,6 +131,7 @@ class DotChain(private val container: Pane) : Iterable<Dot> {
 
     fun addToSelection(dot: Dot) {
         selection.add(dot)
+        dot.selected = true
     }
 
     fun select(dot: Dot) {

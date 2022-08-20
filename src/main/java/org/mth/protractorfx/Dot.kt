@@ -81,11 +81,13 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
         val pane = parent as Pane
         val angleDescriptor = AngleDecorator(dot1, dot2)
 
+        log.finest("Angle centre: $this \nAngle sides: \n\tP1 = $dot1 \n\tP2 = $dot2")
+
         if (!angleDecorators.contains(angleDescriptor)) {
             angleDecorators.add(angleDescriptor)
             angleDescriptor.build(this, pane)
         } else {
-            println("Angle already measured")
+            log.info("Angle already measured")
         }
     }
 
@@ -121,6 +123,7 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                 anchorMap.clear()
                 anchorMap[dot] = Point2D(dot.centerX, dot.centerY)
 
+                log.fine("Selection size = ${dot.chain.selection.size}")
                 dot.chain.selection.forEach {
                     anchorMap[it] = Point2D(it.centerX, it.centerY)
                 }
@@ -162,9 +165,8 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
         }
 
         companion object {
-            private val log: Logger = LogFactory.configureLog(DragSupport::class.java)!!
+            private val log: Logger = LogFactory.configureLog(DragSupport::class.java)
         }
-
     }
 
 }

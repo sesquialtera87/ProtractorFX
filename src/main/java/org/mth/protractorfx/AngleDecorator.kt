@@ -8,6 +8,7 @@ import javafx.scene.paint.Color
 import javafx.scene.paint.Paint
 import javafx.scene.shape.Arc
 import javafx.scene.shape.ArcType
+import javafx.scene.shape.Line
 import javafx.scene.shape.Rectangle
 import javafx.scene.text.Font
 import javafx.scene.text.Text
@@ -27,6 +28,7 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
         private val background = Rectangle()
         val userDragTranslation: Translate = Transform.translate(.0, .0)
 
+        var backgroundColor: Paint by background::fill
         var text: String by label::text
         var fill: Paint by label::fill
         var font: Font by label::font
@@ -41,7 +43,7 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
 
             background.layoutX = 0.0
             background.layoutY = 0.0
-            background.fill = Color.LIGHTGRAY
+            background.fill = Color.BISQUE
 
             children.addAll(background, label)
 
@@ -89,7 +91,26 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
     private val angleLabel = MeasureLabel()
     private val arc: Arc = Arc()
 
+    val chain get() = neighbor1.chain
+
+    val vectorLine = Line()
+    val dragVector = Line()
+
     fun build(dot: Dot, pane: Pane) {
+
+        with(vectorLine) {
+            startXProperty().bind(dot.centerXProperty())
+            startYProperty().bind(dot.centerYProperty())
+            stroke = Color.RED
+        }
+
+        with(dragVector) {
+            startXProperty().bind(dot.centerXProperty())
+            startYProperty().bind(dot.centerYProperty())
+            stroke = Color.CORAL
+        }
+
+
         // create the arc
         arc.apply {
             centerXProperty().bind(dot.centerXProperty())
@@ -105,54 +126,63 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
         }
 
         angleLabel.apply {
-            layoutXProperty().bind(dot.centerXProperty())
-            layoutYProperty().bind(dot.centerYProperty())
             text = "%.${ANGLE_LABEL_PRECISION}f".format(getMeasure())
             isVisible = true
-            fill = dot.chain.measureLabelFontColor
-            font = Font.font(font.name, dot.chain.measureLabelFontSize)
 
-            hideBackground(dot.chain.measureLabelBackgroundVisibility)
+            // initialize appearance properties
+            fill = chain.measureLabelFontColor
+            font = Font.font(font.name, chain.measureLabelFontSize)
+            backgroundColor = chain.measureLabelBackgroundColor
+
+            layoutXProperty().bind(dot.centerXProperty())
+            layoutYProperty().bind(dot.centerYProperty())
+
+            hideBackground(chain.measureLabelBackgroundVisibility)
         }
 
         angleLabel.setOnMouseClicked {
             if (it.button == MouseButton.SECONDARY) {
                 // show the label context-menu
 //                MeasureLabelPopup.show(angleLabel, dot, it.screenX, it.screenY)
-                MeasureLabelMenu.Companion.show(angleLabel, dot, it.screenX, it.screenY)
+                MeasureLabelMenu.show(angleLabel, dot, it.screenX, it.screenY)
             }
         }
 
         // listen to changes of the font color
-        dot.chain.measureLabelFontColorProperty.addListener { _, _, color ->
+        chain.measureLabelFontColorProperty.addListener { _, _, color ->
             angleLabel.fill = color
         }
 
         // listen to changes of the font size
-        dot.chain.measureLabelFontSizeProperty.addListener { _, _, size ->
+        chain.measureLabelFontSizeProperty.addListener { _, _, size ->
             angleLabel.font = Font.font(
                 angleLabel.font.name,
-                dot.chain.measureLabelFontWeight,
+                chain.measureLabelFontWeight,
                 size.toDouble()
             )
         }
 
         // listen to changes of the font weight
-        dot.chain.measureLabelFontWeightProperty.addListener { _, _, weight ->
+        chain.measureLabelFontWeightProperty.addListener { _, _, weight ->
             angleLabel.font = Font.font(
                 angleLabel.font.name,
                 weight,
-                dot.chain.measureLabelFontSize
+                chain.measureLabelFontSize
             )
         }
 
         // listen to changes of the background visibility
-        dot.chain.measureLabelBackgroundVisibilityProperty.addListener { _, _, visible ->
+        chain.measureLabelBackgroundVisibilityProperty.addListener { _, _, visible ->
             angleLabel.hideBackground(visible)
         }
 
+        // listen to changes of the background color
+        chain.measureLabelBackgroundColorProperty.addListener { _, _, color ->
+            angleLabel.backgroundColor = color
+        }
+
         // add the nodes to the Pane and move them to background
-        pane.children.addAll(arc, angleLabel)
+        pane.children.addAll(arc, angleLabel, vectorLine, dragVector)
 
         arc.toBack()
         angleLabel.toBack()
@@ -190,6 +220,18 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
                 Transform.translate(T.x, T.y),
                 userDragTranslation
             )
+        }
+
+        vectorLine.apply {
+            endX = T.x + arc.centerX
+            endY = T.y + arc.centerY
+        }
+
+        dragVector.apply {
+//            endX = angleLabel.userDragTranslation.x + T.x + arc.centerX
+            endX = angleLabel.userDragTranslation.x + arc.centerX
+//            endY = angleLabel.userDragTranslation.y + T.y + arc.centerY
+            endY = angleLabel.userDragTranslation.y + arc.centerY
         }
     }
 
