@@ -1,12 +1,13 @@
 package org.mth.protractorfx
 
 import javafx.event.EventHandler
+import javafx.fxml.FXML
+import javafx.fxml.FXMLLoader
 import javafx.scene.Node
 import javafx.scene.control.*
 import javafx.scene.paint.Color
 import javafx.scene.shape.Rectangle
 import javafx.scene.text.FontWeight
-import javafx.scene.text.Text
 import org.mth.protractorfx.log.LogFactory
 import java.util.logging.Logger
 
@@ -14,6 +15,9 @@ import java.util.logging.Logger
  * The popup menu shown on each measure label
  */
 object MeasureLabelPopup : ContextMenu() {
+
+    @FXML
+    lateinit var backgroundColorMenu: Menu
 
     private val log: Logger = LogFactory.configureLog(MeasureLabelPopup::class.java)
 
@@ -23,11 +27,11 @@ object MeasureLabelPopup : ContextMenu() {
      */
     private var dot: Dot? = null
 
-    private val colorMenu = Menu("Font color")
-    private val fontSizeMenu = Menu("Font size")
-    private val fontStyleMenu = Menu("Font style")
+    val colorMenu = Menu("Font color")
+    val fontSizeMenu = Menu("Font size")
+    val fontStyleMenu = Menu("Font style")
 
-    private val backgroundVisibilityMenuItem = CheckMenuItem("visible")
+    var backgroundVisibilityMenuItem = CheckMenuItem("visible")
 
     init {
         val toggleGroup = ToggleGroup()
@@ -87,6 +91,10 @@ object MeasureLabelPopup : ContextMenu() {
         }
 
         items.addAll(fontSizeMenu, fontStyleMenu, colorMenu, backgroundMenu)
+    }
+
+    private fun resetLabelPosition() {
+
     }
 
     private fun showLabelBackground(visible: Boolean) {

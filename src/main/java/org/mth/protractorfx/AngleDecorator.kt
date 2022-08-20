@@ -15,7 +15,6 @@ import javafx.scene.transform.Transform
 import javafx.scene.transform.Translate
 import org.mth.protractorfx.log.LogFactory
 import java.util.logging.Logger
-import kotlin.math.max
 
 /**
  * @param neighbor1 The first vertex of the oriented angle
@@ -56,28 +55,29 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
 
         inner class DragSupport(label: MeasureLabel) {
 
-            private var oldCenter = Point2D(.0, .0)
             private var anchorPoint = Point2D(.0, .0)
+            private var oldDragTranslation = Point2D(.0, .0)
             private var dr = Point2D(.0, .0)
 
             init {
                 label.setOnMousePressed { event ->
                     anchorPoint = Point2D(event.screenX, event.screenY)
-                    oldCenter = Point2D(label.layoutX, label.layoutY)
-
+                    oldDragTranslation = Point2D(userDragTranslation.x, userDragTranslation.y)
                     event.consume()
 
-                    log.fine("Mouse pressed. \n\tAnchor point = $anchorPoint")
+                    log.finest("Mouse pressed. \n\tAnchor point = $anchorPoint \n\tOld translation vector = $oldDragTranslation")
                 }
 
                 label.setOnMouseDragged {
                     val currentDragPoint = Point2D(it.screenX, it.screenY)
 
                     // calculate the delta from the anchor point
-                    dr = currentDragPoint.subtract(anchorPoint)
+                    dr = currentDragPoint.subtract(anchorPoint).add(oldDragTranslation)
 
                     userDragTranslation.x = dr.x
                     userDragTranslation.y = dr.y
+
+                    log.finest("Translation vector = $dr")
                 }
             }
         }
@@ -118,7 +118,8 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
         angleLabel.setOnMouseClicked {
             if (it.button == MouseButton.SECONDARY) {
                 // show the label context-menu
-                MeasureLabelPopup.show(angleLabel, dot, it.screenX, it.screenY)
+//                MeasureLabelPopup.show(angleLabel, dot, it.screenX, it.screenY)
+                MeasureLabelMenu.Companion.show(angleLabel, dot, it.screenX, it.screenY)
             }
         }
 
@@ -159,6 +160,13 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
         updateAngleLabelPosition()
     }
 
+    fun resetLabelPosition() {
+        with(angleLabel.userDragTranslation) {
+            x = 0.0
+            y = 0.0
+        }
+    }
+
     @Suppress("LocalVariableName")
     private fun updateAngleLabelPosition() {
         // put the center of symmetry of the label on the bisector of the angle
@@ -178,9 +186,9 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
         angleLabel.apply {
             transforms.clear()
             transforms.addAll(
-                userDragTranslation,
                 Transform.translate(W.x, W.y),
-                Transform.translate(T.x, T.y)
+                Transform.translate(T.x, T.y),
+                userDragTranslation
             )
         }
     }
