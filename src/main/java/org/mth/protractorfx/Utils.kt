@@ -13,7 +13,6 @@ import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyCodeCombination
 import javafx.scene.shape.Arc
 import javafx.scene.shape.Circle
-import javafx.scene.shape.Shape
 import javafx.stage.Stage
 import java.io.File
 import kotlin.math.atan2
@@ -27,11 +26,17 @@ var scene = Scene(Group())
 @JvmField
 var stage = Stage()
 
+//@JvmField
+lateinit var chain: DotChain
+
 @JvmField
 val SHORTCUT_DELETE = KeyCodeCombination(KeyCode.DELETE)
 
 @JvmField
 val SHORTCUT_DELETE_SWITCH = KeyCodeCombination(KeyCode.X)
+
+@JvmField
+val SHORTCUT_RECT_SELECTION = KeyCodeCombination(KeyCode.S)
 
 
 @JvmField
@@ -43,18 +48,17 @@ val CURSOR_INSERT_DOT = ImageCursor(Image(ImageProtractor::class.java.getResourc
 @JvmField
 val CURSOR_REMOVE_DOT = ImageCursor(Image(ImageProtractor::class.java.getResourceAsStream("delete_cursor_x32.png")))
 
+@JvmField
+val CURSOR_RECT_SELECTION =
+    ImageCursor(Image(ImageProtractor::class.java.getResourceAsStream("selection_cursor_x32.png")))
+
 
 @JvmField
 val SNAPSHOT_DIR = File("C:\\Users\\matti\\OneDrive\\Documenti\\Java\\ProtractorFX\\src\\main\\resources\\snapshot")
 
-@JvmField
-var dotInsertionEnabled = false
 
 @JvmField
 var dotDeletionEnabled = false
-
-@JvmField
-var angleMeasureEnabled = false
 
 @JvmField
 var ANGLE_LABEL_PRECISION = 1

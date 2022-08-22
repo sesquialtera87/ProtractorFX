@@ -16,6 +16,7 @@ import javafx.scene.transform.Transform
 import javafx.scene.transform.Translate
 import org.mth.protractorfx.log.LogFactory
 import java.util.logging.Logger
+import kotlin.math.acos
 
 /**
  * @param neighbor1 The first vertex of the oriented angle
@@ -23,10 +24,18 @@ import java.util.logging.Logger
  */
 data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
 
+
     inner class MeasureLabel : StackPane() {
         private val label = Text()
         private val background = Rectangle()
-        val userDragTranslation: Translate = Transform.translate(.0, .0)
+        val dragTranslation: Translate = Transform.translate(.0, .0)
+        var dragToTranslationAngle: Double = 0.0
+
+        /**
+         * The vector representing the displacement of the measure label from the center of the [arc]
+         */
+        var T = Point2D(.0, .0)
+
 
         var backgroundColor: Paint by background::fill
         var text: String by label::text
@@ -37,13 +46,16 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
             label.layoutX = 0.0
             label.layoutY = 0.0
             label.layoutBoundsProperty().addListener { _, _, bounds ->
-                background.width = bounds.width
-                background.height = bounds.height
+                background.width = bounds.width + 2
+                background.height = bounds.height + 1
             }
 
-            background.layoutX = 0.0
-            background.layoutY = 0.0
-            background.fill = Color.BISQUE
+            with(background) {
+                relocate(.0, .0)
+                arcWidth = 5.0
+                arcHeight = 5.0
+                fill = Color.BISQUE
+            }
 
             children.addAll(background, label)
 
@@ -64,7 +76,7 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
             init {
                 label.setOnMousePressed { event ->
                     anchorPoint = Point2D(event.screenX, event.screenY)
-                    oldDragTranslation = Point2D(userDragTranslation.x, userDragTranslation.y)
+                    oldDragTranslation = Point2D(dragTranslation.x, dragTranslation.y)
                     event.consume()
 
                     log.finest("Mouse pressed. \n\tAnchor point = $anchorPoint \n\tOld translation vector = $oldDragTranslation")
@@ -76,10 +88,10 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
                     // calculate the delta from the anchor point
                     dr = currentDragPoint.subtract(anchorPoint).add(oldDragTranslation)
 
-                    userDragTranslation.x = dr.x
-                    userDragTranslation.y = dr.y
+                    dragTranslation.x = dr.x
+                    dragTranslation.y = dr.y
 
-                    log.finest("Translation vector = $dr")
+                    dragToTranslationAngle = acos(dr.dotProduct(T) / dr.magnitude() / T.magnitude())
                 }
             }
         }
@@ -98,16 +110,21 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
 
     fun build(dot: Dot, pane: Pane) {
 
+        // add the nodes to the Pane and move them to background
+        pane.children.addAll(arc, angleLabel, vectorLine, dragVector)
+
         with(vectorLine) {
             startXProperty().bind(dot.centerXProperty())
             startYProperty().bind(dot.centerYProperty())
             stroke = Color.RED
+            isVisible = false
         }
 
         with(dragVector) {
             startXProperty().bind(dot.centerXProperty())
             startYProperty().bind(dot.centerYProperty())
             stroke = Color.CORAL
+            isVisible = false
         }
 
 
@@ -134,6 +151,7 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
             font = Font.font(font.name, chain.measureLabelFontSize)
             backgroundColor = chain.measureLabelBackgroundColor
 
+            relocate(dot.centerX, dot.centerY)
             layoutXProperty().bind(dot.centerXProperty())
             layoutYProperty().bind(dot.centerYProperty())
 
@@ -181,8 +199,6 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
             angleLabel.backgroundColor = color
         }
 
-        // add the nodes to the Pane and move them to background
-        pane.children.addAll(arc, angleLabel, vectorLine, dragVector)
 
         arc.toBack()
         angleLabel.toBack()
@@ -191,7 +207,7 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
     }
 
     fun resetLabelPosition() {
-        with(angleLabel.userDragTranslation) {
+        with(angleLabel.dragTranslation) {
             x = 0.0
             y = 0.0
         }
@@ -199,39 +215,46 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
 
     @Suppress("LocalVariableName")
     private fun updateAngleLabelPosition() {
-        // put the center of symmetry of the label on the bisector of the angle
-        val alpha = -Math.toRadians(getMeasure()) / 2
+        with(angleLabel) {
+            // put the center of symmetry of the label on the bisector of the angle
+            val alpha = -Math.toRadians(getMeasure()) / 2
 
-        val bounds = angleLabel.boundsInParent
+            val bounds = angleLabel.boundsInParent
 
-        // translate to the center of symmetry of the rectangle
-        val W = Point2D(-bounds.width / 2, -(bounds.height + 4) / 2)
+            // translate to the center of symmetry of the rectangle
+            val W = Point2D(-bounds.width / 2, -(bounds.height + 4) / 2)
 
-        // direction vector of the first side of the angle
-        var T = neighbor1.getCenter().subtract(arc.getCenter()).normalize()
+            // direction vector of the first side of the angle
+            T = neighbor1.getCenter().subtract(arc.getCenter()).normalize()
 
-        // rescale and rotate the direction vector to outdistance the label from the center of the angle
-        T = T.multiply(43.0).rotate(alpha)
+            // rescale and rotate the direction vector to outdistance the label from the center of the angle
+            T = T.multiply(43.0).rotate(alpha)
 
-        angleLabel.apply {
+
+            val d = T.normalize().rotate(-dragToTranslationAngle)
+                .multiply(Point2D(dragTranslation.x, dragTranslation.y).magnitude())
+
+            dragTranslation.x = d.x
+            dragTranslation.y = d.y
+
             transforms.clear()
             transforms.addAll(
                 Transform.translate(W.x, W.y),
                 Transform.translate(T.x, T.y),
-                userDragTranslation
+                dragTranslation
             )
-        }
 
-        vectorLine.apply {
-            endX = T.x + arc.centerX
-            endY = T.y + arc.centerY
-        }
+            vectorLine.apply {
+                endX = T.x + arc.centerX
+                endY = T.y + arc.centerY
+            }
 
-        dragVector.apply {
-//            endX = angleLabel.userDragTranslation.x + T.x + arc.centerX
-            endX = angleLabel.userDragTranslation.x + arc.centerX
-//            endY = angleLabel.userDragTranslation.y + T.y + arc.centerY
-            endY = angleLabel.userDragTranslation.y + arc.centerY
+            dragVector.apply {
+                endX = d.x + arc.centerX
+//            endX = angleLabel.userDragTranslation.x + arc.centerX
+                endY = d.y + arc.centerY
+//            endY = angleLabel.userDragTranslation.y + arc.centerY
+            }
         }
     }
 

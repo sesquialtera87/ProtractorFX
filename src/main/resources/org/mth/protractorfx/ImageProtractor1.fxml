@@ -15,7 +15,9 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="557.0" prefWidth="916.0" style="-fx-background-color: transparent;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.mth.protractorfx.ImageProtractor">
+<BorderPane prefHeight="557.0" prefWidth="916.0" style="-fx-background-color: transparent;"
+            xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.mth.protractorfx.ImageProtractor">
 
     <center>
         <Pane fx:id="container" prefHeight="339.0" prefWidth="652.0">
@@ -24,47 +26,48 @@
 
     <bottom>
         <ScrollPane fx:id="imageScrollPane">
-            <ImageView fx:id="imageView" />
+            <ImageView fx:id="imageView"/>
         </ScrollPane>
     </bottom>
 
     <right>
         <VBox visible="false">
-            <TextField fx:id="xField" />
-            <TextField fx:id="yField" />
-            <TextField fx:id="widthField" />
-            <TextField fx:id="heightField" onAction="#viewport" />
+            <TextField fx:id="xField"/>
+            <TextField fx:id="yField"/>
+            <TextField fx:id="widthField"/>
+            <TextField fx:id="heightField" onAction="#viewport"/>
         </VBox>
     </right>
 
     <top>
-        <BorderPane prefHeight="25.0" prefWidth="916.0" style="-fx-background-color: transparent;" BorderPane.alignment="CENTER">
+        <BorderPane prefHeight="25.0" prefWidth="916.0" style="-fx-background-color: transparent;"
+                    BorderPane.alignment="CENTER">
             <center>
                 <MenuBar fx:id="menuBar" prefHeight="40.0" prefWidth="854.0" BorderPane.alignment="CENTER">
                     <Menu text="Mode">
-                        <RadioMenuItem onAction="#fullScreenMode" text="Full screen" />
+                        <RadioMenuItem onAction="#fullScreenMode" text="Full screen"/>
                     </Menu>
 
                     <Menu text="Measure">
-                        <MenuItem accelerator="Shortcut+M" onAction="#putAngleMeasure" text="Put measure" />
+                        <MenuItem accelerator="Shortcut+M" onAction="#putAngleMeasure" text="Put measure"/>
                     </Menu>
 
                     <Menu text="Image">
-                        <MenuItem accelerator="Shortcut+P" onAction="#takeScreenshot" text="Screenshot" />
-                        <SeparatorMenuItem />
-                        <MenuItem accelerator="Shortcut+O" onAction="#openImage" text="Open image..." />
-                        <MenuItem accelerator="Shortcut+K" onAction="#showCropArea" text="Crop image" />
+                        <MenuItem accelerator="Shortcut+P" onAction="#takeScreenshot" text="Screenshot"/>
+                        <SeparatorMenuItem/>
+                        <MenuItem accelerator="Shortcut+O" onAction="#openImage" text="Open image..."/>
+                        <MenuItem accelerator="Shortcut+K" onAction="#showCropArea" text="Crop image"/>
                         <Menu text="Zoom">
-                            <MenuItem accelerator="Shortcut+2" onAction="#zoomIn" text="Zoom in" />
-                            <MenuItem accelerator="Shortcut+1" onAction="#zoomOut" text="Zoom out" />
+                            <MenuItem accelerator="Shortcut+2" onAction="#zoomIn" text="Zoom in"/>
+                            <MenuItem accelerator="Shortcut+1" onAction="#zoomOut" text="Zoom out"/>
                         </Menu>
                     </Menu>
 
                     <Menu mnemonicParsing="false" text="View">
-                        <Menu fx:id="chainColorMenu" mnemonicParsing="false" text="Chain color" />
+                        <Menu fx:id="chainColorMenu" mnemonicParsing="false" text="Chain color"/>
                         <Menu text="Background opacity">
-                            <MenuItem accelerator="Shortcut+3" onAction="#increaseOpacity" text="increase" />
-                            <MenuItem accelerator="Shortcut+4" onAction="#reduceOpacity" text="reduce" />
+                            <MenuItem accelerator="Shortcut+3" onAction="#increaseOpacity" text="increase"/>
+                            <MenuItem accelerator="Shortcut+4" onAction="#reduceOpacity" text="reduce"/>
                         </Menu>
                     </Menu>
 
@@ -72,22 +75,20 @@
             </center>
             <right>
                 <HBox>
-                    <Button maxHeight="25.0" minHeight="25.0" mnemonicParsing="false" onAction="#minimizeApp" styleClass="window-button" BorderPane.alignment="CENTER">
+                    <Button maxHeight="25.0" minHeight="25.0" mnemonicParsing="false" onAction="#minimizeApp"
+                            styleClass="window-button" BorderPane.alignment="CENTER">
                         <graphic>
                             <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
-                                <image>
-                                    <Image url="@minimize_x48.png" />
-                                </image>
+                                <Image url="@minimize_x48.png"/>
                             </ImageView>
                         </graphic>
                     </Button>
 
-                    <Button maxHeight="25.0" minHeight="25.0" mnemonicParsing="false" onAction="#closeApp" styleClass="window-button" BorderPane.alignment="CENTER">
+                    <Button maxHeight="25.0" minHeight="25.0" mnemonicParsing="false" onAction="#closeApp"
+                            styleClass="window-button" BorderPane.alignment="CENTER">
                         <graphic>
                             <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
-                                <image>
-                                    <Image url="@close_x48.png" />
-                                </image>
+                                <Image url="@close_x48.png"/>
                             </ImageView>
                         </graphic>
                     </Button>

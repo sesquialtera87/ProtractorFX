@@ -2,7 +2,7 @@ package org.mth.protractorfx
 
 import javafx.geometry.Point2D
 import javafx.scene.input.MouseButton
-import javafx.scene.input.MouseEvent
+import javafx.scene.input.MouseEvent.*
 import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
@@ -38,27 +38,37 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
         centerY = y
         fill = chainColor
 
-        DragSupport(this)
 
-        addEventHandler(MouseEvent.MOUSE_CLICKED) {
+        addEventFilter(MOUSE_CLICKED) {
+            it.consume()
+        }
+
+        addEventHandler(MOUSE_PRESSED) {
             if (it.button == MouseButton.PRIMARY) {
-                log.fine("Click on dot with left mouse button")
+                log.fine("Click on dot with primary button")
 
-                selected = true
+                if (selected) {
+                    it.consume()
+                    return@addEventHandler
+                }
+
                 requestFocus()
 
-                if (dotDeletionEnabled) {
-                    delete()
-                } else if (it.isShiftDown) {
-                    chain.selection.add(this)
+//                if (dotDeletionEnabled) {
+//                    delete()
+//                } else
+                if (it.isShiftDown) {
+                    chain.addToSelection(this)
                     it.consume()
                 } else {
                     chain.clearSelection()
-                    chain.selection.add(this)
+                    chain.addToSelection(this)
                     it.consume()
                 }
             }
         }
+
+        DragSupport(this)
     }
 
 //    fun getCenter() = Point2D(centerX, centerY)
@@ -99,7 +109,7 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
         val SELECTED_COLOR: Color = Color.GRAY
     }
 
-    internal class DragSupport(dot: Dot) {
+    class DragSupport(dot: Dot) {
 
         private val anchorMap: MutableMap<Dot, Point2D> = mutableMapOf()
         private var anchorPoint = Point2D(.0, .0)
@@ -107,35 +117,42 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
         private var anchorPointForDrag = Point2D(.0, .0)
 
         init {
-            dot.setOnDragDetected {
+            dot.addEventFilter(DRAG_DETECTED) { event ->
                 log.fine("Drag detected")
 
                 dot.radius = DOT_RADIUS_SMALL
                 dot.toBack()
+
+
+
+                event.consume()
             }
 
-            dot.setOnMouseReleased {
+            dot.addEventFilter(MOUSE_RELEASED) {
                 dot.radius = DOT_RADIUS
                 dot.toFront()
+
+                it.consume()
             }
 
-            dot.setOnMousePressed { event ->
+            dot.addEventFilter(MOUSE_PRESSED) { event ->
                 anchorMap.clear()
                 anchorMap[dot] = Point2D(dot.centerX, dot.centerY)
 
                 log.fine("Selection size = ${dot.chain.selection.size}")
+
                 dot.chain.selection.forEach {
                     anchorMap[it] = Point2D(it.centerX, it.centerY)
                 }
 
                 anchorPoint = Point2D(event.screenX, event.screenY)
                 anchorPointForDrag = Point2D(dot.centerX, dot.centerY)
-                event.consume()
+//                event.consume()
 
                 log.fine("Mouse pressed. \n\tAnchor point = $anchorPoint \n\tDrag anchor = $anchorPointForDrag")
             }
 
-            dot.setOnMouseDragged {
+            dot.addEventFilter(MOUSE_DRAGGED) {
                 val currentDragPoint = Point2D(it.screenX, it.screenY)
 
                 // set of nodes for which update the angle measures

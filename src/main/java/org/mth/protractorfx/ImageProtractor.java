@@ -19,7 +19,6 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -86,7 +85,6 @@ public class ImageProtractor implements Initializable {
     MenuBar menuBar;
 
     DotChain chain;
-    boolean dotInsertionEnabled = false;
     boolean angleMeasureEnabled = false;
 
     @Override
@@ -105,64 +103,15 @@ public class ImageProtractor implements Initializable {
 
 //        container.getChildren().add(cropArea);
 //        cropArea.setVisible(false);
-        container.setOnMousePressed(evt -> {
-            if (evt.isPrimaryButtonDown()) {
-                log.fine("Selection event");
 
-                SelectionRectangle.INSTANCE.show(evt);
-            }
-        });
 
-        container.setOnMouseDragged(evt -> {
-            if (SelectionRectangle.INSTANCE.isVisible())
-                SelectionRectangle.INSTANCE.updateSelectionShape(evt);
-        });
+        Tools.INSTANCE.initialize(container);
 
-        container.setOnMouseReleased(evt -> {
-            if (evt.getButton() == MouseButton.PRIMARY) {
-                if (SelectionRectangle.INSTANCE.isVisible()) {
-                    chain.forEach(dot -> {
-                        if (SelectionRectangle.INSTANCE.isDotInSelection(dot)) {
-                            chain.addToSelection(dot);
-                        }
-                    });
-
-                    SelectionRectangle.INSTANCE.setVisible(false);
-                    log.fine("Hiding selection area");
-                } else
-                    chain.clearSelection();
-            }
-        });
 
         container.setOnMouseClicked(evt -> {
             cropArea.show(false);
-
-            if (angleMeasureEnabled) {
-                measureAngle(new Point2D(evt.getX(), evt.getY()));
-                container.setCursor(Cursor.DEFAULT);
-                angleMeasureEnabled = false;
-            } else if (dotInsertionEnabled)
-                addDot(evt.getX(), evt.getY());
-        });
-        container.setOnKeyPressed(evt -> {
-            if (UtilsKt.SHORTCUT_DELETE.match(evt)) {
-                deleteSelectedDots();
-            } else if (evt.getCode() == KeyCode.A) {
-                container.setCursor(UtilsKt.CURSOR_INSERT_DOT);
-                dotInsertionEnabled = true;
-            } else if (UtilsKt.SHORTCUT_DELETE_SWITCH.match(evt)) {
-                container.setCursor(UtilsKt.CURSOR_REMOVE_DOT);
-                UtilsKt.dotDeletionEnabled = true;
-            }
-        });
-        container.setOnKeyReleased(evt -> {
-            if (evt.getCode() == KeyCode.A) {
-                container.setCursor(Cursor.DEFAULT);
-                dotInsertionEnabled = false;
-            } else if (UtilsKt.SHORTCUT_DELETE_SWITCH.match(evt)) {
-                container.setCursor(Cursor.DEFAULT);
-                UtilsKt.dotDeletionEnabled = false;
-            }
+//            chain.clearSelection();
+            System.out.println("CLICK");
         });
         container.addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
             switch (evt.getCode()) {
@@ -186,9 +135,7 @@ public class ImageProtractor implements Initializable {
         });
 
         imageView.setPreserveRatio(true);
-        imageView.getTransforms().
-
-                add(zoomScaling);
+        imageView.getTransforms().add(zoomScaling);
 
         imageScrollPane.toBack();
 
@@ -207,22 +154,15 @@ public class ImageProtractor implements Initializable {
                 bind(container.heightProperty());
 
         // color menu initialization
-        Arrays.asList(Color.BLACK, Color.SLATEBLUE, Color.ORANGERED, Color.MAGENTA, Color.PLUM, Color.OLIVEDRAB, Color.TAN, Color.PEACHPUFF)
-                        .
+        Arrays.asList(Color.BLACK, Color.SLATEBLUE, Color.ORANGERED, Color.MAGENTA, Color.PLUM, Color.OLIVEDRAB, Color.TAN, Color.PEACHPUFF).forEach(color -> {
+            MenuItem colorMenuItem = new MenuItem();
+            colorMenuItem.setGraphic(new Rectangle(14, 14, color));
+            colorMenuItem.setOnAction(evt -> chain.setColor(color));
+            chainColorMenu.getItems().add(colorMenuItem);
+        });
 
-                forEach(color ->
-
-                {
-                    MenuItem colorMenuItem = new MenuItem();
-                    colorMenuItem.setGraphic(new Rectangle(14, 14, color));
-                    colorMenuItem.setOnAction(evt -> chain.setColor(color));
-                    chainColorMenu.getItems().add(colorMenuItem);
-                });
-
-        chain = new
-
-                DotChain(container);
-
+        chain = new DotChain(container);
+        UtilsKt.setChain(chain);
     }
 
     private void moveSelectedDots(double dr, int direction) {
@@ -248,11 +188,6 @@ public class ImageProtractor implements Initializable {
             log.warning("Something strange happened");
 
         updateSet.forEach(Dot::updateNeighboringAngles);
-    }
-
-    private void deleteSelectedDots() {
-        chain.getSelection().forEach(Dot::delete);
-        chain.clearSelection();
     }
 
     private void measureAngle(Point2D mouseLocation) {
@@ -284,23 +219,6 @@ public class ImageProtractor implements Initializable {
         Dot dot2 = anglesFromMouse.get(0).getKey();
 
         nearestDot.addAngleMeasure(dot1, dot2);
-    }
-
-    /**
-     * Insert a new graph-node at the specified position
-     *
-     * @param x Horizontal mouse coordinate
-     * @param y Vertical mouse coordinate
-     */
-    private void addDot(double x, double y) {
-        Optional<Dot> selectedDot = chain.getSelectedDot();
-
-        selectedDot.ifPresent(dot -> {
-            Dot newDot = new Dot(x, y, chain);
-            chain.addDot(newDot);
-            chain.connect(newDot, dot);
-            chain.select(newDot);
-        });
     }
 
     private void cropImage() {

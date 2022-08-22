@@ -121,10 +121,12 @@ class DotChain(private val container: Pane) : Iterable<Dot> {
             container.children.add(dot)
             dot.isVisible = true
             dot.toFront()
+
             FadeIn(dot).apply {
                 setSpeed(2.5)
                 play()
             }
+
             true
         }
     }
@@ -165,7 +167,7 @@ class DotChain(private val container: Pane) : Iterable<Dot> {
                     setSpeed(2.0)
                     setOnFinished { container.children.removeAll(dot, dotConnection) }
                 }
-            ).play()
+            ).run { play() }
 
 
             // Move focus on the Pane, to handle correctly the key-released event (X)
