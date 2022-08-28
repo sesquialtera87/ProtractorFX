@@ -51,12 +51,10 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                 requestFocus()
 
                 if (it.isShiftDown) {
-                    chain.addToSelection(this)
+                    Selection.addToSelection(this)
                     it.consume()
                 } else {
-                    Selection.clear()
-                    chain.clearSelection()
-                    chain.addToSelection(this)
+                    Selection.select(this)
                     it.consume()
                 }
             }
@@ -118,7 +116,7 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                 dot.radius = DOT_RADIUS_SMALL
                 dot.toBack()
 
-                if (chain.selection.size != anchorMap.size)
+                if (Selection.size != anchorMap.size)
                     anchorMap.keys.filter { it != dot }
                         .forEach { anchorMap.remove(it) }
 
@@ -137,9 +135,9 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                 anchorMap.clear()
                 anchorMap[dot] = dot.getCenter()
 
-                log.fine("Selection size = ${dot.chain.selection.size}")
+                log.fine("Selection size = ${Selection.size}")
 
-                dot.chain.selection.forEach {
+                Selection.selectedDots().forEach {
                     anchorMap[it] = it.getCenter()
                 }
 

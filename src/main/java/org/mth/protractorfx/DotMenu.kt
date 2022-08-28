@@ -4,6 +4,7 @@ import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
+import javafx.geometry.Point2D
 import javafx.scene.control.*
 import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
@@ -13,6 +14,7 @@ import org.mth.protractorfx.log.LogFactory
 import java.net.URL
 import java.util.*
 import java.util.logging.Logger
+import kotlin.random.Random
 
 /**
  * The popup menu shown on each measure label
@@ -33,25 +35,30 @@ class DotMenu : Initializable {
     @FXML
     fun selectAllDotsInChain() {
         checkDot().ifPresent { dot ->
-            chain.selection.clear()
-
-            dot.chain.forEach { chain.addToSelection(it) }
+            Selection.clear()
+            Selection.addToSelection(dot.chain)
         }
     }
 
     @FXML
     fun removeChain() {
         checkDot().ifPresent { dot ->
+            val pane = dot.parent
+
+            dot.chain.dispose()
             chains.remove(dot.chain)
+
+            pane.requestFocus()
         }
     }
 
     @FXML
     fun newChain() {
         checkDot().ifPresent { dot ->
-            val decorator = dot.angleDecorators.first { it.angleLabel == menu.ownerNode }
-            decorator.dispose(dot.parent as Pane)
-            dot.angleDecorators.remove(decorator)
+            with(Random(3)) {
+                val newChain = DotChain(dot.parent as Pane, Point2D(nextDouble(10.0, 50.0), nextDouble(10.0, 50.0)))
+                chains.add(newChain)
+            }
         }
     }
 

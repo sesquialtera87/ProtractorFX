@@ -61,9 +61,6 @@ val SNAPSHOT_DIR = File("C:\\Users\\matti\\OneDrive\\Documenti\\Java\\Protractor
 
 
 @JvmField
-var dotDeletionEnabled = false
-
-@JvmField
 var ANGLE_LABEL_PRECISION = 1
 
 
