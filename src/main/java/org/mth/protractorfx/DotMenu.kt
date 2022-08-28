@@ -1,15 +1,11 @@
 package org.mth.protractorfx
 
-import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
 import javafx.geometry.Point2D
 import javafx.scene.control.*
 import javafx.scene.layout.Pane
-import javafx.scene.paint.Color
-import javafx.scene.shape.Rectangle
-import javafx.scene.text.FontWeight
 import org.mth.protractorfx.log.LogFactory
 import java.net.URL
 import java.util.*
@@ -62,38 +58,6 @@ class DotMenu : Initializable {
         }
     }
 
-    private fun changeFontWeight(fontWeight: FontWeight) {
-        checkDot().ifPresent {
-            it.chain.measureLabelFontWeight = fontWeight
-
-            log.info("Font weight updated: $fontWeight")
-        }
-    }
-
-    /**
-     * Update the font color for all measure labels in the chain
-     * @param color The new font color
-     */
-    private fun changeFontColor(color: Color) {
-        checkDot().ifPresent {
-            it.chain.measureLabelFontColor = color
-
-            log.info("Color updated: $color")
-        }
-    }
-
-    /**
-     * Update the font size for all labels in the chain
-     * @param fontSize The new font size
-     */
-    private fun changeFontSize(fontSize: Double) {
-        checkDot().ifPresent {
-            it.chain.measureLabelFontSize = fontSize
-
-            log.info("Font size updated: $fontSize")
-        }
-    }
-
     private fun checkDot(): Optional<Dot> {
         if (dot == null) {
             log.warning("Associated dot cannot be null")
@@ -119,9 +83,7 @@ class DotMenu : Initializable {
 
     }
 
-    override fun initialize(url: URL?, bundle: ResourceBundle?) {
-
-    }
+    override fun initialize(url: URL?, bundle: ResourceBundle?) {}
 
 
     companion object {

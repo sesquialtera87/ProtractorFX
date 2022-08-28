@@ -1,6 +1,7 @@
 package org.mth.protractorfx
 
 import javafx.geometry.Point2D
+import javafx.scene.effect.DropShadow
 import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent.*
 import javafx.scene.layout.Pane
@@ -30,6 +31,19 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
 
 
     init {
+        // listen to focus changes
+        focusedProperty().addListener { _, _, _ ->
+            if (isFocused) {
+                effect = DropShadow().apply {
+                    color = Color.ORANGE
+                    width = 10.0
+                    height = 10.0
+                }
+            } else {
+                effect = null
+            }
+        }
+
         // listen for color changes
         chain.chainColor.addListener { _, _, _ -> fill = chainColor }
 
@@ -42,11 +56,6 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
         addEventHandler(MOUSE_PRESSED) {
             if (it.button == MouseButton.PRIMARY) {
                 log.fine("Click on dot with primary button")
-
-                if (selected) {
-                    it.consume()
-                    return@addEventHandler
-                }
 
                 requestFocus()
 
@@ -105,6 +114,11 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
             dot.addEventHandler(MOUSE_CLICKED) {
                 if (it.button == MouseButton.SECONDARY) {
                     DotMenu.show(dot, it.x, it.y)
+                } else if (it.button == MouseButton.PRIMARY) {
+                    if (it.isControlDown) {
+                        Selection.clear()
+                        Selection.addToSelection(dot.chain)
+                    }
                 }
 
                 it.consume()

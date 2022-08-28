@@ -26,13 +26,12 @@ object Selection {
     fun clear() {
         chains.flatten().forEach {
             it.selected = false
-            println(it)
         }
     }
 
-    fun selectedDot() = if (size == 1) Optional.of(selectedDots().first())
+    fun selectedDot() = if (size == 1)
+        Optional.of(selectedDots().first())
     else Optional.empty()
 
     fun selectedDots() = chains.flatten().filter { it.selected }
-
 }

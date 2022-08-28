@@ -156,7 +156,7 @@ public class ImageProtractor implements Initializable {
                 bind(container.heightProperty());
 
         // color menu initialization
-        Arrays.asList(Color.BLACK, Color.SLATEBLUE, Color.ORANGERED, Color.MAGENTA, Color.PLUM, Color.OLIVEDRAB, Color.TAN, Color.PEACHPUFF).forEach(color -> {
+        UtilsKt.defaultColors().forEach(color -> {
             MenuItem colorMenuItem = new MenuItem();
             colorMenuItem.setGraphic(new Rectangle(14, 14, color));
             colorMenuItem.setOnAction(evt -> chain.setColor(color));
@@ -166,6 +166,8 @@ public class ImageProtractor implements Initializable {
         chain = new DotChain(container, new Point2D(0, 0));
         UtilsKt.setChain(chain);
         UtilsKt.getChains().add(chain);
+
+        container.requestFocus();
     }
 
     private void moveSelectedDots(double dr, int direction) {
@@ -363,25 +365,6 @@ public class ImageProtractor implements Initializable {
     void putAngleMeasure() {
     }
 
-    private double clamp(double value, double min, double max) {
-        if (value < min)
-            return min;
-        if (value > max)
-            return max;
-        return value;
-    }
-
-    // convert mouse coordinates in the imageView to coordinates in the actual image:
-    private Point2D imageViewToImage(ImageView imageView, Point2D imageViewCoordinates) {
-        double xProportion = imageViewCoordinates.getX() / imageView.getBoundsInLocal().getWidth();
-        double yProportion = imageViewCoordinates.getY() / imageView.getBoundsInLocal().getHeight();
-
-        Rectangle2D viewport = imageView.getViewport();
-        return new Point2D(
-                viewport.getMinX() + xProportion * viewport.getWidth(),
-                viewport.getMinY() + yProportion * viewport.getHeight());
-    }
-
     public static double getImageScalingFactor(ImageView imageView) {
         double scaleX = imageView.getFitWidth() / imageView.getViewport().getMaxX();
         double scaleY = imageView.getFitHeight() / imageView.getViewport().getMaxY();
@@ -389,19 +372,4 @@ public class ImageProtractor implements Initializable {
         return Math.min(scaleX, scaleY);
     }
 
-    private static Image convertToFxImage(BufferedImage image) {
-        WritableImage wr = null;
-
-        if (image != null) {
-            wr = new WritableImage(image.getWidth(), image.getHeight());
-            PixelWriter pw = wr.getPixelWriter();
-            for (int x = 0; x < image.getWidth(); x++) {
-                for (int y = 0; y < image.getHeight(); y++) {
-                    pw.setArgb(x, y, image.getRGB(x, y));
-                }
-            }
-        }
-
-        return new ImageView(wr).getImage();
-    }
 }

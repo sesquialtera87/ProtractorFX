@@ -75,7 +75,8 @@ object Tools {
                 Selection.clear()
             }
 
-            chain.filter { SelectionRectangle.isDotInSelection(it) }
+            chains.flatten()
+                .filter { SelectionRectangle.isDotInSelection(it) }
                 .forEach { Selection.addToSelection(it) }
 
             SelectionRectangle.stopSelection()
@@ -176,6 +177,8 @@ object Tools {
                 connect(newDot, dot)
                 Selection.select(newDot)
             }
+
+            newDot.requestFocus()
         }
     }
 
@@ -207,19 +210,17 @@ object Tools {
     }
 
     fun deleteDot() {
-        with(chain) {
-            var leaves = Selection.selectedDots().filter { it.isLeaf() }
+        var leaves = Selection.selectedDots().filter { it.isLeaf() }
 
-            while (leaves.isNotEmpty()) {
-                leaves.forEach {
-                    removeDot(it)
-                    Selection.unselect(it)
-                }
-
-                leaves = Selection.selectedDots().filter { it.isLeaf() }
+        while (leaves.isNotEmpty()) {
+            leaves.forEach {
+                it.chain.removeDot(it)
+                Selection.unselect(it)
             }
 
-            Selection.clear()
+            leaves = Selection.selectedDots().filter { it.isLeaf() }
         }
+
+        Selection.clear()
     }
 }

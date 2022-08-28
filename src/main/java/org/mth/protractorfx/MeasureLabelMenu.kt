@@ -117,7 +117,7 @@ class MeasureLabelMenu : Initializable {
         // select the MenuItem related to the current font color
         fontColorMenu.items.forEach {
             val menuItem = it as RadioMenuItem
-            val color = it.properties["font-color"] as Color
+            val color = it.properties["color"] as Color
             menuItem.isSelected = color == dot.chain.measureLabelFontColor
         }
 
@@ -135,12 +135,18 @@ class MeasureLabelMenu : Initializable {
             menuItem.isSelected = weight == dot.chain.measureLabelFontWeight
         }
 
+        // select the MenuItem related to the current background color
+        backgroundColorMenu.items.forEach {
+            val menuItem = it as RadioMenuItem
+            val color = it.properties["color"] as Color
+            menuItem.isSelected = color == dot.chain.measureLabelBackgroundColor
+        }
+
         backgroundVisibilityMenuItem.isSelected = dot.chain.measureLabelBackgroundVisibility
     }
 
     override fun initialize(url: URL?, bundle: ResourceBundle?) {
         val toggleGroup = ToggleGroup()
-        var colorToggleGroup = ToggleGroup()
         val styleToggleGroup = ToggleGroup()
 
         // populate the font-size menu
@@ -155,24 +161,7 @@ class MeasureLabelMenu : Initializable {
         }
 
         // populate the font-color menu
-        listOf(
-            Color.BLACK,
-            Color.SLATEBLUE,
-            Color.ORANGERED,
-            Color.MAGENTA,
-            Color.PLUM,
-            Color.OLIVEDRAB,
-            Color.TAN,
-            Color.PEACHPUFF
-        ).forEach { color ->
-            val menuItem = RadioMenuItem()
-            menuItem.graphic = Rectangle(14.0, 14.0, color)
-            menuItem.properties["font-color"] = color
-            menuItem.onAction = EventHandler { changeFontColor(color) }
-
-            fontColorMenu.items.add(menuItem)
-            colorToggleGroup.toggles.add(menuItem)
-        }
+        initColorMenu(fontColorMenu, { color -> changeFontColor(color) })
 
         // populate the font-weight menu
         var menuItem = RadioMenuItem("Plain")
@@ -188,28 +177,8 @@ class MeasureLabelMenu : Initializable {
         fontStyleMenu.items.add(menuItem)
         styleToggleGroup.toggles.add(menuItem)
 
-
-        // populate the background color menu
-        colorToggleGroup = ToggleGroup()
-
-        listOf(
-            Color.BLACK,
-            Color.SLATEBLUE,
-            Color.ORANGERED,
-            Color.MAGENTA,
-            Color.PLUM,
-            Color.OLIVEDRAB,
-            Color.TAN,
-            Color.PEACHPUFF
-        ).forEach { color ->
-            val menuItem = RadioMenuItem()
-            menuItem.graphic = Rectangle(14.0, 14.0, color)
-            menuItem.properties["background-color"] = color
-            menuItem.onAction = EventHandler { changeBackgroundColor(color) }
-
-            backgroundColorMenu.items.add(menuItem)
-            colorToggleGroup.toggles.add(menuItem)
-        }
+        // populate the background-color menu
+        initColorMenu(backgroundColorMenu, { color -> changeBackgroundColor(color) })
     }
 
     private fun changeBackgroundColor(color: Color) {
