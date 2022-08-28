@@ -64,6 +64,30 @@ val SNAPSHOT_DIR = File("C:\\Users\\matti\\OneDrive\\Documenti\\Java\\Protractor
 var ANGLE_LABEL_PRECISION = 1
 
 
+/**
+ * Find the node in the collection with the minim distance from the given [point].
+ * @param excludeLeaves If `true` the nodes with only one incoming connections (leaves) are ignored from the search
+ */
+fun getNearestDot(point: Point2D, points: Collection<Dot>, excludeLeaves: Boolean = false): Dot {
+    var nearestDot: Dot? = null
+    var minDistance: Double = Double.MAX_VALUE
+    var currentDistance: Double
+
+    points.forEach { dot ->
+        if (!(excludeLeaves && dot.isLeaf())) {
+            currentDistance = point.distance(dot.getCenter())
+
+            if (currentDistance < minDistance) {
+                minDistance = currentDistance
+                nearestDot = dot
+            }
+        }
+    }
+
+    return nearestDot!!
+}
+
+
 fun angleBetween(p1: Point2D, p2: Point2D, degree: Boolean = false): Double {
     val dot = p1.x * p2.x + p1.y * p2.y
     val det = p1.x * p2.y - p2.x * p1.y

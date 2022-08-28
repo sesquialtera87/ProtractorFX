@@ -180,28 +180,5 @@ class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, 
     }
 
 
-    /**
-     * Find the node with the minim distance from the given point.
-     * @param excludeLeaves If `true` the nodes with only one incoming connections (leaves) are ignored from the search
-     */
-    fun getNearestDot(point: Point2D, excludeLeaves: Boolean = false): Dot {
-        var nearestDot = Dot(0.0, 0.0, this)
-        var minDistance: Double = Double.MAX_VALUE
-        var currentDistance: Double
-
-        this.forEach { dot ->
-            if (!(excludeLeaves && dot.isLeaf())) {
-                currentDistance = point.distance(dot.getCenter())
-
-                if (currentDistance < minDistance) {
-                    minDistance = currentDistance
-                    nearestDot = dot
-                }
-            }
-        }
-
-        return nearestDot
-    }
-
     override fun iterator() = adjacencyList.keys.iterator()
 }

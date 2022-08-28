@@ -180,7 +180,7 @@ object Tools {
     }
 
     fun measureAngle(mousePoint: Point2D) {
-        val nearestDot = chain.getNearestDot(mousePoint, true)
+        val nearestDot = getNearestDot(mousePoint, chains.flatten(), true)
         val neighbors = nearestDot.neighbors()
 
         val anglesFromMouse = mutableListOf<Pair<Dot, Double>>()

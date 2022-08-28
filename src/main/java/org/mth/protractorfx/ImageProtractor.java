@@ -193,37 +193,6 @@ public class ImageProtractor implements Initializable {
         updateSet.forEach(Dot::updateNeighboringAngles);
     }
 
-    private void measureAngle(Point2D mouseLocation) {
-        Dot nearestDot = chain.getNearestDot(mouseLocation, true);
-        HashSet<Dot> neighbors = nearestDot.neighbors();
-
-        ArrayList<Pair<Dot, Double>> anglesFromMouse = new ArrayList<>(neighbors.size());
-
-        if (neighbors.size() < 2)
-            // the nearest node is a leaf
-            return;
-
-        for (Dot neighbor : neighbors) {
-            // calculate the angle (measured anticlockwise) from the neighbor node to the mouse point
-            Point2D p1 = new Point2D(neighbor.getCenterX(), neighbor.getCenterY());
-            p1 = p1.subtract(UtilsKt.getCenter(nearestDot));
-            Point2D p2 = mouseLocation.subtract(UtilsKt.getCenter(nearestDot));
-
-            double angle = UtilsKt.angleBetween(p1, p2, true);
-            anglesFromMouse.add(new Pair<>(neighbor, angle));
-            System.out.println(angle);
-        }
-
-        // sort angles in ascending order, from the nearest to the farthest node (counterclockwise)
-        anglesFromMouse.sort(Comparator.comparing(Pair::getValue));
-
-        // get the farthest and the nearest nodes as the delimiters for the user-chosen angle
-        Dot dot1 = anglesFromMouse.get(anglesFromMouse.size() - 1).getKey();
-        Dot dot2 = anglesFromMouse.get(0).getKey();
-
-        nearestDot.addAngleMeasure(dot1, dot2);
-    }
-
     private void cropImage() {
         Rectangle2D viewport = imageView.getViewport();
 
