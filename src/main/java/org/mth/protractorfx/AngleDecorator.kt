@@ -16,7 +16,8 @@ import javafx.scene.transform.Transform
 import javafx.scene.transform.Translate
 import org.mth.protractorfx.log.LogFactory
 import java.util.logging.Logger
-import kotlin.math.acos
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 /**
  * @param neighbor1 The first vertex of the oriented angle
@@ -24,11 +25,28 @@ import kotlin.math.acos
  */
 data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
 
-
     inner class MeasureLabel : StackPane() {
+
+        /**
+         * [Text] component that displays the measure of the angle
+         */
         private val label = Text()
+
+        /**
+         * The [Rectangle] used only for coloring the text background
+         */
         private val background = Rectangle()
+
+        /**
+         * The displacement of the label from the default position, due to user dragging
+         * @see T
+         */
         val dragTranslation: Translate = Transform.translate(.0, .0)
+
+
+        /**
+         * Angle between the default position vector [T] and the custom displacement, measured in radians
+         */
         var dragToTranslationAngle: Double = 0.0
 
         /**
@@ -43,15 +61,12 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
         var font: Font by label::font
 
         init {
-            label.layoutX = 0.0
-            label.layoutY = 0.0
             label.layoutBoundsProperty().addListener { _, _, bounds ->
-                background.width = bounds.width + 2
-                background.height = bounds.height + 1
+                background.width = bounds.width + 4
+                background.height = bounds.height + 3
             }
 
             with(background) {
-                relocate(.0, .0)
                 arcWidth = 5.0
                 arcHeight = 5.0
                 fill = Color.BISQUE
@@ -69,7 +84,14 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
 
         inner class DragSupport(label: MeasureLabel) {
 
+            /**
+             * The drag event start point
+             */
             private var anchorPoint = Point2D(.0, .0)
+
+            /**
+             * The drag displacement before a new drag event
+             */
             private var oldDragTranslation = Point2D(.0, .0)
             private var dr = Point2D(.0, .0)
 
@@ -91,7 +113,10 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
                     dragTranslation.x = dr.x
                     dragTranslation.y = dr.y
 
-                    dragToTranslationAngle = acos(dr.dotProduct(T) / dr.magnitude() / T.magnitude())
+                    // update the angle
+                    dragToTranslationAngle = angleBetween(dr, T)
+
+                    it.consume()
                 }
             }
         }
@@ -100,13 +125,22 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
     /**
      * The label displaying the angle measure
      */
-    private val angleLabel = MeasureLabel()
+    val angleLabel = MeasureLabel()
     private val arc: Arc = Arc()
 
     val chain get() = neighbor1.chain
 
     val vectorLine = Line()
     val dragVector = Line()
+
+    fun dispose(pane: Pane) {
+        listOf(
+            vectorLine,
+            dragVector,
+            arc,
+            angleLabel
+        ).forEach { pane.children.remove(it) }
+    }
 
     fun build(dot: Dot, pane: Pane) {
 
@@ -143,7 +177,7 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
         }
 
         angleLabel.apply {
-            text = "%.${ANGLE_LABEL_PRECISION}f".format(getMeasure())
+            text = DEGREE_MEASURE_TEMPLATE.format(getMeasure())
             isVisible = true
 
             // initialize appearance properties
@@ -161,8 +195,8 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
         angleLabel.setOnMouseClicked {
             if (it.button == MouseButton.SECONDARY) {
                 // show the label context-menu
-//                MeasureLabelPopup.show(angleLabel, dot, it.screenX, it.screenY)
                 MeasureLabelMenu.show(angleLabel, dot, it.screenX, it.screenY)
+                it.consume()
             }
         }
 
@@ -222,17 +256,22 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
             val bounds = angleLabel.boundsInParent
 
             // translate to the center of symmetry of the rectangle
-            val W = Point2D(-bounds.width / 2, -(bounds.height + 4) / 2)
+            val W = Point2D(-bounds.width / 2, -(bounds.height) / 2)
 
-            // direction vector of the first side of the angle
-            T = neighbor1.getCenter().subtract(arc.getCenter()).normalize()
+            // normalized direction vector of the first side of the angle
+            T = neighbor1.getCenter()
+                .subtract(arc.getCenter())
+                .normalize()
 
             // rescale and rotate the direction vector to outdistance the label from the center of the angle
-            T = T.multiply(43.0).rotate(alpha)
+            T = T.multiply(45.0).rotate(alpha)
 
 
-            val d = T.normalize().rotate(-dragToTranslationAngle)
-                .multiply(Point2D(dragTranslation.x, dragTranslation.y).magnitude())
+            // recalculate the drag-vector position to preserve the angle with the translation vector
+            val dragVectorMagnitude = sqrt(dragTranslation.x.pow(2) + dragTranslation.y.pow(2))
+            val d = T.normalize()
+                .rotate(-dragToTranslationAngle)
+                .multiply(dragVectorMagnitude)
 
             dragTranslation.x = d.x
             dragTranslation.y = d.y
@@ -270,7 +309,8 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
 
         // update label position and text
         if (angleLabel.isVisible) {
-            angleLabel.text = "%.${ANGLE_LABEL_PRECISION}f°".format(angleMeasure)
+
+            angleLabel.text = DEGREE_MEASURE_TEMPLATE.format(angleMeasure)
 
             updateAngleLabelPosition()
         }
@@ -308,5 +348,6 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
 
     companion object {
         private val log: Logger = LogFactory.configureLog(AngleDecorator::class.java)
+        val DEGREE_MEASURE_TEMPLATE = "%.${ANGLE_LABEL_PRECISION}f°"
     }
 }

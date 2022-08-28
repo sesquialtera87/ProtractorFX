@@ -39,10 +39,6 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
         fill = chainColor
 
 
-        addEventFilter(MOUSE_CLICKED) {
-            it.consume()
-        }
-
         addEventHandler(MOUSE_PRESSED) {
             if (it.button == MouseButton.PRIMARY) {
                 log.fine("Click on dot with primary button")
@@ -54,13 +50,11 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
 
                 requestFocus()
 
-//                if (dotDeletionEnabled) {
-//                    delete()
-//                } else
                 if (it.isShiftDown) {
                     chain.addToSelection(this)
                     it.consume()
                 } else {
+                    Selection.clear()
                     chain.clearSelection()
                     chain.addToSelection(this)
                     it.consume()
@@ -71,13 +65,6 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
         DragSupport(this)
     }
 
-//    fun getCenter() = Point2D(centerX, centerY)
-
-    fun delete() {
-        log.info("Deleting dot")
-        chain.removeDot(this)
-        chain.clearSelection()
-    }
 
     fun isLeaf() = neighbors().size < 2
 
@@ -113,46 +100,58 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
 
         private val anchorMap: MutableMap<Dot, Point2D> = mutableMapOf()
         private var anchorPoint = Point2D(.0, .0)
-        private var dr = Point2D(.0, .0)
         private var anchorPointForDrag = Point2D(.0, .0)
+        private var dr = Point2D(.0, .0)
 
         init {
-            dot.addEventFilter(DRAG_DETECTED) { event ->
+            dot.addEventHandler(MOUSE_CLICKED) {
+                if (it.button == MouseButton.SECONDARY) {
+                    DotMenu.show(dot, it.x, it.y)
+                }
+
+                it.consume()
+            }
+
+            dot.addEventHandler(DRAG_DETECTED) { event ->
                 log.fine("Drag detected")
 
                 dot.radius = DOT_RADIUS_SMALL
                 dot.toBack()
 
-
+                if (chain.selection.size != anchorMap.size)
+                    anchorMap.keys.filter { it != dot }
+                        .forEach { anchorMap.remove(it) }
 
                 event.consume()
             }
 
-            dot.addEventFilter(MOUSE_RELEASED) {
+            dot.addEventHandler(MOUSE_RELEASED) {
                 dot.radius = DOT_RADIUS
                 dot.toFront()
 
                 it.consume()
             }
 
-            dot.addEventFilter(MOUSE_PRESSED) { event ->
+            dot.addEventHandler(MOUSE_PRESSED) { event ->
+                // remove the old anchor points of the previous selection
                 anchorMap.clear()
-                anchorMap[dot] = Point2D(dot.centerX, dot.centerY)
+                anchorMap[dot] = dot.getCenter()
 
                 log.fine("Selection size = ${dot.chain.selection.size}")
 
                 dot.chain.selection.forEach {
-                    anchorMap[it] = Point2D(it.centerX, it.centerY)
+                    anchorMap[it] = it.getCenter()
                 }
 
                 anchorPoint = Point2D(event.screenX, event.screenY)
-                anchorPointForDrag = Point2D(dot.centerX, dot.centerY)
-//                event.consume()
+                anchorPointForDrag = dot.getCenter()
 
                 log.fine("Mouse pressed. \n\tAnchor point = $anchorPoint \n\tDrag anchor = $anchorPointForDrag")
             }
 
-            dot.addEventFilter(MOUSE_DRAGGED) {
+            dot.addEventHandler(MOUSE_DRAGGED) {
+                log.fine("Dragging")
+
                 val currentDragPoint = Point2D(it.screenX, it.screenY)
 
                 // set of nodes for which update the angle measures

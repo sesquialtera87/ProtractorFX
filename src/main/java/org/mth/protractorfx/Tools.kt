@@ -71,8 +71,10 @@ object Tools {
 
         override fun onRelease(mouseEvent: MouseEvent) {
             // with shift down, maintain the previous selected dots
-            if (!mouseEvent.isShiftDown)
+            if (!mouseEvent.isShiftDown) {
                 chain.clearSelection()
+                Selection.clear()
+            }
 
             chain.filter { SelectionRectangle.isDotInSelection(it) }
                 .forEach { chain.addToSelection(it) }
@@ -174,6 +176,7 @@ object Tools {
                 addDot(newDot)
                 connect(newDot, dot)
                 select(newDot)
+                Selection.select(newDot)
             }
         }
     }
@@ -219,6 +222,7 @@ object Tools {
             }
 
             clearSelection()
+            Selection.clear()
         }
     }
 }

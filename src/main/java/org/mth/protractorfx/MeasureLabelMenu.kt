@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
 import javafx.scene.Node
 import javafx.scene.control.*
+import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import javafx.scene.shape.Rectangle
 import javafx.scene.text.FontWeight
@@ -53,6 +54,15 @@ class MeasureLabelMenu : Initializable {
     fun resetLabelLocations() {
         checkDot().ifPresent { dot ->
             dot.angleDecorators.forEach { it.resetLabelPosition() }
+        }
+    }
+
+    @FXML
+    fun removeMeasure() {
+        checkDot().ifPresent { dot ->
+            val decorator = dot.angleDecorators.first { it.angleLabel == menu.ownerNode }
+            decorator.dispose(dot.parent as Pane)
+            dot.angleDecorators.remove(decorator)
         }
     }
 

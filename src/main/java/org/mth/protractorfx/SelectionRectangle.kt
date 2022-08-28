@@ -16,9 +16,9 @@ object SelectionRectangle : Rectangle() {
 
     init {
         fill = Color.TRANSPARENT
+        stroke = Color.ALICEBLUE
         arcWidth = 10.0
         arcHeight = 10.0
-        stroke = Color.ALICEBLUE
         isVisible = false
     }
 
@@ -79,8 +79,4 @@ object SelectionRectangle : Rectangle() {
      */
     fun isDotInSelection(dot: Dot) =
         dot.intersects(boundsInParent)
-//        dot.centerX + dot.radius > x
-//                && dot.centerX - dot.radius < x + width
-//                && dot.centerY + dot.radius > y
-//                && dot.centerY - dot.radius < y + height
 }

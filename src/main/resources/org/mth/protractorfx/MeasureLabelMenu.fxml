@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.CheckMenuItem?>
+<?import javafx.scene.control.ContextMenu?>
+<?import javafx.scene.control.Menu?>
+
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.MenuItem?>
+<ContextMenu xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+             fx:controller="org.mth.protractorfx.MeasureLabelMenu">
+    <items>
+        <MenuItem text="Remove measure" onAction="#removeMeasure"/>
+        <MenuItem text="Reset location" onAction="#resetLabelLocations"/>
+
+        <SeparatorMenuItem/>
+
+        <Menu text="Font">
+            <Menu text="Color" fx:id="fontColorMenu"/>
+            <Menu text="Weight" fx:id="fontStyleMenu"/>
+            <Menu text="Size" fx:id="fontSizeMenu"/>
+        </Menu>
+
+        <Menu text="Background">
+            <CheckMenuItem text="Visible" fx:id="backgroundVisibilityMenuItem" onAction="#showLabelBackground"/>
+            <Menu text="Color" fx:id="backgroundColorMenu"/>
+        </Menu>
+    </items>
+</ContextMenu>

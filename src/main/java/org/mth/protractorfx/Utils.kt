@@ -15,6 +15,7 @@ import javafx.scene.shape.Arc
 import javafx.scene.shape.Circle
 import javafx.stage.Stage
 import java.io.File
+import java.util.*
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
@@ -28,6 +29,8 @@ var stage = Stage()
 
 //@JvmField
 lateinit var chain: DotChain
+
+val chains: Deque<DotChain> = LinkedList()
 
 @JvmField
 val SHORTCUT_DELETE = KeyCodeCombination(KeyCode.DELETE)

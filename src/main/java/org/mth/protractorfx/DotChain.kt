@@ -144,21 +144,24 @@ class DotChain(private val container: Pane) : Iterable<Dot> {
 
     fun removeDot(dot: Dot) {
         if (dot.isLeaf()) {
-            val parent = adjacencyList[dot]!!.first()
+            val parent = adjacencyList[dot]!!.first() // there's only one node connected (it's a leaf...)
+
+            // remove the dot from its parent's adjacency list and from the adjacency list itself
             adjacencyList[parent]!!.remove(dot)
             adjacencyList.remove(dot)
 
             // get the connection and removes it from Pane
             val dotConnection = connections.first { it.match(dot, parent) }
 
-            val descriptors = parent.angleDecorators.filter { descriptor ->
-                descriptor.neighbor1 == dot || descriptor.neighbor2 == dot
-            }.toList()
+            // remove the measures, related to the deleted node, around the angle
+            parent.angleDecorators
+                .filter { it.neighbor1 == dot || it.neighbor2 == dot }
+                .forEach {
+                    it.dispose(container)
+                    parent.angleDecorators.remove(it)
+                }
 
-            descriptors.forEach {
-                // todo
-            }
-
+            // animate the removal
             ParallelAnimationFX(
                 FadeOut(dotConnection).apply {
                     setSpeed(2.0)
@@ -197,9 +200,9 @@ class DotChain(private val container: Pane) : Iterable<Dot> {
         var minDistance: Double = Double.MAX_VALUE
         var currentDistance: Double
 
-        adjacencyList.keys.forEach { dot ->
+        this.forEach { dot ->
             if (!(excludeLeaves && dot.isLeaf())) {
-                currentDistance = point.distance(Point2D(dot.centerX, dot.centerY))
+                currentDistance = point.distance(dot.getCenter())
 
                 if (currentDistance < minDistance) {
                     minDistance = currentDistance

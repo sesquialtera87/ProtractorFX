@@ -7,7 +7,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.Cursor;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -85,7 +84,6 @@ public class ImageProtractor implements Initializable {
     MenuBar menuBar;
 
     DotChain chain;
-    boolean angleMeasureEnabled = false;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -110,9 +108,13 @@ public class ImageProtractor implements Initializable {
 
         container.setOnMouseClicked(evt -> {
             cropArea.show(false);
-//            chain.clearSelection();
+
+//            if (evt.getSource() == container)
+//                chain.clearSelection();
+
             System.out.println("CLICK");
         });
+
         container.addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
             switch (evt.getCode()) {
                 case LEFT:
@@ -389,8 +391,6 @@ public class ImageProtractor implements Initializable {
 
     @FXML
     void putAngleMeasure() {
-        angleMeasureEnabled = true;
-        container.setCursor(UtilsKt.CURSOR_ANGLE);
     }
 
     private double clamp(double value, double min, double max) {

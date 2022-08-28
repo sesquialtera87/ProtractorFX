@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.CheckMenuItem?>
+<?import javafx.scene.control.ContextMenu?>
+<?import javafx.scene.control.Menu?>
+
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.MenuItem?>
+<ContextMenu xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+             fx:controller="org.mth.protractorfx.DotMenu">
+    <items>
+        <MenuItem text="Select chain" onAction="#selectAllDotsInChain"/>
+        <MenuItem text="Remove chain" onAction="#removeChain"/>
+        <MenuItem text="New chain" onAction="#newChain"/>
+
+        <SeparatorMenuItem/>
+
+        <Menu text="Background">
+            <CheckMenuItem text="Visible" onAction="#selectAllDotsInChain"/>
+            <Menu text="Color" fx:id="backgroundColorMenu"/>
+        </Menu>
+    </items>
+</ContextMenu>
