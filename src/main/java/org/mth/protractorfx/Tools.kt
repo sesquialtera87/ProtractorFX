@@ -170,6 +170,7 @@ object Tools {
         val selectedDot = Selection.selectedDot()
 
         selectedDot.ifPresent { dot: Dot ->
+            val chain = dot.chain
             val newDot = Dot(x, y, chain)
 
             chain.apply {

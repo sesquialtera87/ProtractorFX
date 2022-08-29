@@ -130,8 +130,8 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
 
     val chain get() = neighbor1.chain
 
-    val vectorLine = Line()
-    val dragVector = Line()
+    private val vectorLine = Line()
+    private val dragVector = Line()
 
     fun dispose(pane: Pane) {
         listOf(

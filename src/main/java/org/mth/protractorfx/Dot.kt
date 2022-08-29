@@ -59,13 +59,7 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
 
                 requestFocus()
 
-                if (it.isShiftDown) {
-                    Selection.addToSelection(this)
-                    it.consume()
-                } else {
-                    Selection.select(this)
-                    it.consume()
-                }
+
             }
         }
 
@@ -115,6 +109,7 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                 if (it.button == MouseButton.SECONDARY) {
                     DotMenu.show(dot, it.x, it.y)
                 } else if (it.button == MouseButton.PRIMARY) {
+                    // With CTRL + Click select the chain this dot belongs to
                     if (it.isControlDown) {
                         Selection.clear()
                         Selection.addToSelection(dot.chain)
@@ -141,6 +136,15 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                 dot.radius = DOT_RADIUS
                 dot.toFront()
 
+                if (it.isDragDetect)
+                    if (it.isShiftDown) {
+                        Selection.addToSelection(dot)
+                        it.consume()
+                    } else {
+                        Selection.select(dot)
+                        it.consume()
+                    }
+
                 it.consume()
             }
 
@@ -149,8 +153,7 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                 anchorMap.clear()
                 anchorMap[dot] = dot.getCenter()
 
-                log.fine("Selection size = ${Selection.size}")
-
+                // save the coordinates of every node in the selection
                 Selection.selectedDots().forEach {
                     anchorMap[it] = it.getCenter()
                 }
@@ -161,10 +164,10 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                 log.fine("Mouse pressed. \n\tAnchor point = $anchorPoint \n\tDrag anchor = $anchorPointForDrag")
             }
 
-            dot.addEventHandler(MOUSE_DRAGGED) {
+            dot.addEventHandler(MOUSE_DRAGGED) { mouseEvent ->
                 log.fine("Dragging")
 
-                val currentDragPoint = Point2D(it.screenX, it.screenY)
+                val currentDragPoint = Point2D(mouseEvent.screenX, mouseEvent.screenY)
 
                 // set of nodes for which update the angle measures
                 val updateList: HashSet<Dot> = HashSet()
@@ -186,9 +189,7 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                     updateList.addAll(dot.neighbors())
                 }
 
-                updateList.forEach { dot ->
-                    dot.updateNeighboringAngles()
-                }
+                updateList.forEach { it.updateNeighboringAngles() }
             }
         }
 

@@ -4,8 +4,6 @@ import javafx.beans.property.DoubleProperty
 import javafx.beans.property.IntegerProperty
 import javafx.beans.property.Property
 import javafx.beans.value.ObservableValue
-import javafx.event.ActionEvent
-import javafx.event.Event
 import javafx.event.EventHandler
 import javafx.geometry.Dimension2D
 import javafx.geometry.Point2D

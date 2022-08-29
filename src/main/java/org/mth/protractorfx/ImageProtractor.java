@@ -109,8 +109,11 @@ public class ImageProtractor implements Initializable {
         container.setOnMouseClicked(evt -> {
             cropArea.show(false);
 
-//            if (evt.getSource() == container)
-//                chain.clearSelection();
+            if (evt.isStillSincePress()) {
+                log.fine("Click on empty space");
+                Selection.INSTANCE.clear();
+                container.requestFocus();
+            }
 
             System.out.println("CLICK");
         });

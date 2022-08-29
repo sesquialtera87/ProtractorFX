@@ -166,6 +166,9 @@ class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, 
         connections.add(ConnectorLine(dot1, dot2))
     }
 
+    /**
+     * Remove all dots and their decorators (connector lines, measures) from the pane.
+     */
     fun dispose() {
         forEach { dot ->
             // remove the dot from the pane
@@ -178,7 +181,6 @@ class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, 
             dot.angleDecorators.forEach { it.dispose(container) }
         }
     }
-
 
     override fun iterator() = adjacencyList.keys.iterator()
 }
