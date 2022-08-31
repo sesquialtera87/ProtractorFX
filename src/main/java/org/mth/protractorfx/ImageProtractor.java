@@ -109,8 +109,11 @@ public class ImageProtractor implements Initializable {
         container.setOnMouseClicked(evt -> {
             cropArea.show(false);
 
-//            if (evt.getSource() == container)
-//                chain.clearSelection();
+            if (evt.isStillSincePress()) {
+                log.fine("Click on empty space");
+                Selection.INSTANCE.clear();
+                container.requestFocus();
+            }
 
             System.out.println("CLICK");
         });
@@ -156,22 +159,25 @@ public class ImageProtractor implements Initializable {
                 bind(container.heightProperty());
 
         // color menu initialization
-        Arrays.asList(Color.BLACK, Color.SLATEBLUE, Color.ORANGERED, Color.MAGENTA, Color.PLUM, Color.OLIVEDRAB, Color.TAN, Color.PEACHPUFF).forEach(color -> {
+        UtilsKt.defaultColors().forEach(color -> {
             MenuItem colorMenuItem = new MenuItem();
             colorMenuItem.setGraphic(new Rectangle(14, 14, color));
             colorMenuItem.setOnAction(evt -> chain.setColor(color));
             chainColorMenu.getItems().add(colorMenuItem);
         });
 
-        chain = new DotChain(container);
+        chain = new DotChain(container, new Point2D(0, 0));
         UtilsKt.setChain(chain);
+        UtilsKt.getChains().add(chain);
+
+        container.requestFocus();
     }
 
     private void moveSelectedDots(double dr, int direction) {
         HashSet<Dot> updateSet = new HashSet<>();
 
         if (direction == Adjustable.VERTICAL) {
-            chain.getSelection().forEach(dot -> {
+            Selection.INSTANCE.selectedDots().forEach(dot -> {
                 dot.setCenterY(dot.getCenterY() + dr);
                 updateSet.add(dot);
                 updateSet.addAll(dot.neighbors());
@@ -179,7 +185,7 @@ public class ImageProtractor implements Initializable {
 
             log.fine(String.format("Moving selected dots [Direction=%s, dr=%.2f]", direction, dr));
         } else if (direction == Adjustable.HORIZONTAL) {
-            chain.getSelection().forEach(dot -> {
+            Selection.INSTANCE.selectedDots().forEach(dot -> {
                 dot.setCenterX(dot.getCenterX() + dr);
                 updateSet.add(dot);
                 updateSet.addAll(dot.neighbors());
@@ -190,37 +196,6 @@ public class ImageProtractor implements Initializable {
             log.warning("Something strange happened");
 
         updateSet.forEach(Dot::updateNeighboringAngles);
-    }
-
-    private void measureAngle(Point2D mouseLocation) {
-        Dot nearestDot = chain.getNearestDot(mouseLocation, true);
-        HashSet<Dot> neighbors = nearestDot.neighbors();
-
-        ArrayList<Pair<Dot, Double>> anglesFromMouse = new ArrayList<>(neighbors.size());
-
-        if (neighbors.size() < 2)
-            // the nearest node is a leaf
-            return;
-
-        for (Dot neighbor : neighbors) {
-            // calculate the angle (measured anticlockwise) from the neighbor node to the mouse point
-            Point2D p1 = new Point2D(neighbor.getCenterX(), neighbor.getCenterY());
-            p1 = p1.subtract(UtilsKt.getCenter(nearestDot));
-            Point2D p2 = mouseLocation.subtract(UtilsKt.getCenter(nearestDot));
-
-            double angle = UtilsKt.angleBetween(p1, p2, true);
-            anglesFromMouse.add(new Pair<>(neighbor, angle));
-            System.out.println(angle);
-        }
-
-        // sort angles in ascending order, from the nearest to the farthest node (counterclockwise)
-        anglesFromMouse.sort(Comparator.comparing(Pair::getValue));
-
-        // get the farthest and the nearest nodes as the delimiters for the user-chosen angle
-        Dot dot1 = anglesFromMouse.get(anglesFromMouse.size() - 1).getKey();
-        Dot dot2 = anglesFromMouse.get(0).getKey();
-
-        nearestDot.addAngleMeasure(dot1, dot2);
     }
 
     private void cropImage() {
@@ -393,25 +368,6 @@ public class ImageProtractor implements Initializable {
     void putAngleMeasure() {
     }
 
-    private double clamp(double value, double min, double max) {
-        if (value < min)
-            return min;
-        if (value > max)
-            return max;
-        return value;
-    }
-
-    // convert mouse coordinates in the imageView to coordinates in the actual image:
-    private Point2D imageViewToImage(ImageView imageView, Point2D imageViewCoordinates) {
-        double xProportion = imageViewCoordinates.getX() / imageView.getBoundsInLocal().getWidth();
-        double yProportion = imageViewCoordinates.getY() / imageView.getBoundsInLocal().getHeight();
-
-        Rectangle2D viewport = imageView.getViewport();
-        return new Point2D(
-                viewport.getMinX() + xProportion * viewport.getWidth(),
-                viewport.getMinY() + yProportion * viewport.getHeight());
-    }
-
     public static double getImageScalingFactor(ImageView imageView) {
         double scaleX = imageView.getFitWidth() / imageView.getViewport().getMaxX();
         double scaleY = imageView.getFitHeight() / imageView.getViewport().getMaxY();
@@ -419,19 +375,4 @@ public class ImageProtractor implements Initializable {
         return Math.min(scaleX, scaleY);
     }
 
-    private static Image convertToFxImage(BufferedImage image) {
-        WritableImage wr = null;
-
-        if (image != null) {
-            wr = new WritableImage(image.getWidth(), image.getHeight());
-            PixelWriter pw = wr.getPixelWriter();
-            for (int x = 0; x < image.getWidth(); x++) {
-                for (int y = 0; y < image.getHeight(); y++) {
-                    pw.setArgb(x, y, image.getRGB(x, y));
-                }
-            }
-        }
-
-        return new ImageView(wr).getImage();
-    }
 }

@@ -72,12 +72,12 @@ object Tools {
         override fun onRelease(mouseEvent: MouseEvent) {
             // with shift down, maintain the previous selected dots
             if (!mouseEvent.isShiftDown) {
-                chain.clearSelection()
                 Selection.clear()
             }
 
-            chain.filter { SelectionRectangle.isDotInSelection(it) }
-                .forEach { chain.addToSelection(it) }
+            chains.flatten()
+                .filter { SelectionRectangle.isDotInSelection(it) }
+                .forEach { Selection.addToSelection(it) }
 
             SelectionRectangle.stopSelection()
             deactivate()
@@ -167,22 +167,24 @@ object Tools {
      * Add a new dot at the specified coordinates
      */
     fun addNewDot(x: Double, y: Double) {
-        val selectedDot = chain.getSelectedDot()
+        val selectedDot = Selection.selectedDot()
 
         selectedDot.ifPresent { dot: Dot ->
+            val chain = dot.chain
             val newDot = Dot(x, y, chain)
 
             chain.apply {
                 addDot(newDot)
                 connect(newDot, dot)
-                select(newDot)
                 Selection.select(newDot)
             }
+
+            newDot.requestFocus()
         }
     }
 
     fun measureAngle(mousePoint: Point2D) {
-        val nearestDot = chain.getNearestDot(mousePoint, true)
+        val nearestDot = getNearestDot(mousePoint, chains.flatten(), true)
         val neighbors = nearestDot.neighbors()
 
         val anglesFromMouse = mutableListOf<Pair<Dot, Double>>()
@@ -209,20 +211,17 @@ object Tools {
     }
 
     fun deleteDot() {
-        with(chain) {
-            var leaves = selection.filter { it.isLeaf() }
+        var leaves = Selection.selectedDots().filter { it.isLeaf() }
 
-            while (leaves.isNotEmpty()) {
-                leaves.forEach {
-                    removeDot(it)
-                    selection.remove(it)
-                }
-
-                leaves = selection.filter { it.isLeaf() }
+        while (leaves.isNotEmpty()) {
+            leaves.forEach {
+                it.chain.removeDot(it)
+                Selection.unselect(it)
             }
 
-            clearSelection()
-            Selection.clear()
+            leaves = Selection.selectedDots().filter { it.isLeaf() }
         }
+
+        Selection.clear()
     }
 }

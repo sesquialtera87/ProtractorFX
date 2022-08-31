@@ -13,7 +13,7 @@ import javafx.scene.shape.Line
 import javafx.scene.text.FontWeight
 import java.util.*
 
-class DotChain(private val container: Pane) : Iterable<Dot> {
+class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, .0)) : Iterable<Dot> {
 
     /**
      * A connection line between two graph nodes
@@ -50,11 +50,6 @@ class DotChain(private val container: Pane) : Iterable<Dot> {
                     || (dot1 == this.dot2 && dot2 == this.dot1)
     }
 
-    /**
-     * Contains the nodes of this chain that are actually selected
-     */
-    val selection: HashSet<Dot> = HashSet()
-
     private val adjacencyList: MutableMap<Dot, HashSet<Dot>> = mutableMapOf()
     private val connections: HashSet<ConnectorLine> = HashSet()
 
@@ -81,9 +76,9 @@ class DotChain(private val container: Pane) : Iterable<Dot> {
     val size: Int get() = adjacencyList.size
 
     init {
-        val dot1 = Dot(50.0, 50.0, this)
-        val dot2 = Dot(150.0, 50.0, this)
-        val dot3 = Dot(250.0, 150.0, this)
+        val dot1 = Dot(50.0 + displacement.x, 50.0 + displacement.y, this)
+        val dot2 = Dot(150.0 + displacement.x, 50.0 + displacement.y, this)
+        val dot3 = Dot(250.0 + displacement.x, 150.0 + displacement.y, this)
 
         addDots(dot1, dot2, dot3)
         connect(dot1, dot2)
@@ -108,10 +103,6 @@ class DotChain(private val container: Pane) : Iterable<Dot> {
         }
     }
 
-    fun clearSelection() {
-        selection.forEach { dot -> dot.selected = false }
-        selection.clear()
-    }
 
     fun addDot(dot: Dot): Boolean {
         return if (adjacencyList.containsKey(dot))
@@ -131,16 +122,6 @@ class DotChain(private val container: Pane) : Iterable<Dot> {
         }
     }
 
-    fun addToSelection(dot: Dot) {
-        selection.add(dot)
-        dot.selected = true
-    }
-
-    fun select(dot: Dot) {
-        clearSelection()
-        selection.add(dot)
-        dot.selected = true
-    }
 
     fun removeDot(dot: Dot) {
         if (dot.isLeaf()) {
@@ -185,33 +166,20 @@ class DotChain(private val container: Pane) : Iterable<Dot> {
         connections.add(ConnectorLine(dot1, dot2))
     }
 
-    fun getSelectedDot(): Optional<Dot> {
-        return if (selection.isEmpty())
-            Optional.empty()
-        else Optional.of(selection.last())
-    }
-
     /**
-     * Find the node with the minim distance from the given point.
-     * @param excludeLeaves If `true` the nodes with only one incoming connections (leaves) are ignored from the search
+     * Remove all dots and their decorators (connector lines, measures) from the pane.
      */
-    fun getNearestDot(point: Point2D, excludeLeaves: Boolean = false): Dot {
-        var nearestDot = Dot(0.0, 0.0, this)
-        var minDistance: Double = Double.MAX_VALUE
-        var currentDistance: Double
+    fun dispose() {
+        forEach { dot ->
+            // remove the dot from the pane
+            container.children.remove(dot)
 
-        this.forEach { dot ->
-            if (!(excludeLeaves && dot.isLeaf())) {
-                currentDistance = point.distance(dot.getCenter())
+            // remove the connection lines
+            connections.forEach { container.children.remove(it) }
 
-                if (currentDistance < minDistance) {
-                    minDistance = currentDistance
-                    nearestDot = dot
-                }
-            }
+            // remove all decorators
+            dot.angleDecorators.forEach { it.dispose(container) }
         }
-
-        return nearestDot
     }
 
     override fun iterator() = adjacencyList.keys.iterator()

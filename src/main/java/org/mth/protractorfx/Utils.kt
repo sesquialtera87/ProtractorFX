@@ -4,15 +4,22 @@ import javafx.beans.property.DoubleProperty
 import javafx.beans.property.IntegerProperty
 import javafx.beans.property.Property
 import javafx.beans.value.ObservableValue
+import javafx.event.EventHandler
+import javafx.geometry.Dimension2D
 import javafx.geometry.Point2D
 import javafx.scene.Group
 import javafx.scene.ImageCursor
 import javafx.scene.Scene
+import javafx.scene.control.Menu
+import javafx.scene.control.RadioMenuItem
+import javafx.scene.control.ToggleGroup
 import javafx.scene.image.Image
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyCodeCombination
+import javafx.scene.paint.Color
 import javafx.scene.shape.Arc
 import javafx.scene.shape.Circle
+import javafx.scene.shape.Rectangle
 import javafx.stage.Stage
 import java.io.File
 import java.util.*
@@ -61,10 +68,31 @@ val SNAPSHOT_DIR = File("C:\\Users\\matti\\OneDrive\\Documenti\\Java\\Protractor
 
 
 @JvmField
-var dotDeletionEnabled = false
-
-@JvmField
 var ANGLE_LABEL_PRECISION = 1
+
+
+/**
+ * Find the node in the collection with the minim distance from the given [point].
+ * @param excludeLeaves If `true` the nodes with only one incoming connections (leaves) are ignored from the search
+ */
+fun getNearestDot(point: Point2D, points: Collection<Dot>, excludeLeaves: Boolean = false): Dot {
+    var nearestDot: Dot? = null
+    var minDistance: Double = Double.MAX_VALUE
+    var currentDistance: Double
+
+    points.forEach { dot ->
+        if (!(excludeLeaves && dot.isLeaf())) {
+            currentDistance = point.distance(dot.getCenter())
+
+            if (currentDistance < minDistance) {
+                minDistance = currentDistance
+                nearestDot = dot
+            }
+        }
+    }
+
+    return nearestDot!!
+}
 
 
 fun angleBetween(p1: Point2D, p2: Point2D, degree: Boolean = false): Double {
@@ -82,6 +110,40 @@ fun angleBetween(p1: Point2D, p2: Point2D, degree: Boolean = false): Double {
     }
 
     return angle
+}
+
+fun defaultColors() = listOf(
+    Color.BLACK,
+    Color.SLATEBLUE,
+    Color.ORANGERED,
+    Color.MAGENTA,
+    Color.PLUM,
+    Color.OLIVEDRAB,
+    Color.TAN,
+    Color.PEACHPUFF
+)
+
+/**
+ * Populate the [menu] with a [RadioMenuItem] for each color. To each menu item is attached a property (named *color*)
+ * containing the reference to the related [Color] object.
+ * @param colorAction The action that has to be executed on the selection of the [RadioMenuItem]
+ */
+fun initColorMenu(
+    menu: Menu,
+    colorAction: (Color) -> Unit,
+    colorRectangleSize: Dimension2D = Dimension2D(14.0, 14.0),
+) {
+    val toggleGroup = ToggleGroup()
+
+    defaultColors().forEach { color ->
+        val menuItem = RadioMenuItem()
+        menuItem.graphic = Rectangle(colorRectangleSize.width, colorRectangleSize.height, color)
+        menuItem.properties["color"] = color
+        menuItem.onAction = EventHandler { colorAction.invoke(color) }
+
+        menu.items.add(menuItem)
+        toggleGroup.toggles.add(menuItem)
+    }
 }
 
 fun Arc.getCenter() = Point2D(centerX, centerY)
