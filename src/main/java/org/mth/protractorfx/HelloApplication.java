@@ -6,7 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import jfxtras.labs.util.Util;
+import org.mth.protractorfx.tool.Tool;
 
 import java.io.IOException;
 

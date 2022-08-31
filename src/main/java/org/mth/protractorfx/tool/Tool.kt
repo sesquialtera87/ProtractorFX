@@ -1,10 +1,11 @@
-package org.mth.protractorfx
+package org.mth.protractorfx.tool
 
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent.KEY_PRESSED
 import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent.*
 import org.mth.protractorfx.log.LogFactory
+import org.mth.protractorfx.scene
 import java.util.logging.Logger
 
 enum class Tool(val tool: AbstractTool) {

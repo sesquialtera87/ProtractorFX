@@ -1,4 +1,4 @@
-package org.mth.protractorfx
+package org.mth.protractorfx.tool
 
 import javafx.scene.Cursor
 import javafx.scene.input.KeyCodeCombination

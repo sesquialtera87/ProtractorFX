@@ -1,4 +1,4 @@
-package org.mth.protractorfx
+package org.mth.protractorfx.tool
 
 import javafx.geometry.Point2D
 import javafx.scene.Cursor
@@ -7,6 +7,7 @@ import javafx.scene.input.KeyCodeCombination
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Pane
 import javafx.util.Pair
+import org.mth.protractorfx.*
 import org.mth.protractorfx.log.LogFactory
 import java.util.logging.Logger
 
