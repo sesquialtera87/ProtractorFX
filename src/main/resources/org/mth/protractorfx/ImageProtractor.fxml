@@ -45,6 +45,7 @@
                 <MenuBar fx:id="menuBar" BorderPane.alignment="CENTER">
                     <Menu text="Mode">
                         <RadioMenuItem onAction="#fullScreenMode" text="Full screen"/>
+                        <MenuItem accelerator="Shortcut+Q" text="Quit" onAction="#closeApp"/>
                     </Menu>
 
                     <Menu text="Measure">

@@ -28,9 +28,14 @@ public class HelloApplication extends Application {
 //        stage.addEventHandler(KeyEvent.KEY_RELEASED, controller.keyReleasedHandler);
 
         stage.show();
+        stage.requestFocus();
 
         UtilsKt.scene = scene;
         UtilsKt.stage = stage;
+
+        Tool.Companion.initialize();
+
+//        GlobalKeyListener.INSTANCE.install();
     }
 
     public static void main(String[] args) {

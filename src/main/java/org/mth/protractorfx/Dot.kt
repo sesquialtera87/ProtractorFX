@@ -125,6 +125,10 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                 dot.radius = DOT_RADIUS_SMALL
                 dot.toBack()
 
+                // todo FIX
+                if (!dot.selected)
+                    Selection.addToSelection(dot)
+
                 if (Selection.size != anchorMap.size)
                     anchorMap.keys.filter { it != dot }
                         .forEach { anchorMap.remove(it) }

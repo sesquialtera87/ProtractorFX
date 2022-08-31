@@ -1,0 +1,99 @@
+package org.mth.protractorfx
+
+import javafx.scene.input.KeyCode
+import javafx.scene.input.KeyEvent
+import javafx.scene.input.KeyEvent.KEY_PRESSED
+import javafx.scene.input.KeyEvent.KEY_TYPED
+import javafx.scene.input.MouseButton
+import javafx.scene.input.MouseEvent.*
+import org.mth.protractorfx.log.LogFactory
+import java.util.*
+import java.util.logging.Logger
+
+enum class Tool(val tool: AbstractTool) {
+
+    SELECTION(Tools.selectionTool),
+    MEASURE(Tools.measureTool),
+    INSERTION(Tools.insertionTool),
+    DELETION(Tools.deletionTool);
+
+    companion object {
+
+        private val log: Logger = LogFactory.configureLog(Tool::class.java)
+
+        fun activeTool(): Optional<Tool> {
+            val tools = values().filter { it.tool.active }
+
+            return if (tools.isNotEmpty())
+                Optional.of(tools.first())
+            else Optional.empty<Tool>()
+        }
+
+        fun initialize() {
+            log.finest("Initializing the tools' listeners")
+
+            val tools = values().map { it.tool }
+
+            scene.addEventHandler(KEY_PRESSED) { event ->
+                log.finest("Key pressed: $event")
+
+                when (event.code) {
+                    KeyCode.ESCAPE -> tools.forEach { it.deactivate() }
+                    KeyCode.DELETE -> {
+                        Tools.deleteDot()
+                        event.consume()
+                    }
+                    else -> {}
+                }
+
+                values().filter { it.tool.shortcut.match(event) }
+                    .forEach { tool ->
+                        log.finest("Shortcut detected for tool $tool")
+
+                        tool.tool.apply {
+                            if (active) {
+                                deactivate()
+
+                                log.finest("Deactivating tool $tool")
+                            } else {
+                                values().filter { it != tool }.forEach {
+                                    log.finest("Deactivating tool $it")
+                                    it.tool.deactivate()
+                                }
+                                activate()
+
+                                log.finest("Activating tool $tool")
+                            }
+                        }
+
+                        event.consume()
+                    }
+            }
+
+            scene.addEventHandler(MOUSE_PRESSED) { event ->
+                if (event.isPrimaryButtonDown) {
+                    tools.filter { it.active }
+                        .forEach { it.onPress(event) }
+
+                    event.consume()
+                }
+            }
+
+            scene.addEventHandler(MOUSE_RELEASED) { event ->
+                if (event.button == MouseButton.PRIMARY) {
+                    tools.filter { it.active }
+                        .forEach { it.onRelease(event) }
+
+                    event.consume()
+                }
+            }
+
+            scene.addEventHandler((MOUSE_DRAGGED)) { event ->
+                if (event.button == MouseButton.PRIMARY) {
+                    tools.filter { it.active }
+                        .forEach { it.onDrag(event) }
+                }
+            }
+        }
+    }
+}

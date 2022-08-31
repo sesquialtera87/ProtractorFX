@@ -103,7 +103,6 @@ public class ImageProtractor implements Initializable {
 //        cropArea.setVisible(false);
 
 
-        Tools.INSTANCE.initialize(container);
 
 
         container.setOnMouseClicked(evt -> {
@@ -366,6 +365,12 @@ public class ImageProtractor implements Initializable {
 
     @FXML
     void putAngleMeasure() {
+    }
+
+    @FXML
+    void newChain() {
+        DotChain newChain = new DotChain(container, new Point2D(20, 12));
+        UtilsKt.getChains().add(newChain);
     }
 
     public static double getImageScalingFactor(ImageView imageView) {

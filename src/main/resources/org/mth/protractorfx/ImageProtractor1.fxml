@@ -46,10 +46,12 @@
                 <MenuBar fx:id="menuBar" prefHeight="40.0" prefWidth="854.0" BorderPane.alignment="CENTER">
                     <Menu text="Mode">
                         <RadioMenuItem onAction="#fullScreenMode" text="Full screen"/>
+                        <MenuItem accelerator="Shortcut+Q" text="Quit" onAction="#closeApp"/>
                     </Menu>
 
                     <Menu text="Measure">
-<!--                        <MenuItem accelerator="Shortcut+M" onAction="#putAngleMeasure" text="Put measure"/>-->
+                        <!--                        <MenuItem accelerator="Shortcut+M" onAction="#putAngleMeasure" text="Put measure"/>-->
+                        <MenuItem accelerator="Shortcut+N" text="New chain" onAction="#newChain"/>
                     </Menu>
 
                     <Menu text="Image">

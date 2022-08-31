@@ -18,9 +18,12 @@ object Tools {
 
     val log: Logger = LogFactory.configureLog(Tools::class.java)
 
-    lateinit var pane: Pane
+    val pane: Pane by lazy {
+        println(scene.lookup("#container"))
+        scene.lookup("#container") as Pane
+    }
 
-    private val deletionTool = object : Tool() {
+    val deletionTool = object : AbstractTool() {
         override val cursor: Cursor
             get() = CURSOR_REMOVE_DOT
 
@@ -32,7 +35,7 @@ object Tools {
         }
     }
 
-    private val insertionTool = object : Tool() {
+    val insertionTool = object : AbstractTool() {
         override val cursor: Cursor
             get() = CURSOR_INSERT_DOT
 
@@ -44,7 +47,7 @@ object Tools {
         }
     }
 
-    private val measureTool = object : Tool() {
+    val measureTool = object : AbstractTool() {
         override val cursor: Cursor
             get() = CURSOR_ANGLE
 
@@ -56,7 +59,7 @@ object Tools {
         }
     }
 
-    private val selectionTool = object : Tool() {
+    val selectionTool = object : AbstractTool() {
 
         override val cursor: Cursor
             get() = CURSOR_RECT_SELECTION
@@ -90,30 +93,7 @@ object Tools {
 
     }
 
-    abstract class Tool {
-        var active: Boolean = false
-        abstract val cursor: Cursor
-        abstract val shortcut: KeyCodeCombination
-
-        open fun activate() {
-            active = true
-            pane.cursor = cursor
-        }
-
-        open fun deactivate() {
-            active = false
-            pane.cursor = Cursor.DEFAULT
-        }
-
-        open fun onPress(mouseEvent: MouseEvent) {}
-
-        open fun onDrag(mouseEvent: MouseEvent) {}
-
-        open fun onRelease(mouseEvent: MouseEvent) {}
-    }
-
     fun initialize(pane: Pane) {
-        this.pane = pane
 
         val tools = listOf(
             selectionTool,
@@ -132,7 +112,7 @@ object Tools {
                     partition.second.forEach { it.deactivate() }
                     partition.first.forEach { it.activate() }
 
-                    event.consume()
+//                    event.consume()
                 }
             }
         }
