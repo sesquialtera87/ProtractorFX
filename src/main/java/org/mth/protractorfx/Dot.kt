@@ -16,7 +16,7 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
     /**
      * Get the color of the parent chain
      */
-    private val chainColor: Color get() = chain.chainColor.get()
+    private val chainColor: Color by chain.chainColor
 
     val angleDecorators = mutableListOf<AngleDecorator>()
 
@@ -51,17 +51,6 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
         centerX = x
         centerY = y
         fill = chainColor
-
-
-        addEventHandler(MOUSE_PRESSED) {
-            if (it.button == MouseButton.PRIMARY) {
-                log.fine("Click on dot with primary button")
-
-                requestFocus()
-
-
-            }
-        }
 
         DragSupport(this)
     }
@@ -103,51 +92,53 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
         private var anchorPoint = Point2D(.0, .0)
         private var anchorPointForDrag = Point2D(.0, .0)
         private var dr = Point2D(.0, .0)
+        private var dragInitialized = false
+
+        private fun initDrag(dot: Dot) {
+            log.fine("Drag detected")
+
+            dot.radius = DOT_RADIUS_SMALL
+
+            if (Selection.size != anchorMap.size)
+                anchorMap.keys.filter { it != dot }
+                    .forEach {
+                        anchorMap.remove(it)
+                        it.selected = false
+                    }
+
+            if (!dot.selected)
+                Selection.addToSelection(dot)
+
+            dragInitialized = true
+        }
 
         init {
             dot.addEventHandler(MOUSE_CLICKED) {
                 if (it.button == MouseButton.SECONDARY) {
+                    // popup trigger
                     DotMenu.show(dot, it.x, it.y)
                 } else if (it.button == MouseButton.PRIMARY) {
                     // With CTRL + Click select the chain this dot belongs to
                     if (it.isControlDown) {
+                        log.finest("Chain selection trigger detected")
+
                         Selection.clear()
                         Selection.addToSelection(dot.chain)
+                        dot.requestFocus()
+                    } else if (it.isShiftDown) {
+                        log.finest("Increment selection trigger detected")
+
+                        Selection.addToSelection(dot)
+                        dot.requestFocus()
+                    } else {
+                        if (it.isDragDetect) {
+                            log.finest("Single dot selection trigger detected")
+
+                            Selection.select(dot)
+                            dot.requestFocus()
+                        }
                     }
                 }
-
-                it.consume()
-            }
-
-            dot.addEventHandler(DRAG_DETECTED) { event ->
-                log.fine("Drag detected")
-
-                dot.radius = DOT_RADIUS_SMALL
-                dot.toBack()
-
-                // todo FIX
-                if (!dot.selected)
-                    Selection.addToSelection(dot)
-
-                if (Selection.size != anchorMap.size)
-                    anchorMap.keys.filter { it != dot }
-                        .forEach { anchorMap.remove(it) }
-
-                event.consume()
-            }
-
-            dot.addEventHandler(MOUSE_RELEASED) {
-                dot.radius = DOT_RADIUS
-                dot.toFront()
-
-                if (it.isDragDetect)
-                    if (it.isShiftDown) {
-                        Selection.addToSelection(dot)
-                        it.consume()
-                    } else {
-                        Selection.select(dot)
-                        it.consume()
-                    }
 
                 it.consume()
             }
@@ -165,11 +156,34 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                 anchorPoint = Point2D(event.screenX, event.screenY)
                 anchorPointForDrag = dot.getCenter()
 
-                log.fine("Mouse pressed. \n\tAnchor point = $anchorPoint \n\tDrag anchor = $anchorPointForDrag")
+                log.fine("Mouse pressed. \n\tAnchor point = $anchorPoint \n\tDrag anchor = $anchorPointForDrag \n\tAnchorMap size = ${anchorMap.size}")
             }
+
+            dot.addEventHandler(DRAG_DETECTED) { event ->
+                log.fine("Drag detected")
+
+                if (!dragInitialized)
+                    initDrag(dot)
+
+                event.consume()
+            }
+
+            dot.addEventHandler(MOUSE_RELEASED) {
+                dot.radius = DOT_RADIUS
+//                dot.toFront()
+
+                if (!it.isDragDetect)
+                    dragInitialized = false
+
+                it.consume()
+            }
+
 
             dot.addEventHandler(MOUSE_DRAGGED) { mouseEvent ->
                 log.fine("Dragging")
+
+                if (!dragInitialized)
+                    initDrag(dot)
 
                 val currentDragPoint = Point2D(mouseEvent.screenX, mouseEvent.screenY)
 

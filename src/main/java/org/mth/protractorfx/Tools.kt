@@ -4,10 +4,7 @@ import javafx.geometry.Point2D
 import javafx.scene.Cursor
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyCodeCombination
-import javafx.scene.input.KeyEvent.KEY_PRESSED
-import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
-import javafx.scene.input.MouseEvent.*
 import javafx.scene.layout.Pane
 import javafx.util.Pair
 import org.mth.protractorfx.log.LogFactory
@@ -18,10 +15,7 @@ object Tools {
 
     val log: Logger = LogFactory.configureLog(Tools::class.java)
 
-    val pane: Pane by lazy {
-        println(scene.lookup("#container"))
-        scene.lookup("#container") as Pane
-    }
+    val pane: Pane by lazy { scene.lookup("#container") as Pane }
 
     val deletionTool = object : AbstractTool() {
         override val cursor: Cursor
@@ -91,56 +85,6 @@ object Tools {
             SelectionRectangle.updateSelectionShape(mouseEvent)
         }
 
-    }
-
-    fun initialize(pane: Pane) {
-
-        val tools = listOf(
-            selectionTool,
-            measureTool,
-            insertionTool,
-            deletionTool
-        )
-
-        pane.addEventHandler(KEY_PRESSED) { event ->
-            when (event.code) {
-                KeyCode.ESCAPE -> tools.forEach { it.deactivate() }
-                KeyCode.DELETE -> deleteDot()
-                in listOf(KeyCode.SHIFT, KeyCode.CONTROL, KeyCode.ALT) -> return@addEventHandler
-                else -> {
-                    val partition = tools.partition { it.shortcut.match(event) }
-                    partition.second.forEach { it.deactivate() }
-                    partition.first.forEach { it.activate() }
-
-//                    event.consume()
-                }
-            }
-        }
-
-        pane.addEventHandler(MOUSE_PRESSED) { event ->
-            if (event.isPrimaryButtonDown) {
-                tools.filter { it.active }
-                    .forEach { it.onPress(event) }
-
-                event.consume()
-            }
-        }
-
-        pane.addEventHandler(MOUSE_RELEASED) { event ->
-            if (event.button == MouseButton.PRIMARY) {
-                tools.filter { it.active }
-                    .forEach { it.onRelease(event) }
-
-                event.consume()
-            }
-        }
-
-        pane.addEventHandler((MOUSE_DRAGGED)) { event ->
-            if (event.button == MouseButton.PRIMARY) {
-                tools.filter { it.active }
-                    .forEach { it.onDrag(event) }
-            }
-        }
     }
 
     /**

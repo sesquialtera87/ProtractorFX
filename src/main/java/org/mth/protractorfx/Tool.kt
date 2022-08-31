@@ -1,13 +1,10 @@
 package org.mth.protractorfx
 
 import javafx.scene.input.KeyCode
-import javafx.scene.input.KeyEvent
 import javafx.scene.input.KeyEvent.KEY_PRESSED
-import javafx.scene.input.KeyEvent.KEY_TYPED
 import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent.*
 import org.mth.protractorfx.log.LogFactory
-import java.util.*
 import java.util.logging.Logger
 
 enum class Tool(val tool: AbstractTool) {
@@ -17,17 +14,10 @@ enum class Tool(val tool: AbstractTool) {
     INSERTION(Tools.insertionTool),
     DELETION(Tools.deletionTool);
 
+
     companion object {
 
         private val log: Logger = LogFactory.configureLog(Tool::class.java)
-
-        fun activeTool(): Optional<Tool> {
-            val tools = values().filter { it.tool.active }
-
-            return if (tools.isNotEmpty())
-                Optional.of(tools.first())
-            else Optional.empty<Tool>()
-        }
 
         fun initialize() {
             log.finest("Initializing the tools' listeners")
@@ -46,6 +36,7 @@ enum class Tool(val tool: AbstractTool) {
                     else -> {}
                 }
 
+                // find the tool that match the key combination
                 values().filter { it.tool.shortcut.match(event) }
                     .forEach { tool ->
                         log.finest("Shortcut detected for tool $tool")
