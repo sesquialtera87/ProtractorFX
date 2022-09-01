@@ -19,6 +19,7 @@ object DeletionTool : AbstractTool() {
         val coordinates =
             Point2D(mouseEvent.x, mouseEvent.y).subtract(pane.boundsInParent.minX, pane.boundsInParent.minY)
 
+        // find the dot under the cursor and remove it
         for (dot in chains.flatten()) {
             if (dot.getCenter().subtract(coordinates).magnitude() < dot.radius) {
                 dot.removeFromChain()
@@ -28,7 +29,7 @@ object DeletionTool : AbstractTool() {
 
     }
 
-    fun deleteDot() {
+    fun deleteSelection() {
         var leaves = Selection.selectedDots().filter { it.isLeaf() }
 
         while (leaves.isNotEmpty()) {

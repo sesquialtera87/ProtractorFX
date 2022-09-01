@@ -13,7 +13,8 @@ import javafx.scene.shape.Line
 import javafx.scene.text.FontWeight
 import java.util.*
 
-class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, .0)) : Iterable<Dot> {
+class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, .0), color: Color? = Color.BLACK) :
+    Iterable<Dot> {
 
     /**
      * A connection line between two graph nodes
@@ -76,6 +77,22 @@ class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, 
     val size: Int get() = adjacencyList.size
 
     init {
+        if (color == null) {
+            // choose a random color from the available ones
+            var availableColors = availableColors()
+
+            // if no color is available, choose random from all the colors
+            if (availableColors.isEmpty())
+                availableColors = defaultColors()
+
+            with(Random()) {
+                val randomColor = availableColors[nextInt(availableColors.size)]
+                chainColor.set(randomColor)
+            }
+        } else
+            chainColor.set(color)
+
+
         val dot1 = Dot(50.0 + displacement.x, 50.0 + displacement.y, this)
         val dot2 = Dot(150.0 + displacement.x, 50.0 + displacement.y, this)
         val dot3 = Dot(250.0 + displacement.x, 150.0 + displacement.y, this)
@@ -180,6 +197,11 @@ class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, 
             // remove all decorators
             dot.angleDecorators.forEach { it.dispose(container) }
         }
+    }
+
+    fun availableColors(): List<Color> {
+        val usedColors = chains.map { it.chainColor.get() }
+        return defaultColors() - usedColors.toSet()
     }
 
     override fun iterator() = adjacencyList.keys.iterator()

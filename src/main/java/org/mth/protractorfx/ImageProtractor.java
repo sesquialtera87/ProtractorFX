@@ -164,7 +164,7 @@ public class ImageProtractor implements Initializable {
             chainColorMenu.getItems().add(colorMenuItem);
         });
 
-        chain = new DotChain(container, new Point2D(0, 0));
+        chain = new DotChain(container, new Point2D(0, 0), Color.BLACK);
         UtilsKt.setChain(chain);
         UtilsKt.getChains().add(chain);
 
@@ -175,7 +175,7 @@ public class ImageProtractor implements Initializable {
         HashSet<Dot> updateSet = new HashSet<>();
 
         if (direction == Adjustable.VERTICAL) {
-            Selection.INSTANCE.selectedDots().forEach(dot -> {
+            Selection.INSTANCE.forEach(dot -> {
                 dot.setCenterY(dot.getCenterY() + dr);
                 updateSet.add(dot);
                 updateSet.addAll(dot.neighbors());
@@ -183,7 +183,7 @@ public class ImageProtractor implements Initializable {
 
             log.fine(String.format("Moving selected dots [Direction=%s, dr=%.2f]", direction, dr));
         } else if (direction == Adjustable.HORIZONTAL) {
-            Selection.INSTANCE.selectedDots().forEach(dot -> {
+            Selection.INSTANCE.forEach(dot -> {
                 dot.setCenterX(dot.getCenterX() + dr);
                 updateSet.add(dot);
                 updateSet.addAll(dot.neighbors());
@@ -368,7 +368,7 @@ public class ImageProtractor implements Initializable {
 
     @FXML
     void newChain() {
-        DotChain newChain = new DotChain(container, new Point2D(20, 12));
+        DotChain newChain = new DotChain(container, new Point2D(20, 12), null);
         UtilsKt.getChains().add(newChain);
     }
 

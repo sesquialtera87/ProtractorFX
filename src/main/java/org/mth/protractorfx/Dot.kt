@@ -17,7 +17,7 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
     /**
      * Get the color of the parent chain
      */
-    private val chainColor: Color by chain.chainColor
+    val chainColor: Color by chain.chainColor
 
     val angleDecorators = mutableListOf<AngleDecorator>()
 
@@ -124,7 +124,7 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
             dot.addEventHandler(MOUSE_CLICKED) {
                 if (it.button == MouseButton.SECONDARY) {
                     // popup trigger
-                    DotMenu.show(dot, it.x, it.y)
+                    DotMenu.configureBeforeShow(dot, it.x, it.y)
                     it.consume()
                 } else if (it.button == MouseButton.PRIMARY) {
                     if (Tool.activeTools().isNotEmpty()) {
@@ -162,7 +162,7 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                 anchorMap[dot] = dot.getCenter()
 
                 // save the coordinates of every node in the selection
-                Selection.selectedDots().forEach {
+                Selection.forEach {
                     anchorMap[it] = it.getCenter()
                 }
 

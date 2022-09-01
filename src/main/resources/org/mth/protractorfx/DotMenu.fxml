@@ -17,7 +17,7 @@
 
         <Menu text="Background">
             <CheckMenuItem text="Visible" onAction="#selectAllDotsInChain"/>
-            <Menu text="Color" fx:id="backgroundColorMenu"/>
+            <Menu text="Color" fx:id="chainColorMenu"/>
         </Menu>
     </items>
 </ContextMenu>

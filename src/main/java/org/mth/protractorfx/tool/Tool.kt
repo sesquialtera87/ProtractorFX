@@ -33,7 +33,7 @@ enum class Tool(val tool: AbstractTool) {
                 when (event.code) {
                     KeyCode.ESCAPE -> tools.forEach { it.deactivate() }
                     KeyCode.DELETE -> {
-                        DeletionTool.deleteDot()
+                        DeletionTool.deleteSelection()
                         event.consume()
                     }
                     else -> {}
