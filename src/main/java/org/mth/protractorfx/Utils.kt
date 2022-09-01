@@ -16,6 +16,7 @@ import javafx.scene.control.ToggleGroup
 import javafx.scene.image.Image
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyCodeCombination
+import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import javafx.scene.shape.Arc
 import javafx.scene.shape.Circle
@@ -33,6 +34,8 @@ var scene = Scene(Group())
 
 @JvmField
 var stage = Stage()
+
+val pane: Pane by lazy { scene.lookup("#container") as Pane}
 
 //@JvmField
 lateinit var chain: DotChain

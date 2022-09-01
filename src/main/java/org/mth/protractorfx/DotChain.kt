@@ -89,8 +89,6 @@ class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, 
         chainColor.set(color)
     }
 
-    fun neighborsCount(dot: Dot) = adjacencyList[dot]!!.size
-
     fun neighbors(dot: Dot): HashSet<Dot> = adjacencyList[dot]!!
 
     fun addDots(vararg dots: Dot) {
@@ -124,7 +122,9 @@ class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, 
 
 
     fun removeDot(dot: Dot) {
-        if (dot.isLeaf()) {
+        if (size == 1) {
+            dispose()
+        } else if (dot.isLeaf()) {
             val parent = adjacencyList[dot]!!.first() // there's only one node connected (it's a leaf...)
 
             // remove the dot from its parent's adjacency list and from the adjacency list itself

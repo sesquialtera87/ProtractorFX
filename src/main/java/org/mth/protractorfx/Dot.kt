@@ -8,6 +8,7 @@ import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
 import org.mth.protractorfx.log.LogFactory
+import org.mth.protractorfx.tool.Tool
 import java.util.logging.Logger
 import kotlin.math.max
 
@@ -78,6 +79,13 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
         }
     }
 
+    /**
+     * Simply call the [DotChain.removeDot] method apply to this dot
+     */
+    fun removeFromChain() {
+        chain.removeDot(this)
+    }
+
     companion object {
         val log: Logger = LogFactory.configureLog(Dot::class.java)
 
@@ -117,9 +125,14 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                 if (it.button == MouseButton.SECONDARY) {
                     // popup trigger
                     DotMenu.show(dot, it.x, it.y)
+                    it.consume()
                 } else if (it.button == MouseButton.PRIMARY) {
-                    // With CTRL + Click select the chain this dot belongs to
+                    if (Tool.activeTools().isNotEmpty()) {
+                        return@addEventHandler
+                    }
+
                     if (it.isControlDown) {
+                        // With CTRL + Click select the chain this dot belongs to
                         log.finest("Chain selection trigger detected")
 
                         Selection.clear()
@@ -138,9 +151,9 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                             dot.requestFocus()
                         }
                     }
-                }
 
-                it.consume()
+                    it.consume()
+                }
             }
 
             dot.addEventHandler(MOUSE_PRESSED) { event ->
@@ -175,7 +188,8 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                 if (!it.isDragDetect)
                     dragInitialized = false
 
-                it.consume()
+                if (Tool.activeTools().isEmpty())
+                    it.consume()
             }
 
 

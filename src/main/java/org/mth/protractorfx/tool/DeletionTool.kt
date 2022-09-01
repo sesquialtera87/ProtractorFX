@@ -5,10 +5,7 @@ import javafx.scene.Cursor
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyCodeCombination
 import javafx.scene.input.MouseEvent
-import org.mth.protractorfx.CURSOR_REMOVE_DOT
-import org.mth.protractorfx.Selection
-import org.mth.protractorfx.chains
-import org.mth.protractorfx.getCenter
+import org.mth.protractorfx.*
 
 object DeletionTool : AbstractTool() {
 
@@ -24,7 +21,7 @@ object DeletionTool : AbstractTool() {
 
         for (dot in chains.flatten()) {
             if (dot.getCenter().subtract(coordinates).magnitude() < dot.radius) {
-                dot.chain.removeDot(dot)
+                dot.removeFromChain()
                 break
             }
         }
@@ -36,7 +33,7 @@ object DeletionTool : AbstractTool() {
 
         while (leaves.isNotEmpty()) {
             leaves.forEach {
-                it.chain.removeDot(it)
+                it.removeFromChain()
                 Selection.unselect(it)
             }
 

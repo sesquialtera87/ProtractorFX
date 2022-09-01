@@ -10,15 +10,17 @@ import java.util.logging.Logger
 
 enum class Tool(val tool: AbstractTool) {
 
-    SELECTION(Tools.selectionTool),
-    MEASURE(Tools.measureTool),
-    INSERTION(Tools.insertionTool),
-    DELETION(Tools.deletionTool);
+    SELECTION(SelectionTool),
+    MEASURE(MeasureTool),
+    INSERTION(InsertionTool),
+    DELETION(DeletionTool);
 
 
     companion object {
 
         private val log: Logger = LogFactory.configureLog(Tool::class.java)
+
+        fun activeTools() = values().filter { it.tool.active }
 
         fun initialize() {
             log.finest("Initializing the tools' listeners")
@@ -31,7 +33,7 @@ enum class Tool(val tool: AbstractTool) {
                 when (event.code) {
                     KeyCode.ESCAPE -> tools.forEach { it.deactivate() }
                     KeyCode.DELETE -> {
-                        Tools.deleteDot()
+                        DeletionTool.deleteDot()
                         event.consume()
                     }
                     else -> {}
@@ -72,6 +74,7 @@ enum class Tool(val tool: AbstractTool) {
             }
 
             scene.addEventHandler(MOUSE_RELEASED) { event ->
+                println(event)
                 if (event.button == MouseButton.PRIMARY) {
                     tools.filter { it.active }
                         .forEach { it.onRelease(event) }

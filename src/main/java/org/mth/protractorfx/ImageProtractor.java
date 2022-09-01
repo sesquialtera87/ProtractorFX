@@ -27,6 +27,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.StageStyle;
 import javafx.util.Pair;
 import org.mth.protractorfx.log.LogFactory;
+import org.mth.protractorfx.tool.InsertionTool;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -103,12 +104,10 @@ public class ImageProtractor implements Initializable {
 //        cropArea.setVisible(false);
 
 
-
-
         container.setOnMouseClicked(evt -> {
             cropArea.show(false);
 
-            if (evt.isStillSincePress()) {
+            if (evt.isStillSincePress() && !InsertionTool.INSTANCE.getActive()) {
                 log.fine("Click on empty space");
                 Selection.INSTANCE.clear();
                 container.requestFocus();
