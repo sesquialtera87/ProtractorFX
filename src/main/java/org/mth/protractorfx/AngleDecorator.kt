@@ -15,8 +15,10 @@ import javafx.scene.text.Text
 import javafx.scene.transform.Transform
 import javafx.scene.transform.Translate
 import org.mth.protractorfx.log.LogFactory
+import org.mth.protractorfx.tool.MeasureUnit.*
 import java.util.logging.Logger
 import kotlin.math.pow
+import kotlin.math.round
 import kotlin.math.sqrt
 
 /**
@@ -114,7 +116,7 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
                     dragTranslation.y = dr.y
 
                     // update the angle
-                    dragToTranslationAngle = angleBetween(dr, T)
+                    dragToTranslationAngle = angleBetween(dr, T, MEASURE_UNIT)
 
                     it.consume()
                 }
@@ -177,7 +179,7 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
         }
 
         angleLabel.apply {
-            text = DEGREE_MEASURE_TEMPLATE.format(getMeasure())
+            text = format(getMeasure())
             isVisible = true
 
             // initialize appearance properties
@@ -233,6 +235,10 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
             angleLabel.backgroundColor = color
         }
 
+        // listen to changes of the measure unit
+        measureUnitProperty.addListener { _, _, unit ->
+
+        }
 
         arc.toBack()
         angleLabel.toBack()
@@ -309,8 +315,7 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
 
         // update label position and text
         if (angleLabel.isVisible) {
-
-            angleLabel.text = DEGREE_MEASURE_TEMPLATE.format(angleMeasure)
+            angleLabel.text = format(angleMeasure)
 
             updateAngleLabelPosition()
         }
@@ -331,23 +336,57 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
         return result
     }
 
+    /**
+     * Calculate the measure of the angle in **degrees**
+     */
     private fun getMeasure(): Double {
         val p1 = neighbor1.getCenter()
         val p2 = neighbor2.getCenter()
         val arcCenter = arc.getCenter()
 
-        return angleBetween(p2.subtract(arcCenter), p1.subtract(arcCenter), degree = true)
+        return angleBetween(p2.subtract(arcCenter), p1.subtract(arcCenter), DECIMAL_DEGREE)
     }
 
     private fun getInitialAngle(): Double {
         val p1 = neighbor1.getCenter()
         val arcCenter = arc.getCenter()
 
-        return angleBetween(p1.subtract(arcCenter), Point2D(1.0, 0.0), degree = true)
+        return angleBetween(p1.subtract(arcCenter), Point2D(1.0, 0.0), DECIMAL_DEGREE)
     }
 
     companion object {
         private val log: Logger = LogFactory.configureLog(AngleDecorator::class.java)
-        val DEGREE_MEASURE_TEMPLATE = "%.${ANGLE_LABEL_PRECISION}f°"
+
+        private val DECIMAL_DEGREE_TEMPLATE = "%.${ANGLE_LABEL_PRECISION}f°"
+        private val RADIANS_TEMPLATE = "%.${ANGLE_LABEL_PRECISION}f"
+        private const val SEXAGESIMAL_DEGREE_TEMPLATE = "%d° %02d' %02d''"
+        private val CENTESIMAL_DEGREE_TEMPLATE = "%d° %02d' %02d''"
+
+        /**
+         * Format the given measure
+         * @param angle The measure in **degrees**
+         */
+        fun format(angle: Double): String {
+            return when (MEASURE_UNIT) {
+                RADIANS -> RADIANS_TEMPLATE.format(Math.toRadians(angle))
+                SEXAGESIMAL_DEGREES -> {
+                    val S = round(angle * 3600).toInt()
+                    val seconds = S % 60
+                    val minutes = (S / 60) % 60
+                    val degrees = (S / 3600)
+
+                    SEXAGESIMAL_DEGREE_TEMPLATE.format(degrees, minutes, seconds)
+                }
+                DECIMAL_DEGREE -> DECIMAL_DEGREE_TEMPLATE.format(angle)
+                CENTESIMAL_DEGREE -> {
+                    val S = round(angle * 10 / 9 * 10000).toInt()
+                    val seconds = S % 100
+                    val minutes = (S / 100) % 100
+                    val degrees = (S / 10000)
+
+                    CENTESIMAL_DEGREE_TEMPLATE.format(degrees, minutes, seconds)
+                }
+            }
+        }
     }
 }

@@ -12,7 +12,6 @@ import java.net.URL
 import java.util.*
 import java.util.function.Consumer
 import java.util.logging.Logger
-import kotlin.random.Random
 
 /**
  * The popup menu shown on each measure label
@@ -53,10 +52,10 @@ class DotMenu : Initializable {
     @FXML
     fun newChain() {
         dot {
-            with(Random(23)) {
+            with(Random()) {
                 val newChain = DotChain(
                     container = it.parent as Pane,
-                    displacement = Point2D(nextDouble(10.0, 250.0), nextDouble(10.0, 250.0)),
+                    displacement = Point2D(nextDouble(50.0, 450.0), nextDouble(50.0, 450.0)),
                     color = null
                 )
                 chains.add(newChain)
@@ -73,14 +72,10 @@ class DotMenu : Initializable {
         return Optional.ofNullable(dot)
     }
 
-    /**
-     * Show the context menu over the [measureLabel].
-     * @param dot The graph-node related to the label
-     */
-    fun configureBeforeShow(dot: Dot) { // todo change method name
+    fun configureBeforeShow(dot: Dot) {
         this.dot = dot
 
-//        select the MenuItem related to the current chain color
+        // select the MenuItem related to the current chain color
         chainColorMenu.items.forEach {
             val menuItem = it as RadioMenuItem
             val color = it.properties["color"] as Color
