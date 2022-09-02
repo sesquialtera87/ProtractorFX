@@ -11,7 +11,6 @@ import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import javafx.scene.shape.Line
 import javafx.scene.text.FontWeight
-import org.mth.protractorfx.tool.MeasureUnit
 import java.util.*
 
 class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, .0), color: Color? = Color.BLACK) :
@@ -35,6 +34,7 @@ class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, 
             // add the line to the parent Pane
             parent.children.add(this)
             isVisible = true
+            stroke = dot1.chainColor.desaturate()
 
             FadeIn(this).apply {
                 setSpeed(2.0)
@@ -92,6 +92,13 @@ class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, 
             }
         } else
             chainColor.set(color)
+
+        // update the connector color in response to a change of the chain color
+        chainColor.addListener { _, _, chainColor ->
+            connections.forEach {
+                it.stroke = chainColor.desaturate()
+            }
+        }
 
 
         val dot1 = Dot(50.0 + displacement.x, 50.0 + displacement.y, this)
