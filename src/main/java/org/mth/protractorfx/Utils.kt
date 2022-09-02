@@ -27,6 +27,7 @@ import org.mth.protractorfx.tool.MeasureUnit
 import org.mth.protractorfx.tool.MeasureUnit.*
 import java.io.File
 import java.util.*
+import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
@@ -113,7 +114,7 @@ fun getNearestDot(point: Point2D, points: Collection<Dot>, excludeLeaves: Boolea
 }
 
 
-fun angleBetween(p1: Point2D, p2: Point2D, unit: MeasureUnit = DECIMAL_DEGREE): Double {
+fun angleBetween(p1: Point2D, p2: Point2D, unit: MeasureUnit = DECIMAL_DEGREE, positive: Boolean = true): Double {
     val dot = p1.x * p2.x + p1.y * p2.y
     val det = p1.x * p2.y - p2.x * p1.y
     var angle = atan2(det, dot) // radians
@@ -123,12 +124,14 @@ fun angleBetween(p1: Point2D, p2: Point2D, unit: MeasureUnit = DECIMAL_DEGREE): 
             angle = Math.toDegrees(angle)
 
             // put angle measure in range [0,360]
-            if (angle < 0)
+            if (positive && angle < 0)
                 angle += 360
         }
-        RADIANS -> {}
-        SEXAGESIMAL_DEGREES -> {}
-        CENTESIMAL_DEGREE -> {}
+        RADIANS -> {
+            if (positive && angle < 0)
+                angle += 2 * PI
+        }
+        CENTESIMAL_DEGREE, SEXAGESIMAL_DEGREES -> throw IllegalArgumentException()
     }
 
     return angle
