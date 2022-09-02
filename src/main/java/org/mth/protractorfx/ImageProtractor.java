@@ -12,10 +12,9 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.PixelWriter;
-import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
@@ -25,8 +24,9 @@ import javafx.scene.transform.Scale;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.StageStyle;
-import javafx.util.Pair;
 import org.mth.protractorfx.log.LogFactory;
+import org.mth.protractorfx.tool.InsertionTool;
+import org.mth.protractorfx.tool.MeasureUnit;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -38,7 +38,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.HashSet;
+import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import static java.lang.Double.parseDouble;
@@ -82,6 +83,8 @@ public class ImageProtractor implements Initializable {
     Menu chainColorMenu;
     @FXML
     MenuBar menuBar;
+    @FXML
+    Menu measureUnitMenu;
 
     DotChain chain;
 
@@ -103,13 +106,10 @@ public class ImageProtractor implements Initializable {
 //        cropArea.setVisible(false);
 
 
-        Tools.INSTANCE.initialize(container);
-
-
         container.setOnMouseClicked(evt -> {
             cropArea.show(false);
 
-            if (evt.isStillSincePress()) {
+            if (evt.isStillSincePress() && !InsertionTool.INSTANCE.getActive()) {
                 log.fine("Click on empty space");
                 Selection.INSTANCE.clear();
                 container.requestFocus();
@@ -166,7 +166,18 @@ public class ImageProtractor implements Initializable {
             chainColorMenu.getItems().add(colorMenuItem);
         });
 
-        chain = new DotChain(container, new Point2D(0, 0));
+
+        ToggleGroup group = new ToggleGroup();
+
+        for (MeasureUnit unit : MeasureUnit.values()) {
+            RadioMenuItem item = new RadioMenuItem(unit.getDisplay());
+            item.setSelected(UtilsKt.measureUnitProperty.getValue() == unit);
+            item.setOnAction(actionEvent -> UtilsKt.measureUnitProperty.set(unit));
+            measureUnitMenu.getItems().add(item);
+            group.getToggles().add(item);
+        }
+
+        chain = new DotChain(container, new Point2D(0, 0), Color.BLACK);
         UtilsKt.setChain(chain);
         UtilsKt.getChains().add(chain);
 
@@ -177,7 +188,7 @@ public class ImageProtractor implements Initializable {
         HashSet<Dot> updateSet = new HashSet<>();
 
         if (direction == Adjustable.VERTICAL) {
-            Selection.INSTANCE.selectedDots().forEach(dot -> {
+            Selection.INSTANCE.forEach(dot -> {
                 dot.setCenterY(dot.getCenterY() + dr);
                 updateSet.add(dot);
                 updateSet.addAll(dot.neighbors());
@@ -185,7 +196,7 @@ public class ImageProtractor implements Initializable {
 
             log.fine(String.format("Moving selected dots [Direction=%s, dr=%.2f]", direction, dr));
         } else if (direction == Adjustable.HORIZONTAL) {
-            Selection.INSTANCE.selectedDots().forEach(dot -> {
+            Selection.INSTANCE.forEach(dot -> {
                 dot.setCenterX(dot.getCenterX() + dr);
                 updateSet.add(dot);
                 updateSet.addAll(dot.neighbors());
@@ -366,6 +377,12 @@ public class ImageProtractor implements Initializable {
 
     @FXML
     void putAngleMeasure() {
+    }
+
+    @FXML
+    void newChain() {
+        DotChain newChain = new DotChain(container, new Point2D(20, 12), null);
+        UtilsKt.getChains().add(newChain);
     }
 
     public static double getImageScalingFactor(ImageView imageView) {

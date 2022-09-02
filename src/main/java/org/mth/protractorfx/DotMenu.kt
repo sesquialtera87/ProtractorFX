@@ -6,11 +6,12 @@ import javafx.fxml.Initializable
 import javafx.geometry.Point2D
 import javafx.scene.control.*
 import javafx.scene.layout.Pane
+import javafx.scene.paint.Color
 import org.mth.protractorfx.log.LogFactory
 import java.net.URL
 import java.util.*
+import java.util.function.Consumer
 import java.util.logging.Logger
-import kotlin.random.Random
 
 /**
  * The popup menu shown on each measure label
@@ -26,23 +27,23 @@ class DotMenu : Initializable {
     private var dot: Dot? = null
 
     @FXML
-    lateinit var backgroundColorMenu: Menu
+    lateinit var chainColorMenu: Menu
 
     @FXML
     fun selectAllDotsInChain() {
-        checkDot().ifPresent { dot ->
+        dot {
             Selection.clear()
-            Selection.addToSelection(dot.chain)
+            Selection.addToSelection(it.chain)
         }
     }
 
     @FXML
     fun removeChain() {
-        checkDot().ifPresent { dot ->
-            val pane = dot.parent
+        dot {
+            val pane = it.parent
 
-            dot.chain.dispose()
-            chains.remove(dot.chain)
+            it.chain.dispose()
+            chains.remove(it.chain)
 
             pane.requestFocus()
         }
@@ -50,9 +51,13 @@ class DotMenu : Initializable {
 
     @FXML
     fun newChain() {
-        checkDot().ifPresent { dot ->
-            with(Random(3)) {
-                val newChain = DotChain(dot.parent as Pane, Point2D(nextDouble(10.0, 50.0), nextDouble(10.0, 50.0)))
+        dot {
+            with(Random()) {
+                val newChain = DotChain(
+                    container = it.parent as Pane,
+                    displacement = Point2D(nextDouble(50.0, 450.0), nextDouble(50.0, 450.0)),
+                    color = null
+                )
                 chains.add(newChain)
             }
         }
@@ -67,23 +72,27 @@ class DotMenu : Initializable {
         return Optional.ofNullable(dot)
     }
 
-    /**
-     * Show the context menu over the [measureLabel].
-     * @param dot The graph-node related to the label
-     */
-    fun show(dot: Dot) { // todo change method name
+    fun configureBeforeShow(dot: Dot) {
         this.dot = dot
 
-        // select the MenuItem related to the current font color
-//        fontColorMenu.items.forEach {
-//            val menuItem = it as RadioMenuItem
-//            val color = it.properties["font-color"] as Color
-//            menuItem.isSelected = color == dot.chain.measureLabelFontColor
-//        }
+        // select the MenuItem related to the current chain color
+        chainColorMenu.items.forEach {
+            val menuItem = it as RadioMenuItem
+            val color = it.properties["color"] as Color
+            menuItem.isSelected = color == dot.chainColor
+        }
 
     }
 
-    override fun initialize(url: URL?, bundle: ResourceBundle?) {}
+    fun dot(consumer: Consumer<Dot>) = checkDot().ifPresent { consumer.accept(it) }
+
+    private fun changeChainColor(color: Color) {
+        dot { it.chain.chainColor.set(color) }
+    }
+
+    override fun initialize(url: URL?, bundle: ResourceBundle?) {
+        initColorMenu(chainColorMenu, { color -> changeChainColor(color) })
+    }
 
 
     companion object {
@@ -97,9 +106,9 @@ class DotMenu : Initializable {
             contextMenu
         }
 
-        fun show(dot: Dot, x: Double, y: Double) {
+        fun configureBeforeShow(dot: Dot, x: Double, y: Double) {
             menu.show(dot, x, y)
-            controller.show(dot)
+            controller.configureBeforeShow(dot)
         }
     }
 }

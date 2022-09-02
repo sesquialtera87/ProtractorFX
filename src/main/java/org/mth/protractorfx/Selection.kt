@@ -2,12 +2,14 @@ package org.mth.protractorfx
 
 import java.util.*
 
-object Selection {
+object Selection : Iterable<Dot> {
 
     /**
      * The number of dots actually selected
      */
     val size: Int get() = selectedDots().size
+
+    fun isEmpty() = size == 0
 
     /**
      * Select the [dot], clearing all other previous selected nodes
@@ -47,12 +49,23 @@ object Selection {
         }
     }
 
-    fun selectedDot() = if (size == 1)
-        Optional.of(selectedDots().first())
-    else Optional.empty()
+    /**
+     * Return the selected [Dot], if any. In the case that more than one dot is selected, the method returns the dot
+     * actually focused.
+     */
+    fun selectedDot(): Optional<Dot> {
+        for (dot in this) {
+            if (dot.isFocused)
+                return Optional.of(dot)
+        }
+
+        return Optional.empty()
+    }
 
     /**
      * Return a collection of the current selected dots
      */
     fun selectedDots() = chains.flatten().filter { it.selected }
+
+    override fun iterator() = selectedDots().iterator()
 }
