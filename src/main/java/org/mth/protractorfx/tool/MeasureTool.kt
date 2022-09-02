@@ -32,7 +32,7 @@ object MeasureTool : AbstractTool() {
             // calculate the angle (measured anticlockwise) from the neighbor node to the mouse point
             val p1 = neighbor.getCenter().subtract(nearestDot.getCenter())
             val p2 = mousePoint.subtract(nearestDot.getCenter())
-            val angle = angleBetween(p1, p2, true)
+            val angle = angleBetween(p1, p2, MeasureUnit.DECIMAL_DEGREE)
             anglesFromMouse.add(Pair(neighbor, angle))
         }
 

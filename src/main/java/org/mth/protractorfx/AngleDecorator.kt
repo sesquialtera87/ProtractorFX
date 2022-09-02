@@ -114,7 +114,7 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
                     dragTranslation.y = dr.y
 
                     // update the angle
-                    dragToTranslationAngle = angleBetween(dr, T)
+                    dragToTranslationAngle = angleBetween(dr, T, MEASURE_UNIT)
 
                     it.consume()
                 }
@@ -336,14 +336,14 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
         val p2 = neighbor2.getCenter()
         val arcCenter = arc.getCenter()
 
-        return angleBetween(p2.subtract(arcCenter), p1.subtract(arcCenter), degree = true)
+        return angleBetween(p2.subtract(arcCenter), p1.subtract(arcCenter), MEASURE_UNIT)
     }
 
     private fun getInitialAngle(): Double {
         val p1 = neighbor1.getCenter()
         val arcCenter = arc.getCenter()
 
-        return angleBetween(p1.subtract(arcCenter), Point2D(1.0, 0.0), degree = true)
+        return angleBetween(p1.subtract(arcCenter), Point2D(1.0, 0.0), MEASURE_UNIT)
     }
 
     companion object {

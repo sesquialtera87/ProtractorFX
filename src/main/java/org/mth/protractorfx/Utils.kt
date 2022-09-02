@@ -3,6 +3,7 @@ package org.mth.protractorfx
 import javafx.beans.property.DoubleProperty
 import javafx.beans.property.IntegerProperty
 import javafx.beans.property.Property
+import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.value.ObservableValue
 import javafx.event.EventHandler
 import javafx.geometry.Dimension2D
@@ -22,6 +23,8 @@ import javafx.scene.shape.Arc
 import javafx.scene.shape.Circle
 import javafx.scene.shape.Rectangle
 import javafx.stage.Stage
+import org.mth.protractorfx.tool.MeasureUnit
+import org.mth.protractorfx.tool.MeasureUnit.*
 import java.io.File
 import java.util.*
 import kotlin.math.atan2
@@ -29,24 +32,31 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.reflect.KProperty
 
+operator fun <T> ObservableValue<T>.getValue(thisRef: Any, property: KProperty<*>): T = value
+
+operator fun <T> Property<T>.setValue(thisRef: Any, property: KProperty<*>, value: T?) = setValue(value)
+
+operator fun IntegerProperty.getValue(thisRef: Any, property: KProperty<*>): Int = value
+
+operator fun IntegerProperty.setValue(thisRef: Any, property: KProperty<*>, value: Int) = setValue(value)
+
+operator fun DoubleProperty.getValue(thisRef: Any, property: KProperty<*>): Double = value
+
+operator fun DoubleProperty.setValue(thisRef: Any, property: KProperty<*>, value: Double) = setValue(value)
+
+
 @JvmField
 var scene = Scene(Group())
 
 @JvmField
 var stage = Stage()
 
-val pane: Pane by lazy { scene.lookup("#container") as Pane}
+val pane: Pane by lazy { scene.lookup("#container") as Pane }
 
 //@JvmField
 lateinit var chain: DotChain
 
 val chains: Deque<DotChain> = LinkedList()
-
-@JvmField
-val SHORTCUT_DELETE = KeyCodeCombination(KeyCode.DELETE)
-
-@JvmField
-val SHORTCUT_DELETE_SWITCH = KeyCodeCombination(KeyCode.X)
 
 @JvmField
 val SHORTCUT_RECT_SELECTION = KeyCodeCombination(KeyCode.S)
@@ -73,6 +83,11 @@ val SNAPSHOT_DIR = File("C:\\Users\\matti\\OneDrive\\Documenti\\Java\\Protractor
 @JvmField
 var ANGLE_LABEL_PRECISION = 1
 
+@JvmField
+val measureUnitProperty = SimpleObjectProperty(DECIMAL_DEGREE)
+
+val MEASURE_UNIT: MeasureUnit
+    get() = measureUnitProperty.value
 
 /**
  * Find the node in the collection with the minim distance from the given [point].
@@ -98,18 +113,22 @@ fun getNearestDot(point: Point2D, points: Collection<Dot>, excludeLeaves: Boolea
 }
 
 
-fun angleBetween(p1: Point2D, p2: Point2D, degree: Boolean = false): Double {
+fun angleBetween(p1: Point2D, p2: Point2D, unit: MeasureUnit = DECIMAL_DEGREE): Double {
     val dot = p1.x * p2.x + p1.y * p2.y
     val det = p1.x * p2.y - p2.x * p1.y
-    var angle = atan2(det, dot)
+    var angle = atan2(det, dot) // radians
 
-    if (degree) {
-        // convert to degree
-        angle = Math.toDegrees(angle)
+    when (unit) {
+        DECIMAL_DEGREE -> {
+            angle = Math.toDegrees(angle)
 
-        // put angle measure in range [0,360]
-        if (angle < 0)
-            angle += 360
+            // put angle measure in range [0,360]
+            if (angle < 0)
+                angle += 360
+        }
+        RADIANS -> {}
+        SEXAGESIMAL_DEGREES -> {}
+        CENTESIMAL_DEGREE -> {}
     }
 
     return angle
@@ -157,14 +176,3 @@ fun Point2D.rotate(alpha: Double) = Point2D(
     this.dotProduct(sin(alpha), cos(alpha)),
 )
 
-operator fun <T> ObservableValue<T>.getValue(thisRef: Any, property: KProperty<*>): T = value
-
-operator fun <T> Property<T>.setValue(thisRef: Any, property: KProperty<*>, value: T?) = setValue(value)
-
-operator fun IntegerProperty.getValue(thisRef: Any, property: KProperty<*>): Int = value
-
-operator fun IntegerProperty.setValue(thisRef: Any, property: KProperty<*>, value: Int) = setValue(value)
-
-operator fun DoubleProperty.getValue(thisRef: Any, property: KProperty<*>): Double = value
-
-operator fun DoubleProperty.setValue(thisRef: Any, property: KProperty<*>, value: Double) = setValue(value)

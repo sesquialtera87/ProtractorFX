@@ -11,6 +11,7 @@ import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import javafx.scene.shape.Line
 import javafx.scene.text.FontWeight
+import org.mth.protractorfx.tool.MeasureUnit
 import java.util.*
 
 class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, .0), color: Color? = Color.BLACK) :
