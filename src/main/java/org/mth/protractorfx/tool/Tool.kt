@@ -28,7 +28,7 @@ enum class Tool(val tool: AbstractTool) {
             val tools = values().map { it.tool }
 
             scene.addEventHandler(KEY_PRESSED) { event ->
-                log.finest("Key pressed: $event")
+//                log.finest("Key pressed: $event")
 
                 when (event.code) {
                     KeyCode.ESCAPE -> tools.forEach { it.deactivate() }
@@ -42,7 +42,7 @@ enum class Tool(val tool: AbstractTool) {
                 // find the tool that match the key combination
                 values().filter { it.tool.shortcut.match(event) }
                     .forEach { tool ->
-                        log.finest("Shortcut detected for tool $tool")
+//                        log.finest("Shortcut detected for tool $tool")
 
                         tool.tool.apply {
                             if (active) {
