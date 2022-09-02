@@ -9,6 +9,7 @@ import javafx.util.Pair
 import org.mth.protractorfx.*
 
 object MeasureTool : AbstractTool() {
+
     override val cursor: Cursor
         get() = CURSOR_ANGLE
 
@@ -19,6 +20,9 @@ object MeasureTool : AbstractTool() {
         measureAngle(Point2D(mouseEvent.x, mouseEvent.y))
     }
 
+    /**
+     * Put an [AngleDecorator] around the angle nearest to the mouse click
+     */
     private fun measureAngle(mousePoint: Point2D) {
         val nearestDot = getNearestDot(mousePoint, chains.flatten(), true)
         val neighbors = nearestDot.neighbors()

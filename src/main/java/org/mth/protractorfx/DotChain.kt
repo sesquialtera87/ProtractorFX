@@ -42,6 +42,10 @@ class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, 
             }
 
             toBack()
+
+            setOnMouseClicked {
+                dot1.chain.forEach { it.toFront() }
+            }
         }
 
         /**
@@ -207,7 +211,7 @@ class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, 
         }
     }
 
-    fun availableColors(): List<Color> {
+    private fun availableColors(): List<Color> {
         val usedColors = chains.map { it.chainColor.get() }
         return defaultColors() - usedColors.toSet()
     }

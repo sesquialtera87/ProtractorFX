@@ -106,6 +106,7 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
             log.fine("Drag detected")
 
             dot.radius = DOT_RADIUS_SMALL
+            dot.toFront()
 
             if (Selection.size != anchorMap.size)
                 anchorMap.keys.filter { it != dot }
@@ -157,6 +158,8 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
             }
 
             dot.addEventHandler(MOUSE_PRESSED) { event ->
+                dot.chain.forEach { it.toFront() }
+
                 // remove the old anchor points of the previous selection
                 anchorMap.clear()
                 anchorMap[dot] = dot.getCenter()
