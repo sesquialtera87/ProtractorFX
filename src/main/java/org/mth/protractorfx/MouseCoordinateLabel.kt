@@ -20,7 +20,7 @@ object MouseCoordinateLabel : Label() {
 
     init {
         styleClass.add("coordinate-label")
-        text = ""
+        text = "[100, 100]"
         showMouseCoordinates.addListener { _, _, value ->
             if (value) {
                 scene.addEventHandler(MOUSE_MOVED, mouseHandler)
@@ -41,7 +41,8 @@ object MouseCoordinateLabel : Label() {
 
     fun update(x: Double, y: Double) {
         text = "[%.0f, %.0f]".format(x, y - pane.boundsInParent.minY)
-        layoutX = max(0.0, x - pane.boundsInParent.minX - width / 2)
+
+        layoutX = max(0.0, x - width / 2)
         layoutY = max(0.0, y - pane.boundsInParent.minY - height - 2)
     }
 }
