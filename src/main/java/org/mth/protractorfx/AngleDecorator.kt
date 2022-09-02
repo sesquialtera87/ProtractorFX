@@ -153,14 +153,14 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
             startXProperty().bind(dot.centerXProperty())
             startYProperty().bind(dot.centerYProperty())
             stroke = Color.RED
-            isVisible = false
+//            isVisible = false
         }
 
         with(dragVector) {
             startXProperty().bind(dot.centerXProperty())
             startYProperty().bind(dot.centerYProperty())
             stroke = Color.CORAL
-            isVisible = false
+//            isVisible = false
         }
 
 
@@ -255,6 +255,15 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
 
     @Suppress("LocalVariableName")
     private fun updateAngleLabelPosition() {
+        val NW = Point2D(angleLabel.layoutX, angleLabel.layoutY)
+        val NE = Point2D(angleLabel.layoutX + angleLabel.width, angleLabel.layoutY)
+        val SW = Point2D(angleLabel.layoutX, angleLabel.layoutY + angleLabel.height)
+        val SE = Point2D(angleLabel.layoutX + angleLabel.width, angleLabel.layoutY + angleLabel.height)
+
+        println(SE)
+        println(angleLabel.boundsInParent)
+        println(angleLabel.boundsInLocal)
+
         with(angleLabel) {
             // put the center of symmetry of the label on the bisector of the angle
             val alpha = -Math.toRadians(getMeasure()) / 2

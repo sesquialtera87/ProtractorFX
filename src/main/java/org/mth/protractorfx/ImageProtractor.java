@@ -177,6 +177,8 @@ public class ImageProtractor implements Initializable {
             group.getToggles().add(item);
         }
 
+        container.getChildren().add(MouseCoordinateLabel.INSTANCE);
+
         chain = new DotChain(container, new Point2D(0, 0), Color.BLACK);
         UtilsKt.setChain(chain);
         UtilsKt.getChains().add(chain);

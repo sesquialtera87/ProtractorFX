@@ -1,9 +1,6 @@
 package org.mth.protractorfx
 
-import javafx.beans.property.DoubleProperty
-import javafx.beans.property.IntegerProperty
-import javafx.beans.property.Property
-import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.property.*
 import javafx.beans.value.ObservableValue
 import javafx.event.EventHandler
 import javafx.geometry.Dimension2D
@@ -58,6 +55,9 @@ val pane: Pane by lazy { scene.lookup("#container") as Pane }
 lateinit var chain: DotChain
 
 val chains: Deque<DotChain> = LinkedList()
+
+@JvmField
+var showMouseCoordinates = SimpleBooleanProperty(false)
 
 @JvmField
 val SHORTCUT_RECT_SELECTION = KeyCodeCombination(KeyCode.S)

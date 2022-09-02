@@ -19,3 +19,9 @@
 .window-button:pressed {
     -fx-background-color: lightgrey;
 }
+
+.coordinate-label {
+    -fx-background-color: LIGHTGRAY;
+    -fx-background-radius: 2;
+    -fx-font-size: 8pt;
+}
