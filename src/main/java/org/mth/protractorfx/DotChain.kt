@@ -107,7 +107,7 @@ class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, 
 
         val dot1 = Dot(50.0 + displacement.x, 50.0 + displacement.y, this)
         val dot2 = Dot(150.0 + displacement.x, 50.0 + displacement.y, this)
-        val dot3 = Dot(250.0 + displacement.x, 150.0 + displacement.y, this)
+        val dot3 = Dot(50.0 + displacement.x, 150.0 + displacement.y, this)
 
         addDots(dot1, dot2, dot3)
         connect(dot1, dot2)

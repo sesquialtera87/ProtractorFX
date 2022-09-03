@@ -6,10 +6,7 @@ import javafx.scene.layout.Pane
 import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
 import javafx.scene.paint.Paint
-import javafx.scene.shape.Arc
-import javafx.scene.shape.ArcType
-import javafx.scene.shape.Line
-import javafx.scene.shape.Rectangle
+import javafx.scene.shape.*
 import javafx.scene.text.Font
 import javafx.scene.text.Text
 import javafx.scene.transform.Transform
@@ -17,9 +14,7 @@ import javafx.scene.transform.Translate
 import org.mth.protractorfx.log.LogFactory
 import org.mth.protractorfx.tool.MeasureUnit.*
 import java.util.logging.Logger
-import kotlin.math.pow
-import kotlin.math.round
-import kotlin.math.sqrt
+import kotlin.math.*
 
 /**
  * @param neighbor1 The first vertex of the oriented angle
@@ -55,6 +50,11 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
          * The vector representing the displacement of the measure label from the center of the [arc]
          */
         var T = Point2D(.0, .0)
+
+        var a: Double = 1.0
+        var R: Double = 0.0
+        var B = Point2D(.0, .0)
+        var W = Point2D(.0, .0)
 
 
         var backgroundColor: Paint by background::fill
@@ -110,7 +110,7 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
                     val currentDragPoint = Point2D(it.screenX, it.screenY)
 
                     // calculate the delta from the anchor point
-                    dr = currentDragPoint.subtract(anchorPoint).add(oldDragTranslation)
+                    dr = currentDragPoint.subtract(anchorPoint) sum oldDragTranslation
 
                     dragTranslation.x = dr.x
                     dragTranslation.y = dr.y
@@ -135,6 +135,11 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
     private val vectorLine = Line()
     private val dragVector = Line()
 
+    private val NE_line = Line()
+    private val SE_line = Line()
+
+    val circle = Circle()
+
     fun dispose(pane: Pane) {
         listOf(
             vectorLine,
@@ -147,7 +152,35 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
     fun build(dot: Dot, pane: Pane) {
 
         // add the nodes to the Pane and move them to background
-        pane.children.addAll(arc, angleLabel, vectorLine, dragVector)
+        pane.children.addAll(
+//            circle,
+            arc,
+            angleLabel,
+//            dragVector,
+//            vectorLine,
+//            NE_line,
+//            SE_line
+        )
+
+        with(circle) {
+            stroke = Color.PINK
+            fill = Color.CORAL
+            isVisible = false
+        }
+
+        with(NE_line) {
+            startXProperty().bind(dot.centerXProperty())
+            startYProperty().bind(dot.centerYProperty())
+            stroke = Color.PINK
+//            isVisible = false
+        }
+
+        with(SE_line) {
+            startXProperty().bind(dot.centerXProperty())
+            startYProperty().bind(dot.centerYProperty())
+            stroke = Color.DARKSEAGREEN
+//            isVisible = false
+        }
 
         with(vectorLine) {
             startXProperty().bind(dot.centerXProperty())
@@ -235,11 +268,6 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
             angleLabel.backgroundColor = color
         }
 
-        // listen to changes of the measure unit
-        measureUnitProperty.addListener { _, _, unit ->
-
-        }
-
         arc.toBack()
         angleLabel.toBack()
 
@@ -254,16 +282,42 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
     }
 
     @Suppress("LocalVariableName")
+    fun updatePosition() {
+        with(angleLabel) {
+            val bounds = angleLabel.boundsInParent
+            val angle = getMeasure()
+
+            // the normal vector to the first side of the angle, pointing to the interior of the angle (the -1)
+            val N1 = (neighbor1.getCenter() sub arc.getCenter()).orthogonal(-1)
+
+            // translate to the center of symmetry of the rectangle
+            W = Point2D(-bounds.width / 2, -(bounds.height) / 2)
+
+            B = bisectorVector()
+
+            if (angle < 90.0) {
+                R = 0.5 * sqrt(bounds.width.pow(2) + bounds.height.pow(2)) + 3
+
+                a = max(R / (B dot N1), 46.0)
+                a = min(110.0, a)
+            } else {
+                a = 46.0
+            }
+
+            T = B.multiply(a) sum W
+        }
+    }
+
+    private fun bisectorVector(): Point2D {
+        val alpha = -Math.toRadians(getMeasure()) / 2
+        return (neighbor1.getCenter() sub arc.getCenter())
+            .normalize()
+            .rotate(alpha)
+    }
+
+
+    @Suppress("LocalVariableName")
     private fun updateAngleLabelPosition() {
-        val NW = Point2D(angleLabel.layoutX, angleLabel.layoutY)
-        val NE = Point2D(angleLabel.layoutX + angleLabel.width, angleLabel.layoutY)
-        val SW = Point2D(angleLabel.layoutX, angleLabel.layoutY + angleLabel.height)
-        val SE = Point2D(angleLabel.layoutX + angleLabel.width, angleLabel.layoutY + angleLabel.height)
-
-        println(SE)
-        println(angleLabel.boundsInParent)
-        println(angleLabel.boundsInLocal)
-
         with(angleLabel) {
             // put the center of symmetry of the label on the bisector of the angle
             val alpha = -Math.toRadians(getMeasure()) / 2
@@ -291,12 +345,31 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
             dragTranslation.x = d.x
             dragTranslation.y = d.y
 
+            updatePosition()
+
             transforms.clear()
             transforms.addAll(
-                Transform.translate(W.x, W.y),
+//                Transform.translate(W.x, W.y),
                 Transform.translate(T.x, T.y),
-                dragTranslation
+//                dragTranslation
             )
+
+            circle.apply {
+                centerX = T.x - W.x + arc.centerX
+                centerY = T.y - W.y + arc.centerY
+                radius = R
+                angleLabel.toFront()
+            }
+
+            NE_line.apply {
+                endX = bounds.maxX
+                endY = bounds.minY
+            }
+
+            SE_line.apply {
+                endX = bounds.maxX
+                endY = bounds.maxY
+            }
 
             vectorLine.apply {
                 endX = T.x + arc.centerX

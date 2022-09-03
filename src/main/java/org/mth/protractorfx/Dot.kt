@@ -212,7 +212,7 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                     dr = currentDragPoint.subtract(anchorPoint)
 
                     // get the new center coordinates of the node
-                    val newCenter = oldCenter.add(dr)
+                    val newCenter = dr sum oldCenter
 
                     dot.apply {
                         centerX = max(newCenter.x, DOT_RADIUS)
