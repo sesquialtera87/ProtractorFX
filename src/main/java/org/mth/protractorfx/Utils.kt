@@ -19,6 +19,7 @@ import javafx.scene.paint.Color
 import javafx.scene.shape.Arc
 import javafx.scene.shape.Circle
 import javafx.scene.shape.Rectangle
+import javafx.scene.transform.Translate
 import javafx.stage.Stage
 import org.mth.protractorfx.tool.MeasureUnit
 import org.mth.protractorfx.tool.MeasureUnit.*
@@ -176,6 +177,12 @@ fun initColorMenu(
 
 fun Arc.getCenter() = Point2D(centerX, centerY)
 fun Circle.getCenter() = Point2D(centerX, centerY)
+
+fun Translate.toVector() = Point2D(x, y)
+fun Translate.set(vector: Point2D) {
+    x = vector.x
+    y = vector.y
+}
 
 /**
  * Rotate clockwise the vector by the specified angle expressed in **radians**.

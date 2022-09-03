@@ -67,13 +67,13 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
 
     fun addAngleMeasure(dot1: Dot, dot2: Dot) {
         val pane = parent as Pane
-        val angleDescriptor = AngleDecorator(dot1, dot2)
+        val angleDescriptor = AngleDecorator(dot1, dot2, Angle(this, dot1, dot2))
 
         log.finest("Angle centre: $this \nAngle sides: \n\tP1 = $dot1 \n\tP2 = $dot2")
 
         if (!angleDecorators.contains(angleDescriptor)) {
             angleDecorators.add(angleDescriptor)
-            angleDescriptor.build(this, pane)
+            angleDescriptor.build(pane)
         } else {
             log.info("Angle already measured")
         }
