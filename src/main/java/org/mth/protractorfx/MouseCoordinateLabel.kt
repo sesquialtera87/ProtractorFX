@@ -11,14 +11,23 @@ import kotlin.math.max
 
 object MouseCoordinateLabel : Label() {
 
+    private const val COORDINATE_TEMPLATE = "[%.0f, %.0f]"
+
+    /**
+     * Shortcut to show the mouse coordinates
+     */
     val combination = KeyCodeCombination(KeyCode.E)
 
+    /**
+     * Track the mouse motion events for displaying the coordinates
+     */
     private val mouseHandler = EventHandler<MouseEvent> {
         isVisible = true
         update(it.x, it.y)
     }
 
     init {
+        isVisible = false // initially invisible
         styleClass.add("coordinate-label")
         text = "[100, 100]"
         showMouseCoordinates.addListener { _, _, value ->
@@ -40,7 +49,7 @@ object MouseCoordinateLabel : Label() {
     }
 
     fun update(x: Double, y: Double) {
-        text = "[%.0f, %.0f]".format(x, y - pane.boundsInParent.minY)
+        text = COORDINATE_TEMPLATE.format(x, y - pane.boundsInParent.minY)
 
         layoutX = max(0.0, x - width / 2)
         layoutY = max(0.0, y - pane.boundsInParent.minY - height - 2)
