@@ -14,6 +14,8 @@ data class Angle(
 
     val L2 get() = extreme2.getCenter() sub vertex.getCenter()
 
+    val C: Point2D get() = vertex.getCenter()
+
     fun bisector(): Point2D {
         val alpha = -measure(RADIANS) / 2
         return L1.normalize().rotate(alpha)
