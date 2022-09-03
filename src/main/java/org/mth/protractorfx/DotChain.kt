@@ -165,7 +165,7 @@ class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, 
 
             // remove the measures, related to the deleted node, around the angle
             parent.angleDecorators
-                .filter { it.neighbor1 == dot || it.neighbor2 == dot }
+                .filter { it.containsDot(dot) }
                 .forEach {
                     it.dispose(container)
                     parent.angleDecorators.remove(it)

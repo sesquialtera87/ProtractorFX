@@ -16,11 +16,7 @@ import org.mth.protractorfx.tool.MeasureUnit.*
 import java.util.logging.Logger
 import kotlin.math.*
 
-/**
- * @param neighbor1 The first vertex of the oriented angle
- * @param neighbor2 The second vertex of the oriented angle
- */
-data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot, val angle: Angle) {
+data class AngleDecorator(val angle: Angle) {
 
     inner class MeasureLabel : StackPane() {
 
@@ -46,13 +42,31 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot, val angle: Ang
         var dragToTranslationAngle: Double = 0.0
 
         /**
-         * The vector representing the displacement of the measure label from the center of the [arc]
+         * The vector representing the displacement of the measure label from the center of the [arc].
+         * T = aB+W
          */
         var T = Point2D(.0, .0)
 
+        /**
+         * The magnitude of the bisector vector.
+         * @see B
+         */
         var a: Double = 1.0
+
+        /**
+         * The radius of the circumscribed circle to the label
+         */
         var R: Double = 0.0
+
+        /**
+         * The bisector of the angle. This vector has norm 1.
+         */
         var B = Point2D(.0, .0)
+
+        /**
+         * The vector that from tol-left corner of the label, to its center of symmetry.
+         * @see T
+         */
         var W = Point2D(.0, .0)
 
 
@@ -134,9 +148,12 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot, val angle: Ang
 
     private val vectorLine = Line()
     private val dragVector = Line()
+    private val circle = Circle()
 
-    val circle = Circle()
 
+    /**
+     * Remove all nodes belonging to this decorator from the [Pane]
+     */
     fun dispose(pane: Pane) {
         listOf(
             vectorLine,
@@ -146,7 +163,14 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot, val angle: Ang
         ).forEach { pane.children.remove(it) }
     }
 
-    fun build(pane: Pane) {
+    fun containsDot(dot: Dot, asVertex: Boolean = false): Boolean {
+        return if (asVertex)
+            angle.vertex == dot
+        else
+            angle.extreme1 == dot || angle.extreme2 == dot
+    }
+
+    fun build() { // todo remove and put in constructor
         val vertex = angle.vertex
 
         // add the nodes to the Pane and move them to background
@@ -154,8 +178,8 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot, val angle: Ang
 //            circle,
             arc,
             angleLabel,
-            dragVector,
-            vectorLine,
+//            dragVector,
+//            vectorLine,
         )
 
         with(circle) {
@@ -277,7 +301,7 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot, val angle: Ang
             println(layoutBounds)
 
             // the normal vector to the first side of the angle, pointing to the interior of the angle (the -1)
-            val N1 = (neighbor1.getCenter() sub arc.getCenter()).orthogonal(-1)
+            val N1 = (angle.L1 sub angle.C).orthogonal(-1)
 
             // translate to the center of symmetry of the rectangle
             W = Point2D(-bounds.width / 2, -bounds.height / 2)
@@ -359,23 +383,19 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot, val angle: Ang
         return if (other == null || other !is AngleDecorator)
             false
         else {
-            other.neighbor1 == neighbor1 && other.neighbor2 == neighbor2
+            other.angle.extreme1 == angle.extreme1 &&
+                    other.angle.extreme2 == angle.extreme2
+                    && other.angle.vertex == angle.vertex
         }
     }
 
     override fun hashCode(): Int {
-        var result = neighbor1.hashCode()
-        result = 31 * result + neighbor2.hashCode()
+        var result = angle.hashCode()
         result = 31 * result + arc.hashCode()
         return result
     }
 
-    private fun getInitialAngle(): Double {
-        val p1 = neighbor1.getCenter()
-        val arcCenter = arc.getCenter()
-
-        return angleBetween(p1.subtract(arcCenter), Point2D(1.0, 0.0), DECIMAL_DEGREE)
-    }
+    private fun getInitialAngle() = angleBetween(angle.L1, Point2D(1.0, 0.0))
 
     companion object {
         private val log: Logger = LogFactory.configureLog(AngleDecorator::class.java)

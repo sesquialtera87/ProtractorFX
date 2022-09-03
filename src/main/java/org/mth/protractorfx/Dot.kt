@@ -4,7 +4,6 @@ import javafx.geometry.Point2D
 import javafx.scene.effect.DropShadow
 import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent.*
-import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
 import org.mth.protractorfx.log.LogFactory
@@ -66,14 +65,13 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
     }
 
     fun addAngleMeasure(dot1: Dot, dot2: Dot) {
-        val pane = parent as Pane
-        val angleDescriptor = AngleDecorator(dot1, dot2, Angle(this, dot1, dot2))
+        val angleDescriptor = AngleDecorator(Angle(this, dot1, dot2))
 
         log.finest("Angle centre: $this \nAngle sides: \n\tP1 = $dot1 \n\tP2 = $dot2")
 
         if (!angleDecorators.contains(angleDescriptor)) {
             angleDecorators.add(angleDescriptor)
-            angleDescriptor.build(pane)
+            angleDescriptor.build()
         } else {
             log.info("Angle already measured")
         }
