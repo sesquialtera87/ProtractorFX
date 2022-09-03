@@ -113,7 +113,10 @@ fun getNearestDot(point: Point2D, points: Collection<Dot>, excludeLeaves: Boolea
     return nearestDot!!
 }
 
-
+/**
+ * Measure the angle between the two vectors [p1] and [p2]. The angle is measured **clockwise**, starting from [p1]
+ * going to [p2].
+ */
 fun angleBetween(p1: Point2D, p2: Point2D, unit: MeasureUnit = DECIMAL_DEGREE, positive: Boolean = true): Double {
     val dot = p1.x * p2.x + p1.y * p2.y
     val det = p1.x * p2.y - p2.x * p1.y
@@ -174,8 +177,24 @@ fun initColorMenu(
 fun Arc.getCenter() = Point2D(centerX, centerY)
 fun Circle.getCenter() = Point2D(centerX, centerY)
 
+/**
+ * Rotate clockwise the vector by the specified angle expressed in **radians**.
+ */
 fun Point2D.rotate(alpha: Double) = Point2D(
     this.dotProduct(cos(alpha), -sin(alpha)),
     this.dotProduct(sin(alpha), cos(alpha)),
 )
+
+infix fun Point2D.dot(vector: Point2D) = this.dotProduct(vector)
+
+infix fun Point2D.sum(vector: Point2D): Point2D = this.add(vector)
+
+infix fun Point2D.sub(vector: Point2D): Point2D = this.subtract(vector)
+
+/**
+ * Returns the versor orthogonal to the given vector.
+ * @param direction If you want a clockwise rotation pass the value +1, otherwise -1 produces a counterclockwise rotation.
+ * By default, the rotation is clockwise.
+ */
+fun Point2D.orthogonal(direction: Byte = +1) = this.normalize().rotate(direction * PI / 2)
 
