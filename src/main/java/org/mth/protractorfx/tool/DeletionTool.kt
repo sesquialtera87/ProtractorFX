@@ -6,6 +6,8 @@ import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyCodeCombination
 import javafx.scene.input.MouseEvent
 import org.mth.protractorfx.*
+import org.mth.protractorfx.command.Action
+import org.mth.protractorfx.command.CommandManager
 
 object DeletionTool : AbstractTool() {
 
@@ -22,11 +24,11 @@ object DeletionTool : AbstractTool() {
         // find the dot under the cursor and remove it
         for (dot in chains.flatten()) {
             if (dot.getCenter().subtract(coordinates).magnitude() < dot.radius) {
-                dot.removeFromChain()
+                if (dot.isLeaf())
+                    CommandManager.execute(DeleteSingleDotAction(dot))
                 break
             }
         }
-
     }
 
     fun deleteSelection() {
@@ -42,5 +44,21 @@ object DeletionTool : AbstractTool() {
         }
 
         Selection.clear()
+    }
+
+    class DeleteSingleDotAction(val dot: Dot, override val name: String = "delete-single") : Action {
+        lateinit var parent: Dot
+
+        override fun execute() {
+            parent = dot.neighbors().first()
+            dot.removeFromChain()
+        }
+
+        override fun undo() {
+            with(parent.chain) {
+                addDot(dot)
+                connect(dot, parent)
+            }
+        }
     }
 }
