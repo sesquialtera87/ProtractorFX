@@ -32,21 +32,54 @@ object DeletionTool : AbstractTool() {
     }
 
     fun deleteSelection() {
-        var leaves = Selection.selectedDots().filter { it.isLeaf() }
-
-        while (leaves.isNotEmpty()) {
-            leaves.forEach {
-                it.removeFromChain()
-                Selection.unselect(it)
-            }
-
-            leaves = Selection.selectedDots().filter { it.isLeaf() }
-        }
-
-        Selection.clear()
+        CommandManager.execute(DeleteSelectedDotsAction())
     }
 
-    class DeleteSingleDotAction(val dot: Dot, override val name: String = "delete-single") : Action {
+    /**
+     * Removes the nodes actually selected.
+     */
+    private class DeleteSelectedDotsAction(override val name: String = "delete-selection") : Action {
+
+        data class DotPair(val parent: Dot, val leaf: Dot)
+
+        /**
+         * A list containing the deleted nodes, in order of deletion
+         */
+        val deletionList = ArrayList<DotPair>()
+
+        override fun execute() {
+            var leaves = Selection.selectedDots().filter { it.isLeaf() }
+
+            while (leaves.isNotEmpty()) {
+                leaves.forEach {
+                    deletionList.add(DotPair(
+                        parent = it.neighbors().first(), // it's a leaf, only one neighborhood
+                        leaf = it
+                    ))
+                    it.removeFromChain()
+                    Selection.unselect(it)
+                }
+
+                leaves = Selection.selectedDots().filter { it.isLeaf() }
+            }
+
+            Selection.clear()
+            deletionList.trimToSize() // todo remove???
+        }
+
+        override fun undo() {
+            deletionList.forEach {
+                val (parent, dot) = it
+
+                with(parent.chain) {
+                    addDot(dot)
+                    connect(dot, parent)
+                }
+            }
+        }
+    }
+
+    private class DeleteSingleDotAction(val dot: Dot, override val name: String = "delete-single") : Action {
         lateinit var parent: Dot
 
         override fun execute() {

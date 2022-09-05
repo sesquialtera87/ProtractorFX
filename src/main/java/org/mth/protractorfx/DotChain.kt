@@ -174,10 +174,10 @@ class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, 
             // animate the removal
             ParallelAnimationFX(
                 FadeOut(dotConnection).apply {
-                    setSpeed(2.0)
+                    setSpeed(3.0)
                 },
                 FadeOut(dot).apply {
-                    setSpeed(2.0)
+                    setSpeed(3.0)
                     setOnFinished { container.children.removeAll(dot, dotConnection) }
                 }
             ).run { play() }

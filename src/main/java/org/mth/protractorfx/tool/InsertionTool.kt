@@ -68,16 +68,12 @@ object InsertionTool : AbstractTool() {
         private val parentDot: Dot,
         override val name: String = "insert_dot"
     ) : Action {
-
-        private val newDot: Dot
-
-        init {
-            newDot = Dot(coordinates.x, coordinates.y, parentDot.chain)
-        }
+        private val newDot: Dot = Dot(coordinates.x, coordinates.y, parentDot.chain)
 
         override fun execute() {
             val chain = newDot.chain
 
+            // add a new Dot to the chain
             chain.apply {
                 addDot(newDot)
                 connect(newDot, parentDot)
