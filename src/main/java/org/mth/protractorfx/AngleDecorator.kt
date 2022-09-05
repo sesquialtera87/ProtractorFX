@@ -148,7 +148,7 @@ data class AngleDecorator(val angle: Angle) {
 
     private val vectorLine = Line()
     private val dragVector = Line()
-    private val circle = Circle()
+    private val circle = Circle(0.0, Color.AQUAMARINE)
 
 
     /**
@@ -175,7 +175,7 @@ data class AngleDecorator(val angle: Angle) {
 
         // add the nodes to the Pane and move them to background
         pane.children.addAll(
-//            circle,
+            circle,
             arc,
             angleLabel,
 //            dragVector,
@@ -185,7 +185,7 @@ data class AngleDecorator(val angle: Angle) {
         with(circle) {
             stroke = Color.PINK
             fill = Color.CORAL
-            isVisible = false
+//            isVisible = false
         }
 
         with(vectorLine) {
@@ -296,12 +296,8 @@ data class AngleDecorator(val angle: Angle) {
             val bounds = boundsInParent
             val angleMeasure = angle.measure()
 
-            println(boundsInLocal)
-            println(boundsInParent)
-            println(layoutBounds)
-
             // the normal vector to the first side of the angle, pointing to the interior of the angle (the -1)
-            val N1 = (angle.L1 sub angle.C).orthogonal(-1)
+            val N1 = angle.L1.orthogonal(-1)
 
             // translate to the center of symmetry of the rectangle
             W = Point2D(-bounds.width / 2, -bounds.height / 2)
@@ -311,12 +307,12 @@ data class AngleDecorator(val angle: Angle) {
             /* for angle less than 90° correct the position (the minimum space is guaranteed by the circumscribed
             circle to the measure label */
             if (angleMeasure < 90.0 && !isLabelPositionCustomized()) {
-                R = 0.5 * sqrt(bounds.width.pow(2) + bounds.height.pow(2)) + 3
+                R = 0.5 * sqrt(bounds.width.pow(2) + bounds.height.pow(2)) + dR
 
-                a = max(R / (B dot N1), 46.0)
-                a = min(110.0, a)
+                a = max(R / (B dot N1), MIN_DISTANCE_FROM_CENTER)
+                a = min(MAX_DISTANCE_FROM_CENTER, a)
             } else {
-                a = 46.0
+                a = MIN_DISTANCE_FROM_CENTER
             }
 
             T = B.multiply(a) sum W
@@ -399,6 +395,10 @@ data class AngleDecorator(val angle: Angle) {
 
     companion object {
         private val log: Logger = LogFactory.configureLog(AngleDecorator::class.java)
+
+        const val dR = 3.0
+        const val MAX_DISTANCE_FROM_CENTER = 110.0
+        const val MIN_DISTANCE_FROM_CENTER = 46.0
 
         private val DECIMAL_DEGREE_TEMPLATE = "%.${ANGLE_LABEL_PRECISION}f°"
         private val RADIANS_TEMPLATE = "%.${ANGLE_LABEL_PRECISION}f"
