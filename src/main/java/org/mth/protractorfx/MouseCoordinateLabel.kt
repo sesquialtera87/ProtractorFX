@@ -6,6 +6,8 @@ import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyCodeCombination
 import javafx.scene.input.MouseEvent
 import javafx.scene.input.MouseEvent.MOUSE_MOVED
+import javafx.scene.transform.Transform
+import javafx.scene.transform.Translate
 import java.awt.MouseInfo
 import kotlin.math.max
 
@@ -18,12 +20,14 @@ object MouseCoordinateLabel : Label() {
      */
     val combination = KeyCodeCombination(KeyCode.E)
 
+    private val translation: Translate = Transform.translate(.0, .0)
+
     /**
      * Track the mouse motion events for displaying the coordinates
      */
     private val mouseHandler = EventHandler<MouseEvent> {
         isVisible = true
-        update(it.x, it.y)
+        update(it.screenX, it.screenY)
     }
 
     init {
@@ -44,14 +48,24 @@ object MouseCoordinateLabel : Label() {
                 isVisible = false
                 toBack()
             }
-
         }
+
+        transforms.add(translation)
     }
 
+    /**
+     * @param x The horizontal screen coordinate of the mouse pointer
+     * @param y The vertical screen coordinate of the mouse pointer
+     */
     fun update(x: Double, y: Double) {
-        text = COORDINATE_TEMPLATE.format(x, y - pane.boundsInParent.minY)
+        val bounds = pane.localToScreen(pane.boundsInLocal)
+        val point = pane.screenToLocal(x, y)
 
-        layoutX = max(0.0, x - width / 2)
-        layoutY = max(0.0, y - pane.boundsInParent.minY - height - 2)
+        text = COORDINATE_TEMPLATE.format(x - bounds.minX, y - bounds.minY)
+
+        layoutX = max(0.0, point.x)
+        layoutY = max(0.0, point.y)
+
+        translation.y = -height
     }
 }
