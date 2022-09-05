@@ -4,9 +4,10 @@ import javafx.geometry.Point2D
 import javafx.scene.effect.DropShadow
 import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent.*
-import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
+import org.mth.protractorfx.command.Action
+import org.mth.protractorfx.command.CommandManager
 import org.mth.protractorfx.log.LogFactory
 import org.mth.protractorfx.tool.Tool
 import java.util.logging.Logger
@@ -66,14 +67,15 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
     }
 
     fun addAngleMeasure(dot1: Dot, dot2: Dot) {
-        val pane = parent as Pane
-        val angleDescriptor = AngleDecorator(dot1, dot2)
+        val decorator = AngleDecorator(Angle(this, dot1, dot2))
 
         log.finest("Angle centre: $this \nAngle sides: \n\tP1 = $dot1 \n\tP2 = $dot2")
 
-        if (!angleDecorators.contains(angleDescriptor)) {
-            angleDecorators.add(angleDescriptor)
-            angleDescriptor.build(this, pane)
+        if (!angleDecorators.contains(decorator)) {
+            runLater {
+                angleDecorators.add(decorator)
+                decorator.build()
+            }
         } else {
             log.info("Angle already measured")
         }
@@ -188,8 +190,11 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                 dot.radius = DOT_RADIUS
 //                dot.toFront()
 
-                if (!it.isDragDetect)
+                if (!it.isDragDetect) {
                     dragInitialized = false
+
+                    CommandManager.execute(MoveAction(anchorMap))
+                }
 
                 if (Tool.activeTools().isEmpty())
                     it.consume()
@@ -212,7 +217,7 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                     dr = currentDragPoint.subtract(anchorPoint)
 
                     // get the new center coordinates of the node
-                    val newCenter = oldCenter.add(dr)
+                    val newCenter = dr sum oldCenter
 
                     dot.apply {
                         centerX = max(newCenter.x, DOT_RADIUS)
@@ -233,4 +238,26 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
         }
     }
 
+    class MoveAction(
+        private val dotLocations: Map<Dot, Point2D>,
+        override val name: String = "move-dots",
+    ) : Action {
+
+        override fun execute() {}
+
+        override fun undo() {
+            // set of nodes for which update the angle measures
+            val updateList: HashSet<Dot> = HashSet()
+
+            dotLocations.forEach { (dot, point) ->
+                dot.centerX = point.x
+                dot.centerY = point.y
+
+                updateList.add(dot)
+                updateList.addAll(dot.neighbors())
+            }
+
+            updateList.forEach { it.updateNeighboringAngles() }
+        }
+    }
 }

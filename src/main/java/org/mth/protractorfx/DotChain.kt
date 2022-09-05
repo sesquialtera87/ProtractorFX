@@ -107,7 +107,7 @@ class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, 
 
         val dot1 = Dot(50.0 + displacement.x, 50.0 + displacement.y, this)
         val dot2 = Dot(150.0 + displacement.x, 50.0 + displacement.y, this)
-        val dot3 = Dot(250.0 + displacement.x, 150.0 + displacement.y, this)
+        val dot3 = Dot(50.0 + displacement.x, 150.0 + displacement.y, this)
 
         addDots(dot1, dot2, dot3)
         connect(dot1, dot2)
@@ -165,7 +165,7 @@ class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, 
 
             // remove the measures, related to the deleted node, around the angle
             parent.angleDecorators
-                .filter { it.neighbor1 == dot || it.neighbor2 == dot }
+                .filter { it.containsDot(dot) }
                 .forEach {
                     it.dispose(container)
                     parent.angleDecorators.remove(it)
@@ -174,10 +174,10 @@ class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, 
             // animate the removal
             ParallelAnimationFX(
                 FadeOut(dotConnection).apply {
-                    setSpeed(2.0)
+                    setSpeed(3.0)
                 },
                 FadeOut(dot).apply {
-                    setSpeed(2.0)
+                    setSpeed(3.0)
                     setOnFinished { container.children.removeAll(dot, dotConnection) }
                 }
             ).run { play() }

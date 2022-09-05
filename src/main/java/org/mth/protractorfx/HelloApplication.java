@@ -8,13 +8,21 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.mth.protractorfx.tool.Tool;
 
+import java.awt.*;
 import java.io.IOException;
 
 public class HelloApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
+        if(true) {
+            TestKt.test();
+//            return;
+        }
+
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("ImageProtractor1.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 950, 600);
+        Scene scene = new Scene(fxmlLoader.load(),
+                Toolkit.getDefaultToolkit().getScreenSize().width,
+                Toolkit.getDefaultToolkit().getScreenSize().height * 0.7);
 
         scene.setFill(Color.rgb(255, 255, 255, 0.1));
         scene.getStylesheets().add(HelloApplication.class.getResource("style.css").toExternalForm());
@@ -22,9 +30,7 @@ public class HelloApplication extends Application {
         stage.setTitle("Hello!");
         stage.setScene(scene);
         stage.initStyle(StageStyle.TRANSPARENT);
-        stage.setMaximized(true);
-//        stage.addEventHandler(KeyEvent.KEY_PRESSED, controller.keyPressedHandler);
-//        stage.addEventHandler(KeyEvent.KEY_RELEASED, controller.keyReleasedHandler);
+//        stage.setMaximized(true);
 
         stage.show();
         stage.requestFocus();

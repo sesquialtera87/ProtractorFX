@@ -1,5 +1,6 @@
 package org.mth.protractorfx.tool
 
+import javafx.geometry.Point2D
 import javafx.scene.Cursor
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyCodeCombination
@@ -7,6 +8,8 @@ import javafx.scene.input.MouseEvent
 import org.mth.protractorfx.CURSOR_INSERT_DOT
 import org.mth.protractorfx.Dot
 import org.mth.protractorfx.Selection
+import org.mth.protractorfx.command.Action
+import org.mth.protractorfx.command.CommandManager
 import org.mth.protractorfx.log.LogFactory
 import org.mth.protractorfx.pane
 import java.util.logging.Logger
@@ -44,18 +47,44 @@ object InsertionTool : AbstractTool() {
      */
     private fun addNewDot(x: Double, y: Double) {
         val selectedDot = Selection.selectedDot()
-        println(selectedDot.isPresent)
-        selectedDot.ifPresent { dot: Dot ->
-            val chain = dot.chain
-            val newDot = Dot(x, y, chain)
 
+        selectedDot.ifPresent { dot: Dot ->
+            CommandManager.execute(NewDotAction(Point2D(x, y), dot))
+//            val chain = dot.chain
+//            val newDot = Dot(x, y, chain)
+//
+//            chain.apply {
+//                addDot(newDot)
+//                connect(newDot, dot)
+//                Selection.select(newDot)
+//            }
+//
+//            newDot.requestFocus()
+        }
+    }
+
+    class NewDotAction(
+        coordinates: Point2D,
+        private val parentDot: Dot,
+        override val name: String = "insert_dot"
+    ) : Action {
+        private val newDot: Dot = Dot(coordinates.x, coordinates.y, parentDot.chain)
+
+        override fun execute() {
+            val chain = newDot.chain
+
+            // add a new Dot to the chain
             chain.apply {
                 addDot(newDot)
-                connect(newDot, dot)
+                connect(newDot, parentDot)
                 Selection.select(newDot)
             }
 
             newDot.requestFocus()
+        }
+
+        override fun undo() {
+            newDot.removeFromChain()
         }
     }
 }

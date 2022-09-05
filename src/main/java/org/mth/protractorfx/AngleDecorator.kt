@@ -1,31 +1,131 @@
 package org.mth.protractorfx
 
+import javafx.geometry.Insets
 import javafx.geometry.Point2D
+import javafx.scene.control.Label
 import javafx.scene.input.MouseButton
-import javafx.scene.layout.Pane
-import javafx.scene.layout.StackPane
+import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.scene.paint.Paint
-import javafx.scene.shape.Arc
-import javafx.scene.shape.ArcType
-import javafx.scene.shape.Line
-import javafx.scene.shape.Rectangle
+import javafx.scene.shape.*
 import javafx.scene.text.Font
 import javafx.scene.text.Text
-import javafx.scene.transform.Transform
 import javafx.scene.transform.Translate
 import org.mth.protractorfx.log.LogFactory
 import org.mth.protractorfx.tool.MeasureUnit.*
 import java.util.logging.Logger
-import kotlin.math.pow
-import kotlin.math.round
-import kotlin.math.sqrt
+import kotlin.math.*
 
-/**
- * @param neighbor1 The first vertex of the oriented angle
- * @param neighbor2 The second vertex of the oriented angle
- */
-data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
+data class AngleDecorator(val angle: Angle) {
+
+    inner class MeasureLabel1 : Label() {
+
+
+        /**
+         * The displacement of the label from the default position, due to user dragging
+         * @see T
+         */
+        val dragTranslation: Translate = Translate(.0, .0)
+
+        val bisectorTranslation: Translate = Translate(.0, .0)
+
+        /**
+         * Angle between the default position vector [T] and the custom displacement, measured in **radians**
+         */
+        var dragToTranslationAngle: Double = 0.0
+
+        /**
+         * The vector representing the displacement of the measure label from the center of the [arc].
+         * T = aB+W
+         */
+        var T = Point2D(.0, .0)
+
+        /**
+         * The magnitude of the bisector vector.
+         * @see B
+         */
+        var a: Double = MIN_DISTANCE_FROM_CENTER
+
+        /**
+         * The radius of the circumscribed circle to the label
+         */
+        var R: Double = 0.0
+
+        /**
+         * The bisector of the angle. This vector has norm 1.
+         */
+        var B = Point2D(.0, .0)
+
+        /**
+         * The vector that from tol-left corner of the label, to its center of symmetry.
+         * @see T
+         */
+        var W = Point2D(.0, .0)
+
+
+        var backgroundColor: Paint = Color.BISQUE
+            set(value) {
+                field = value
+                background = Background(BackgroundFill(value, CornerRadii(2.0), Insets(.0)))
+            }
+
+        var fill: Paint = Color.BISQUE
+
+        init {
+            text = "000.0°"
+            transforms.addAll(bisectorTranslation, dragTranslation)
+            background = Background(BackgroundFill(Color.RED, CornerRadii(2.0), Insets(.0)))
+            styleClass.add("measure-label")
+            DragSupport(this)
+        }
+
+        fun update() = updateBounds()
+
+        fun hideBackground(visible: Boolean) {
+//            if (visible) background.fill = Color.LIGHTGRAY // todo ??
+//            else background.fill = Color.TRANSPARENT
+        }
+
+        inner class DragSupport(label: MeasureLabel1) {
+
+            /**
+             * The drag event start point
+             */
+            private var anchorPoint = Point2D(.0, .0)
+
+            /**
+             * The drag displacement before a new drag event
+             */
+            private var oldDragTranslation = Point2D(.0, .0)
+            private var dr = Point2D(.0, .0)
+
+            init {
+                label.setOnMousePressed { event ->
+                    anchorPoint = Point2D(event.screenX, event.screenY)
+                    oldDragTranslation = dragTranslation.toVector()
+                    event.consume()
+
+                    log.finest("Mouse pressed. \n\tAnchor point = $anchorPoint \n\tOld translation vector = $oldDragTranslation")
+                }
+
+                label.setOnMouseDragged {
+                    val currentDragPoint = Point2D(it.screenX, it.screenY)
+
+                    // calculate the delta from the anchor point
+                    dr = (currentDragPoint sub anchorPoint) sum oldDragTranslation
+
+                    dragTranslation.set(dr)
+
+                    // update the angle
+                    dragToTranslationAngle = angleBetween(dr, T, RADIANS)
+
+                    updateDragLines()
+
+                    it.consume()
+                }
+            }
+        }
+    }
 
     inner class MeasureLabel : StackPane() {
 
@@ -43,18 +143,42 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
          * The displacement of the label from the default position, due to user dragging
          * @see T
          */
-        val dragTranslation: Translate = Transform.translate(.0, .0)
+        val dragTranslation: Translate = Translate(.0, .0)
 
+        val bisectorTranslation: Translate = Translate(.0, .0)
 
         /**
-         * Angle between the default position vector [T] and the custom displacement, measured in radians
+         * Angle between the default position vector [T] and the custom displacement, measured in **radians**
          */
         var dragToTranslationAngle: Double = 0.0
 
         /**
-         * The vector representing the displacement of the measure label from the center of the [arc]
+         * The vector representing the displacement of the measure label from the center of the [arc].
+         * T = aB+W
          */
         var T = Point2D(.0, .0)
+
+        /**
+         * The magnitude of the bisector vector.
+         * @see B
+         */
+        var a: Double = MIN_DISTANCE_FROM_CENTER
+
+        /**
+         * The radius of the circumscribed circle to the label
+         */
+        var R: Double = 0.0
+
+        /**
+         * The bisector of the angle. This vector has norm 1.
+         */
+        var B = Point2D(.0, .0)
+
+        /**
+         * The vector that from tol-left corner of the label, to its center of symmetry.
+         * @see T
+         */
+        var W = Point2D(.0, .0)
 
 
         var backgroundColor: Paint by background::fill
@@ -63,6 +187,8 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
         var font: Font by label::font
 
         init {
+            styleClass.add("measure-label")
+
             label.layoutBoundsProperty().addListener { _, _, bounds ->
                 background.width = bounds.width + 4
                 background.height = bounds.height + 3
@@ -76,11 +202,15 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
 
             children.addAll(background, label)
 
+            transforms.addAll(bisectorTranslation, dragTranslation)
+
+            isVisible = false
+
             DragSupport(this)
         }
 
         fun hideBackground(visible: Boolean) {
-            if (visible) background.fill = Color.LIGHTGRAY
+            if (visible) background.fill = Color.LIGHTGRAY // todo ??
             else background.fill = Color.TRANSPARENT
         }
 
@@ -100,7 +230,7 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
             init {
                 label.setOnMousePressed { event ->
                     anchorPoint = Point2D(event.screenX, event.screenY)
-                    oldDragTranslation = Point2D(dragTranslation.x, dragTranslation.y)
+                    oldDragTranslation = dragTranslation.toVector()
                     event.consume()
 
                     log.finest("Mouse pressed. \n\tAnchor point = $anchorPoint \n\tOld translation vector = $oldDragTranslation")
@@ -110,13 +240,14 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
                     val currentDragPoint = Point2D(it.screenX, it.screenY)
 
                     // calculate the delta from the anchor point
-                    dr = currentDragPoint.subtract(anchorPoint).add(oldDragTranslation)
+                    dr = (currentDragPoint sub anchorPoint) sum oldDragTranslation
 
-                    dragTranslation.x = dr.x
-                    dragTranslation.y = dr.y
+                    dragTranslation.set(dr)
 
                     // update the angle
-                    dragToTranslationAngle = angleBetween(dr, T, MEASURE_UNIT)
+                    dragToTranslationAngle = angleBetween(dr, T, RADIANS)
+
+                    updateDragLines()
 
                     it.consume()
                 }
@@ -130,11 +261,16 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
     val angleLabel = MeasureLabel()
     private val arc: Arc = Arc()
 
-    val chain get() = neighbor1.chain
+    val chain get() = angle.vertex.chain
 
     private val vectorLine = Line()
     private val dragVector = Line()
+    private val circle = Circle(0.0, Color.AQUAMARINE)
 
+
+    /**
+     * Remove all nodes belonging to this decorator from the [Pane]
+     */
     fun dispose(pane: Pane) {
         listOf(
             vectorLine,
@@ -144,21 +280,43 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
         ).forEach { pane.children.remove(it) }
     }
 
-    fun build(dot: Dot, pane: Pane) {
+    fun containsDot(dot: Dot, asVertex: Boolean = false): Boolean {
+        return if (asVertex)
+            angle.vertex == dot
+        else
+            angle.extreme1 == dot || angle.extreme2 == dot
+    }
+
+    fun build() { // todo remove and put in constructor
+        val vertex = angle.vertex
 
         // add the nodes to the Pane and move them to background
-        pane.children.addAll(arc, angleLabel, vectorLine, dragVector)
+        pane.children.addAll(
+            circle,
+            arc,
+            angleLabel,
+//            dragVector,
+//            vectorLine,
+        )
+
+        pane.requestLayout()
+
+        with(circle) {
+            stroke = Color.PINK
+            fill = Color.CORAL
+            isVisible = false
+        }
 
         with(vectorLine) {
-            startXProperty().bind(dot.centerXProperty())
-            startYProperty().bind(dot.centerYProperty())
+            startXProperty().bind(vertex.centerXProperty())
+            startYProperty().bind(vertex.centerYProperty())
             stroke = Color.RED
 //            isVisible = false
         }
 
         with(dragVector) {
-            startXProperty().bind(dot.centerXProperty())
-            startYProperty().bind(dot.centerYProperty())
+            startXProperty().bind(vertex.centerXProperty())
+            startYProperty().bind(vertex.centerYProperty())
             stroke = Color.CORAL
 //            isVisible = false
         }
@@ -166,20 +324,20 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
 
         // create the arc
         arc.apply {
-            centerXProperty().bind(dot.centerXProperty())
-            centerYProperty().bind(dot.centerYProperty())
+            centerXProperty().bind(vertex.centerXProperty())
+            centerYProperty().bind(vertex.centerYProperty())
             radiusX = 20.0
             radiusY = 20.0
             type = ArcType.ROUND
             fill = Color.TRANSPARENT
             stroke = Color.DARKGREEN
             strokeWidth = 1.5
-            length = getMeasure()
+            length = angle.measure()
             startAngle = getInitialAngle()
         }
 
         angleLabel.apply {
-            text = format(getMeasure())
+            text = format(angle.measure())
             isVisible = true
 
             // initialize appearance properties
@@ -187,9 +345,8 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
             font = Font.font(font.name, chain.measureLabelFontSize)
             backgroundColor = chain.measureLabelBackgroundColor
 
-            relocate(dot.centerX, dot.centerY)
-            layoutXProperty().bind(dot.centerXProperty())
-            layoutYProperty().bind(dot.centerYProperty())
+            layoutXProperty().bind(vertex.centerXProperty())
+            layoutYProperty().bind(vertex.centerYProperty())
 
             hideBackground(chain.measureLabelBackgroundVisibility)
         }
@@ -197,7 +354,7 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
         angleLabel.setOnMouseClicked {
             if (it.button == MouseButton.SECONDARY) {
                 // show the label context-menu
-                MeasureLabelMenu.show(angleLabel, dot, it.screenX, it.screenY)
+                MeasureLabelMenu.show(angleLabel, vertex, it.screenX, it.screenY)
                 it.consume()
             }
         }
@@ -235,86 +392,94 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
             angleLabel.backgroundColor = color
         }
 
-        // listen to changes of the measure unit
-        measureUnitProperty.addListener { _, _, unit ->
-
-        }
-
         arc.toBack()
         angleLabel.toBack()
 
-        updateAngleLabelPosition()
+        updateLabelPosition()
     }
 
     fun resetLabelPosition() {
-        with(angleLabel.dragTranslation) {
-            x = 0.0
-            y = 0.0
+        with(angleLabel) {
+            dragTranslation.x = .0
+            dragTranslation.y = .0
+        }
+
+        updateLabelPosition()
+    }
+
+    private fun isLabelPositionCustomized() = angleLabel.dragTranslation.toVector() != Point2D(.0, .0)
+
+    @Suppress("LocalVariableName")
+    fun updateLabelPosition() {
+
+        fun dR(a: Double) =
+            dR * (MAX_DISTANCE_FROM_CENTER - a) / (MAX_DISTANCE_FROM_CENTER - MIN_DISTANCE_FROM_CENTER)
+
+        runLater {
+            with(angleLabel) {
+                val bounds = boundsInParent
+                val angleMeasure = angle.measure()
+
+                // the normal vector to the first side of the angle, pointing to the interior of the angle (the -1)
+                val N1 = angle.L1.orthogonal(-1)
+
+                // translate to the center of symmetry of the rectangle
+                W = Point2D(-bounds.width / 2, -bounds.height / 2)
+
+                B = angle.bisector()
+
+                /* for angle less than 90° correct the position (the minimum space is guaranteed by the circumscribed
+                circle to the measure label */
+                if (angleMeasure < 90.0 && !isLabelPositionCustomized()) {
+                    R = 0.5 * sqrt(bounds.width.pow(2) + bounds.height.pow(2)) + dR(a)
+
+                    a = max(R / (B dot N1), MIN_DISTANCE_FROM_CENTER)
+                    a = min(MAX_DISTANCE_FROM_CENTER, a)
+                } else {
+                    a = MIN_DISTANCE_FROM_CENTER
+                }
+
+                T = B.multiply(a) sum W
+
+                // recalculate the drag-vector position to preserve the angle with the translation vector
+                val dragVectorMagnitude = dragTranslation.toVector().magnitude()
+                val d = T.normalize()
+                    .rotate(-dragToTranslationAngle)
+                    .multiply(dragVectorMagnitude)
+
+                bisectorTranslation.set(T)
+                dragTranslation.set(d)
+
+                updateDragLines()
+            }
         }
     }
 
-    @Suppress("LocalVariableName")
-    private fun updateAngleLabelPosition() {
-        val NW = Point2D(angleLabel.layoutX, angleLabel.layoutY)
-        val NE = Point2D(angleLabel.layoutX + angleLabel.width, angleLabel.layoutY)
-        val SW = Point2D(angleLabel.layoutX, angleLabel.layoutY + angleLabel.height)
-        val SE = Point2D(angleLabel.layoutX + angleLabel.width, angleLabel.layoutY + angleLabel.height)
-
-        println(SE)
-        println(angleLabel.boundsInParent)
-        println(angleLabel.boundsInLocal)
-
+    private fun updateDragLines() {
         with(angleLabel) {
-            // put the center of symmetry of the label on the bisector of the angle
-            val alpha = -Math.toRadians(getMeasure()) / 2
-
-            val bounds = angleLabel.boundsInParent
-
-            // translate to the center of symmetry of the rectangle
-            val W = Point2D(-bounds.width / 2, -(bounds.height) / 2)
-
-            // normalized direction vector of the first side of the angle
-            T = neighbor1.getCenter()
-                .subtract(arc.getCenter())
-                .normalize()
-
-            // rescale and rotate the direction vector to outdistance the label from the center of the angle
-            T = T.multiply(45.0).rotate(alpha)
-
-
-            // recalculate the drag-vector position to preserve the angle with the translation vector
-            val dragVectorMagnitude = sqrt(dragTranslation.x.pow(2) + dragTranslation.y.pow(2))
-            val d = T.normalize()
-                .rotate(-dragToTranslationAngle)
-                .multiply(dragVectorMagnitude)
-
-            dragTranslation.x = d.x
-            dragTranslation.y = d.y
-
-            transforms.clear()
-            transforms.addAll(
-                Transform.translate(W.x, W.y),
-                Transform.translate(T.x, T.y),
-                dragTranslation
-            )
+            circle.apply {
+                centerX = T.x - W.x + arc.centerX
+                centerY = T.y - W.y + arc.centerY
+                radius = R
+                angleLabel.toFront()
+            }
 
             vectorLine.apply {
                 endX = T.x + arc.centerX
                 endY = T.y + arc.centerY
             }
+        }
 
-            dragVector.apply {
-                endX = d.x + arc.centerX
-//            endX = angleLabel.userDragTranslation.x + arc.centerX
-                endY = d.y + arc.centerY
-//            endY = angleLabel.userDragTranslation.y + arc.centerY
-            }
+        dragVector.apply {
+            endX = angleLabel.dragTranslation.x + arc.centerX
+            endY = angleLabel.dragTranslation.y + arc.centerY
         }
     }
 
+
     fun update() {
         // the updated angle measure
-        val angleMeasure = getMeasure()
+        val angleMeasure = angle.measure()
 
         // update arc properties
         arc.apply {
@@ -326,7 +491,7 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
         if (angleLabel.isVisible) {
             angleLabel.text = format(angleMeasure)
 
-            updateAngleLabelPosition()
+            updateLabelPosition()
         }
     }
 
@@ -334,37 +499,26 @@ data class AngleDecorator(val neighbor1: Dot, val neighbor2: Dot) {
         return if (other == null || other !is AngleDecorator)
             false
         else {
-            other.neighbor1 == neighbor1 && other.neighbor2 == neighbor2
+            other.angle.extreme1 == angle.extreme1 &&
+                    other.angle.extreme2 == angle.extreme2
+                    && other.angle.vertex == angle.vertex
         }
     }
 
     override fun hashCode(): Int {
-        var result = neighbor1.hashCode()
-        result = 31 * result + neighbor2.hashCode()
+        var result = angle.hashCode()
         result = 31 * result + arc.hashCode()
         return result
     }
 
-    /**
-     * Calculate the measure of the angle in **degrees**
-     */
-    private fun getMeasure(): Double {
-        val p1 = neighbor1.getCenter()
-        val p2 = neighbor2.getCenter()
-        val arcCenter = arc.getCenter()
-
-        return angleBetween(p2.subtract(arcCenter), p1.subtract(arcCenter), DECIMAL_DEGREE)
-    }
-
-    private fun getInitialAngle(): Double {
-        val p1 = neighbor1.getCenter()
-        val arcCenter = arc.getCenter()
-
-        return angleBetween(p1.subtract(arcCenter), Point2D(1.0, 0.0), DECIMAL_DEGREE)
-    }
+    private fun getInitialAngle() = angleBetween(angle.L1, Point2D(1.0, 0.0))
 
     companion object {
         private val log: Logger = LogFactory.configureLog(AngleDecorator::class.java)
+
+        const val dR = 3.0
+        const val MAX_DISTANCE_FROM_CENTER = 110.0
+        const val MIN_DISTANCE_FROM_CENTER = 46.0
 
         private val DECIMAL_DEGREE_TEMPLATE = "%.${ANGLE_LABEL_PRECISION}f°"
         private val RADIANS_TEMPLATE = "%.${ANGLE_LABEL_PRECISION}f"
