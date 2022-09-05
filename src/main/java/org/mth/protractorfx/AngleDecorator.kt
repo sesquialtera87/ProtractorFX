@@ -51,7 +51,7 @@ data class AngleDecorator(val angle: Angle) {
          * The magnitude of the bisector vector.
          * @see B
          */
-        var a: Double = 1.0
+        var a: Double = MIN_DISTANCE_FROM_CENTER
 
         /**
          * The radius of the circumscribed circle to the label
@@ -292,6 +292,10 @@ data class AngleDecorator(val angle: Angle) {
 
     @Suppress("LocalVariableName")
     fun updateLabelPosition() {
+
+        fun dR(a: Double) =
+            dR * (MAX_DISTANCE_FROM_CENTER - a) / (MAX_DISTANCE_FROM_CENTER - MIN_DISTANCE_FROM_CENTER)
+
         with(angleLabel) {
             val bounds = boundsInParent
             val angleMeasure = angle.measure()
@@ -307,7 +311,7 @@ data class AngleDecorator(val angle: Angle) {
             /* for angle less than 90° correct the position (the minimum space is guaranteed by the circumscribed
             circle to the measure label */
             if (angleMeasure < 90.0 && !isLabelPositionCustomized()) {
-                R = 0.5 * sqrt(bounds.width.pow(2) + bounds.height.pow(2)) + dR
+                R = 0.5 * sqrt(bounds.width.pow(2) + bounds.height.pow(2)) + dR(a)
 
                 a = max(R / (B dot N1), MIN_DISTANCE_FROM_CENTER)
                 a = min(MAX_DISTANCE_FROM_CENTER, a)
