@@ -67,13 +67,15 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
     }
 
     fun addAngleMeasure(dot1: Dot, dot2: Dot) {
-        val angleDescriptor = AngleDecorator(Angle(this, dot1, dot2))
+        val decorator = AngleDecorator(Angle(this, dot1, dot2))
 
         log.finest("Angle centre: $this \nAngle sides: \n\tP1 = $dot1 \n\tP2 = $dot2")
 
-        if (!angleDecorators.contains(angleDescriptor)) {
-            angleDecorators.add(angleDescriptor)
-            angleDescriptor.build()
+        if (!angleDecorators.contains(decorator)) {
+            runLater {
+                angleDecorators.add(decorator)
+                decorator.build()
+            }
         } else {
             log.info("Angle already measured")
         }
@@ -238,7 +240,7 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
 
     class MoveAction(
         private val dotLocations: Map<Dot, Point2D>,
-        override val name: String = "move-dots"
+        override val name: String = "move-dots",
     ) : Action {
 
         override fun execute() {}

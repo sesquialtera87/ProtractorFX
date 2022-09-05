@@ -1,15 +1,15 @@
 package org.mth.protractorfx
 
+import javafx.geometry.Insets
 import javafx.geometry.Point2D
+import javafx.scene.control.Label
 import javafx.scene.input.MouseButton
-import javafx.scene.layout.Pane
-import javafx.scene.layout.StackPane
+import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.scene.paint.Paint
 import javafx.scene.shape.*
 import javafx.scene.text.Font
 import javafx.scene.text.Text
-import javafx.scene.transform.Transform
 import javafx.scene.transform.Translate
 import org.mth.protractorfx.log.LogFactory
 import org.mth.protractorfx.tool.MeasureUnit.*
@@ -17,6 +17,115 @@ import java.util.logging.Logger
 import kotlin.math.*
 
 data class AngleDecorator(val angle: Angle) {
+
+    inner class MeasureLabel1 : Label() {
+
+
+        /**
+         * The displacement of the label from the default position, due to user dragging
+         * @see T
+         */
+        val dragTranslation: Translate = Translate(.0, .0)
+
+        val bisectorTranslation: Translate = Translate(.0, .0)
+
+        /**
+         * Angle between the default position vector [T] and the custom displacement, measured in **radians**
+         */
+        var dragToTranslationAngle: Double = 0.0
+
+        /**
+         * The vector representing the displacement of the measure label from the center of the [arc].
+         * T = aB+W
+         */
+        var T = Point2D(.0, .0)
+
+        /**
+         * The magnitude of the bisector vector.
+         * @see B
+         */
+        var a: Double = MIN_DISTANCE_FROM_CENTER
+
+        /**
+         * The radius of the circumscribed circle to the label
+         */
+        var R: Double = 0.0
+
+        /**
+         * The bisector of the angle. This vector has norm 1.
+         */
+        var B = Point2D(.0, .0)
+
+        /**
+         * The vector that from tol-left corner of the label, to its center of symmetry.
+         * @see T
+         */
+        var W = Point2D(.0, .0)
+
+
+        var backgroundColor: Paint = Color.BISQUE
+            set(value) {
+                field = value
+                background = Background(BackgroundFill(value, CornerRadii(2.0), Insets(.0)))
+            }
+
+        var fill: Paint = Color.BISQUE
+
+        init {
+            text = "000.0°"
+            transforms.addAll(bisectorTranslation, dragTranslation)
+            background = Background(BackgroundFill(Color.RED, CornerRadii(2.0), Insets(.0)))
+            styleClass.add("measure-label")
+            DragSupport(this)
+        }
+
+        fun update() = updateBounds()
+
+        fun hideBackground(visible: Boolean) {
+//            if (visible) background.fill = Color.LIGHTGRAY // todo ??
+//            else background.fill = Color.TRANSPARENT
+        }
+
+        inner class DragSupport(label: MeasureLabel1) {
+
+            /**
+             * The drag event start point
+             */
+            private var anchorPoint = Point2D(.0, .0)
+
+            /**
+             * The drag displacement before a new drag event
+             */
+            private var oldDragTranslation = Point2D(.0, .0)
+            private var dr = Point2D(.0, .0)
+
+            init {
+                label.setOnMousePressed { event ->
+                    anchorPoint = Point2D(event.screenX, event.screenY)
+                    oldDragTranslation = dragTranslation.toVector()
+                    event.consume()
+
+                    log.finest("Mouse pressed. \n\tAnchor point = $anchorPoint \n\tOld translation vector = $oldDragTranslation")
+                }
+
+                label.setOnMouseDragged {
+                    val currentDragPoint = Point2D(it.screenX, it.screenY)
+
+                    // calculate the delta from the anchor point
+                    dr = (currentDragPoint sub anchorPoint) sum oldDragTranslation
+
+                    dragTranslation.set(dr)
+
+                    // update the angle
+                    dragToTranslationAngle = angleBetween(dr, T, RADIANS)
+
+                    updateDragLines()
+
+                    it.consume()
+                }
+            }
+        }
+    }
 
     inner class MeasureLabel : StackPane() {
 
@@ -34,7 +143,9 @@ data class AngleDecorator(val angle: Angle) {
          * The displacement of the label from the default position, due to user dragging
          * @see T
          */
-        val dragTranslation: Translate = Transform.translate(.0, .0)
+        val dragTranslation: Translate = Translate(.0, .0)
+
+        val bisectorTranslation: Translate = Translate(.0, .0)
 
         /**
          * Angle between the default position vector [T] and the custom displacement, measured in **radians**
@@ -76,6 +187,8 @@ data class AngleDecorator(val angle: Angle) {
         var font: Font by label::font
 
         init {
+            styleClass.add("measure-label")
+
             label.layoutBoundsProperty().addListener { _, _, bounds ->
                 background.width = bounds.width + 4
                 background.height = bounds.height + 3
@@ -88,6 +201,10 @@ data class AngleDecorator(val angle: Angle) {
             }
 
             children.addAll(background, label)
+
+            transforms.addAll(bisectorTranslation, dragTranslation)
+
+            isVisible = false
 
             DragSupport(this)
         }
@@ -182,10 +299,12 @@ data class AngleDecorator(val angle: Angle) {
 //            vectorLine,
         )
 
+        pane.requestLayout()
+
         with(circle) {
             stroke = Color.PINK
             fill = Color.CORAL
-//            isVisible = false
+            isVisible = false
         }
 
         with(vectorLine) {
@@ -296,46 +415,43 @@ data class AngleDecorator(val angle: Angle) {
         fun dR(a: Double) =
             dR * (MAX_DISTANCE_FROM_CENTER - a) / (MAX_DISTANCE_FROM_CENTER - MIN_DISTANCE_FROM_CENTER)
 
-        with(angleLabel) {
-            val bounds = boundsInParent
-            val angleMeasure = angle.measure()
+        runLater {
+            with(angleLabel) {
+                val bounds = boundsInParent
+                val angleMeasure = angle.measure()
 
-            // the normal vector to the first side of the angle, pointing to the interior of the angle (the -1)
-            val N1 = angle.L1.orthogonal(-1)
+                // the normal vector to the first side of the angle, pointing to the interior of the angle (the -1)
+                val N1 = angle.L1.orthogonal(-1)
 
-            // translate to the center of symmetry of the rectangle
-            W = Point2D(-bounds.width / 2, -bounds.height / 2)
+                // translate to the center of symmetry of the rectangle
+                W = Point2D(-bounds.width / 2, -bounds.height / 2)
 
-            B = angle.bisector()
+                B = angle.bisector()
 
-            /* for angle less than 90° correct the position (the minimum space is guaranteed by the circumscribed
-            circle to the measure label */
-            if (angleMeasure < 90.0 && !isLabelPositionCustomized()) {
-                R = 0.5 * sqrt(bounds.width.pow(2) + bounds.height.pow(2)) + dR(a)
+                /* for angle less than 90° correct the position (the minimum space is guaranteed by the circumscribed
+                circle to the measure label */
+                if (angleMeasure < 90.0 && !isLabelPositionCustomized()) {
+                    R = 0.5 * sqrt(bounds.width.pow(2) + bounds.height.pow(2)) + dR(a)
 
-                a = max(R / (B dot N1), MIN_DISTANCE_FROM_CENTER)
-                a = min(MAX_DISTANCE_FROM_CENTER, a)
-            } else {
-                a = MIN_DISTANCE_FROM_CENTER
+                    a = max(R / (B dot N1), MIN_DISTANCE_FROM_CENTER)
+                    a = min(MAX_DISTANCE_FROM_CENTER, a)
+                } else {
+                    a = MIN_DISTANCE_FROM_CENTER
+                }
+
+                T = B.multiply(a) sum W
+
+                // recalculate the drag-vector position to preserve the angle with the translation vector
+                val dragVectorMagnitude = dragTranslation.toVector().magnitude()
+                val d = T.normalize()
+                    .rotate(-dragToTranslationAngle)
+                    .multiply(dragVectorMagnitude)
+
+                bisectorTranslation.set(T)
+                dragTranslation.set(d)
+
+                updateDragLines()
             }
-
-            T = B.multiply(a) sum W
-
-            // recalculate the drag-vector position to preserve the angle with the translation vector
-            val dragVectorMagnitude = dragTranslation.toVector().magnitude()
-            val d = T.normalize()
-                .rotate(-dragToTranslationAngle)
-                .multiply(dragVectorMagnitude)
-
-            dragTranslation.set(d)
-
-            transforms.clear()
-            transforms.addAll(
-                Transform.translate(T.x, T.y),
-                dragTranslation
-            )
-
-            updateDragLines()
         }
     }
 

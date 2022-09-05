@@ -1,5 +1,6 @@
 package org.mth.protractorfx
 
+import javafx.application.Platform
 import javafx.beans.property.*
 import javafx.beans.value.ObservableValue
 import javafx.event.EventHandler
@@ -204,4 +205,6 @@ infix fun Point2D.sub(vector: Point2D): Point2D = this.subtract(vector)
  * By default, the rotation is clockwise.
  */
 fun Point2D.orthogonal(direction: Byte = +1) = this.normalize().rotate(direction * PI / 2)
+
+fun runLater(runnable: Runnable) = Platform.runLater(runnable)
 
