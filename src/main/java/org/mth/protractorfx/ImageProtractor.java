@@ -5,7 +5,6 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
@@ -88,8 +87,6 @@ public class ImageProtractor implements Initializable {
     MenuBar menuBar;
     @FXML
     Menu measureUnitMenu;
-    @FXML
-    Menu undoMenu;
     @FXML
     Button maximizeButton;
 
@@ -196,7 +193,7 @@ public class ImageProtractor implements Initializable {
 
         container.getChildren().add(MouseCoordinateLabel.INSTANCE);
 
-        chain = new DotChain(container, new Point2D(0, 0), Color.BLACK);
+        chain = DotChain.randomChain(container);
         UtilsKt.setChain(chain);
         UtilsKt.getChains().add(chain);
 
@@ -412,8 +409,7 @@ public class ImageProtractor implements Initializable {
 
     @FXML
     void newChain() {
-        DotChain newChain = new DotChain(container, new Point2D(20, 12), null);
-        UtilsKt.getChains().add(newChain);
+        UtilsKt.getChains().add(DotChain.randomChain(container));
     }
 
     public static double getImageScalingFactor(ImageView imageView) {

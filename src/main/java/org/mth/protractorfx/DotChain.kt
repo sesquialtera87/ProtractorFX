@@ -11,9 +11,11 @@ import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import javafx.scene.shape.Line
 import javafx.scene.text.FontWeight
+import javafx.scene.transform.Translate
 import java.util.*
+import kotlin.math.PI
 
-class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, .0), color: Color? = Color.BLACK) :
+class DotChain(private val container: Pane, color: Color? = Color.BLACK) :
     Iterable<Dot> {
 
     /**
@@ -57,7 +59,7 @@ class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, 
     }
 
     private val adjacencyList: MutableMap<Dot, HashSet<Dot>> = mutableMapOf()
-    private val connections: HashSet<ConnectorLine> = HashSet()
+    private val connectors: HashSet<ConnectorLine> = HashSet()
 
     /**
      * The color of the nodes of this chain
@@ -84,7 +86,7 @@ class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, 
     init {
         if (color == null) {
             // choose a random color from the available ones
-            var availableColors = availableColors()
+            var availableColors = Companion.availableColors()
 
             // if no color is available, choose random from all the colors
             if (availableColors.isEmpty())
@@ -99,19 +101,39 @@ class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, 
 
         // update the connector color in response to a change of the chain color
         chainColor.addListener { _, _, chainColor ->
-            connections.forEach {
+            connectors.forEach {
                 it.stroke = chainColor.desaturate()
             }
         }
+    }
 
+    fun translate(translate: Translate) {
+        forEach { dot ->
+            dot.centerX += translate.x
+            dot.centerY += translate.y
+        }
+    }
 
-        val dot1 = Dot(50.0 + displacement.x, 50.0 + displacement.y, this)
-        val dot2 = Dot(150.0 + displacement.x, 50.0 + displacement.y, this)
-        val dot3 = Dot(50.0 + displacement.x, 150.0 + displacement.y, this)
+    fun rotate(alpha: Double) {
+        val barycenter = barycenter()
 
-        addDots(dot1, dot2, dot3)
-        connect(dot1, dot2)
-        connect(dot2, dot3)
+        forEach { dot ->
+            val rotatedCenter = (dot.getCenter() sub barycenter).rotate(alpha) sum barycenter
+            dot.centerX = rotatedCenter.x
+            dot.centerY = rotatedCenter.y
+        }
+    }
+
+    fun barycenter(): Point2D {
+        var x = 0.0
+        var y = 0.0
+
+        forEach {
+            x += it.centerX
+            y += it.centerY
+        }
+
+        return Point2D(x / size, y / size)
     }
 
     fun setColor(color: Color) {
@@ -161,7 +183,7 @@ class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, 
             adjacencyList.remove(dot)
 
             // get the connection and removes it from Pane
-            val dotConnection = connections.first { it.match(dot, parent) }
+            val dotConnection = connectors.first { it.match(dot, parent) }
 
             // remove the measures, related to the deleted node, around the angle
             parent.angleDecorators
@@ -192,7 +214,7 @@ class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, 
         adjacencyList[dot1]?.add(dot2)
         adjacencyList[dot2]?.add(dot1)
 
-        connections.add(ConnectorLine(dot1, dot2))
+        connectors.add(ConnectorLine(dot1, dot2))
     }
 
     /**
@@ -204,17 +226,53 @@ class DotChain(private val container: Pane, displacement: Point2D = Point2D(.0, 
             container.children.remove(dot)
 
             // remove the connection lines
-            connections.forEach { container.children.remove(it) }
+            connectors.forEach { container.children.remove(it) }
 
             // remove all decorators
             dot.angleDecorators.forEach { it.dispose(container) }
         }
     }
 
-    private fun availableColors(): List<Color> {
-        val usedColors = chains.map { it.chainColor.get() }
-        return defaultColors() - usedColors.toSet()
-    }
-
     override fun iterator() = adjacencyList.keys.iterator()
+
+    companion object {
+        @JvmStatic
+        fun standardChain(pane: Pane) =
+            DotChain(pane).apply {
+                val dot1 = Dot(0.0, 0.0, this)
+                val dot2 = Dot(150.0, 0.0, this)
+                val dot3 = Dot(50.0, 150.0, this)
+
+                addDots(dot1, dot2, dot3)
+                connect(dot1, dot2)
+                connect(dot2, dot3)
+            }
+
+        /**
+         * Return a list of the colours not already used for the chains. If no colour is available, returns a list of
+         * all colors.
+         */
+        @JvmStatic
+        fun availableColors(): List<Color> {
+            val usedColors = chains.map { it.chainColor.get() }
+            val availableColors = defaultColors() - usedColors.toSet()
+
+            return availableColors.ifEmpty { defaultColors() }
+        }
+
+        @JvmStatic
+        fun randomChain(container: Pane = pane) = standardChain(container)
+            .apply {
+                val bounds = container.boundsInParent
+                val minH = bounds.height / 5
+                val maxH = bounds.height * 4 / 5
+                val minW = bounds.width / 5
+                val maxW = bounds.width * 4 / 5
+
+                val rnd = Random()
+                translate(Translate(rnd.nextDouble(minW, maxW), rnd.nextDouble(minH, maxH)))
+                rotate(rnd.nextDouble(0.0, 2 * PI))
+                chainColor.value = availableColors().random()
+            }
+    }
 }

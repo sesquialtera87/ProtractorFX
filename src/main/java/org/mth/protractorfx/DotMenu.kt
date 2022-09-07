@@ -3,15 +3,17 @@ package org.mth.protractorfx
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
-import javafx.geometry.Point2D
 import javafx.scene.control.*
 import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
+import javafx.scene.transform.Transform
+import javafx.scene.transform.Translate
 import org.mth.protractorfx.log.LogFactory
 import java.net.URL
 import java.util.*
 import java.util.function.Consumer
 import java.util.logging.Logger
+import kotlin.math.PI
 
 /**
  * The popup menu shown on each measure label
@@ -51,16 +53,7 @@ class DotMenu : Initializable {
 
     @FXML
     fun newChain() {
-        dot {
-            with(Random()) {
-                val newChain = DotChain(
-                    container = it.parent as Pane,
-                    displacement = Point2D(nextDouble(50.0, 450.0), nextDouble(50.0, 450.0)),
-                    color = null
-                )
-                chains.add(newChain)
-            }
-        }
+        chains.add(DotChain.randomChain())
     }
 
     private fun checkDot(): Optional<Dot> {
