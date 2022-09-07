@@ -392,6 +392,8 @@ data class AngleDecorator(val angle: Angle) {
             angleLabel.backgroundColor = color
         }
 
+        measureUnitProperty.addListener { _, _, _ -> update() }
+
         arc.toBack()
         angleLabel.toBack()
 
