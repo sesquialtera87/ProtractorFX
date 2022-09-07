@@ -22,6 +22,8 @@ import javafx.scene.shape.Circle
 import javafx.scene.shape.Rectangle
 import javafx.scene.transform.Translate
 import javafx.stage.Stage
+import org.mth.protractorfx.command.Action
+import org.mth.protractorfx.command.CommandManager
 import org.mth.protractorfx.tool.MeasureUnit
 import org.mth.protractorfx.tool.MeasureUnit.*
 import java.io.File
@@ -207,4 +209,6 @@ infix fun Point2D.sub(vector: Point2D): Point2D = this.subtract(vector)
 fun Point2D.orthogonal(direction: Byte = +1) = this.normalize().rotate(direction * PI / 2)
 
 fun runLater(runnable: Runnable) = Platform.runLater(runnable)
+
+fun execute(action: Action) = CommandManager.execute(action)
 

@@ -7,7 +7,6 @@ import javafx.scene.input.KeyCodeCombination
 import javafx.scene.input.MouseEvent
 import org.mth.protractorfx.*
 import org.mth.protractorfx.command.Action
-import org.mth.protractorfx.command.CommandManager
 
 object DeletionTool : AbstractTool() {
 
@@ -25,14 +24,14 @@ object DeletionTool : AbstractTool() {
         for (dot in chains.flatten()) {
             if (dot.getCenter().subtract(coordinates).magnitude() < dot.radius) {
                 if (dot.isLeaf())
-                    CommandManager.execute(DeleteSingleDotAction(dot))
+                    execute(DeleteSingleDotAction(dot))
                 break
             }
         }
     }
 
     fun deleteSelection() {
-        CommandManager.execute(DeleteSelectedDotsAction())
+        execute(DeleteSelectedDotsAction())
     }
 
     /**

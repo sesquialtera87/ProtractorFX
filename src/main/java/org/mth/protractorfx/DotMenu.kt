@@ -7,7 +7,7 @@ import javafx.scene.control.ContextMenu
 import javafx.scene.control.Menu
 import javafx.scene.control.RadioMenuItem
 import javafx.scene.paint.Color
-import org.mth.protractorfx.command.CommandManager
+import org.mth.protractorfx.command.Action
 import org.mth.protractorfx.log.LogFactory
 import java.net.URL
 import java.util.*
@@ -41,18 +41,13 @@ class DotMenu : Initializable {
     @FXML
     fun removeChain() {
         dot {
-            val pane = it.parent
-
-            it.chain.dispose()
-            chains.remove(it.chain)
-
-            pane.requestFocus()
+            execute(DeleteChainAction(it.chain))
         }
     }
 
     @FXML
     fun newChain() {
-        CommandManager.execute(ImageProtractor.NewChainAction())
+        execute(ImageProtractor.NewChainAction())
     }
 
     private fun checkDot(): Optional<Dot> {
@@ -86,6 +81,21 @@ class DotMenu : Initializable {
         initColorMenu(chainColorMenu, { color -> changeChainColor(color) })
     }
 
+
+    class DeleteChainAction(private val dotChain: DotChain, override val name: String = "remove-chain") : Action {
+        override fun execute(): Boolean {
+            dotChain.dispose()
+            chains.remove(dotChain)
+
+            pane.requestFocus()
+
+            return true
+        }
+
+        override fun undo() {
+            // todo
+        }
+    }
 
     companion object {
         private lateinit var controller: DotMenu

@@ -7,7 +7,6 @@ import javafx.scene.input.MouseEvent.*
 import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
 import org.mth.protractorfx.command.Action
-import org.mth.protractorfx.command.CommandManager
 import org.mth.protractorfx.log.LogFactory
 import org.mth.protractorfx.tool.Tool
 import java.util.logging.Logger
@@ -193,7 +192,7 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
                 if (!it.isDragDetect) {
                     dragInitialized = false
 
-                    CommandManager.execute(MoveAction(anchorMap))
+                    execute(MoveAction(anchorMap))
                 }
 
                 if (Tool.activeTools().isEmpty())
