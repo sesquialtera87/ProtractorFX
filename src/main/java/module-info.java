@@ -4,6 +4,7 @@ module com.mth.protractorfx {
     requires javafx.swing;
     requires jfxtras.labs;
     requires AnimateFX;
+    requires org.jfxtras.styles.jmetro;
 
     requires org.controlsfx.controls;
     requires org.kordamp.ikonli.javafx;

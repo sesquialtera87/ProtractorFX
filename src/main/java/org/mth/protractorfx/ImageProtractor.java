@@ -24,6 +24,7 @@ import javafx.scene.transform.Scale;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.StageStyle;
+import org.mth.protractorfx.command.CommandManager;
 import org.mth.protractorfx.log.LogFactory;
 import org.mth.protractorfx.tool.InsertionTool;
 import org.mth.protractorfx.tool.MeasureUnit;
@@ -85,6 +86,8 @@ public class ImageProtractor implements Initializable {
     MenuBar menuBar;
     @FXML
     Menu measureUnitMenu;
+    @FXML
+    Menu undoMenu;
 
     DotChain chain;
 
@@ -246,6 +249,12 @@ public class ImageProtractor implements Initializable {
 
 //        cropArea.setVisible(false);
         cropArea.show(false);
+    }
+
+    @FXML
+    void undo() {
+        log.fine("Undo");
+        CommandManager.INSTANCE.undo();
     }
 
     @FXML

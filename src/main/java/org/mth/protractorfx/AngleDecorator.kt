@@ -529,6 +529,7 @@ data class AngleDecorator(val angle: Angle) {
          * Format the given measure
          * @param angle The measure in **degrees**
          */
+        @Suppress("LocalVariableName")
         fun format(angle: Double): String {
             return when (MEASURE_UNIT) {
                 RADIANS -> RADIANS_TEMPLATE.format(Math.toRadians(angle))

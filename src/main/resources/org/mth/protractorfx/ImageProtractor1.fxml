@@ -44,8 +44,9 @@
                     BorderPane.alignment="CENTER">
             <center>
                 <MenuBar fx:id="menuBar" prefHeight="40.0" prefWidth="854.0" BorderPane.alignment="CENTER">
-                    <Menu text="Mode">
-                        <RadioMenuItem onAction="#fullScreenMode" text="Full screen"/>
+                    <Menu text="Protractor">
+                        <MenuItem accelerator="Shortcut+Z" text="Undo" onAction="#undo"/>
+                        <MenuItem accelerator="Shortcut+W" text="Minimize" onAction="#minimizeApp"/>
                         <MenuItem accelerator="Shortcut+Q" text="Quit" onAction="#closeApp"/>
                     </Menu>
 
