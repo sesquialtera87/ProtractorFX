@@ -9,7 +9,7 @@ object CommandManager {
     private val queueStackNormal: QueueStack<List<Action>>
     private val queueStackReverse: QueueStack<List<Action>>
 
-     val actionHistory = LinkedList<Action>()
+    val actionHistory = LinkedList<Action>()
 
     init {
         queueStackNormal = QueueStack()
@@ -27,7 +27,7 @@ object CommandManager {
         if (actionHistory.isNotEmpty()) {
             val action = actionHistory.pop()
             action.undo()
-            println("Undoing " + action)
+            println("Undoing " + action.name)
             return
         }
 

@@ -70,7 +70,7 @@ object InsertionTool : AbstractTool() {
     ) : Action {
         private val newDot: Dot = Dot(coordinates.x, coordinates.y, parentDot.chain)
 
-        override fun execute() {
+        override fun execute(): Boolean {
             val chain = newDot.chain
 
             // add a new Dot to the chain
@@ -81,6 +81,8 @@ object InsertionTool : AbstractTool() {
             }
 
             newDot.requestFocus()
+
+            return true
         }
 
         override fun undo() {

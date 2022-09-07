@@ -2,7 +2,6 @@ module com.mth.protractorfx {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.swing;
-    requires jfxtras.labs;
     requires AnimateFX;
     requires org.jfxtras.styles.jmetro;
 

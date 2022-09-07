@@ -243,7 +243,7 @@ class Dot(x: Double, y: Double, val chain: DotChain) : Circle() {
         override val name: String = "move-dots",
     ) : Action {
 
-        override fun execute() {}
+        override fun execute() = true
 
         override fun undo() {
             // set of nodes for which update the angle measures

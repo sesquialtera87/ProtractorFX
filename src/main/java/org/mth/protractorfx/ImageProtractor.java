@@ -7,6 +7,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -23,6 +25,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.mth.protractorfx.command.CommandManager;
 import org.mth.protractorfx.log.LogFactory;
@@ -88,11 +91,23 @@ public class ImageProtractor implements Initializable {
     Menu measureUnitMenu;
     @FXML
     Menu undoMenu;
+    @FXML
+    Button maximizeButton;
 
     DotChain chain;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        UtilsKt.stage.maximizedProperty().addListener((observableValue, aBoolean, maximized) -> {
+            ImageView graphic = (ImageView) maximizeButton.getGraphic();
+
+            if (maximized) {
+                graphic.setImage(new Image(getClass().getResourceAsStream("restore_down_x48.png")));
+            } else {
+                graphic.setImage(new Image(getClass().getResourceAsStream("maximize_x48.png")));
+            }
+        });
+
         container.getChildren().add(SelectionRectangle.INSTANCE);
 
         // bind zoom update with the related transform
@@ -312,6 +327,12 @@ public class ImageProtractor implements Initializable {
     @FXML
     void minimizeApp() {
         UtilsKt.stage.setIconified(true);
+    }
+
+    @FXML
+    void maximizeWindow() {
+        Stage stage = UtilsKt.stage;
+        stage.setMaximized(!stage.isMaximized());
     }
 
     @FXML

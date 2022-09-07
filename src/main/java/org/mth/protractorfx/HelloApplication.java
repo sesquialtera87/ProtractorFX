@@ -20,6 +20,8 @@ public class HelloApplication extends Application {
 //            return;
         }
 
+        UtilsKt.stage = stage;
+
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("ImageProtractor1.fxml"));
         Scene scene = new Scene(fxmlLoader.load(),
                 Toolkit.getDefaultToolkit().getScreenSize().width,
@@ -34,13 +36,12 @@ public class HelloApplication extends Application {
         stage.setTitle("Hello!");
         stage.setScene(scene);
         stage.initStyle(StageStyle.TRANSPARENT);
-//        stage.setMaximized(true);
+        stage.setMaximized(true);
 
         stage.show();
         stage.requestFocus();
 
         UtilsKt.scene = scene;
-        UtilsKt.stage = stage;
 
         Tool.Companion.initialize();
 

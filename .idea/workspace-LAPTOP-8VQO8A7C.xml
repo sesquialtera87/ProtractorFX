@@ -1,0 +1,500 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="d79389df-debf-47ae-a8a9-97d09d9da882" name="Changes" comment="Implemented deletion under click">
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/mth/protractorfx/AngleDecorator.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/mth/protractorfx/AngleDecorator.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/mth/protractorfx/HelloApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/mth/protractorfx/HelloApplication.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+        <option value="Kotlin Class" />
+        <option value="Kotlin File" />
+        <option value="FxmlFile" />
+        <option value="Kotlin Enum" />
+        <option value="Kotlin Object" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <excluded-from-favorite>
+      <branch-storage>
+        <map>
+          <entry type="LOCAL">
+            <value>
+              <list>
+                <branch-info repo="$PROJECT_DIR$" source="master" />
+              </list>
+            </value>
+          </entry>
+        </map>
+      </branch-storage>
+    </excluded-from-favorite>
+    <favorite-branches>
+      <branch-storage>
+        <map>
+          <entry type="LOCAL">
+            <value>
+              <list>
+                <branch-info repo="$PROJECT_DIR$" source="mouse_actions_fix" />
+              </list>
+            </value>
+          </entry>
+        </map>
+      </branch-storage>
+    </favorite-branches>
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="recentNewPullRequestHead">
+      <RepoCoordinatesHolder>
+        <option name="owner" value="sesquialtera87" />
+        <option name="repository" value="ProtractorFX" />
+      </RepoCoordinatesHolder>
+    </option>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="290wOEDB65eqXc9bU5V6o88prLI" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="Downloaded.Files.Path.Enabled" value="false" />
+    <property name="Repository.Attach.Annotations" value="false" />
+    <property name="Repository.Attach.JavaDocs" value="true" />
+    <property name="Repository.Attach.Sources" value="false" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/main/resources/org/mth/protractorfx" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.3091954" />
+    <property name="settings.editor.selected.configurable" value="reference.projectsettings.compiler.javacompiler" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\matti\OneDrive\Documenti\Java\ProtractorFX\src\main\resources\org\mth\protractorfx" />
+      <recent name="C:\Users\matti\OneDrive\Documenti\Java\ProtractorFX\target\classes\com\mth\protractorfx" />
+      <recent name="C:\Users\matti\OneDrive\Documenti\Java\ProtractorFX\src\main\java\org\mth\protractorfx" />
+      <recent name="C:\Users\matti\OneDrive\Documenti\Java\ProtractorFX\src\main\resources" />
+      <recent name="C:\Users\matti\OneDrive\Documenti\Java\ProtractorFX\src\main\resources\com\mth\protractorfx" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\matti\OneDrive\Documenti\Java\ProtractorFX\src\main\resources\com\mth\protractorfx" />
+    </key>
+    <key name="MoveKotlinTopLevelDeclarationsDialog.RECENTS_KEY">
+      <recent name="org.mth.protractorfx.tool" />
+    </key>
+    <key name="MoveInnerDialog.RECENTS_KEY">
+      <recent name="com.mth.protractorfx" />
+    </key>
+    <key name="CopyKotlinDeclarationDialog.RECENTS_KEY">
+      <recent name="org.mth.protractorfx" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.HelloApplication (1)">
+    <configuration name="HelloApplication (1)" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="org.mth.protractorfx.HelloApplication" />
+      <module name="ProtractorFX" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.mth.protractorfx.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Test (1)" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="org.mth.protractorfx.Test" />
+      <module name="ProtractorFX" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.mth.protractorfx.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Test" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.mth.protractorfx.Test" />
+      <module name="ProtractorFX" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.mth.protractorfx.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TestKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="org.mth.protractorfx.TestKt" />
+      <module name="ProtractorFX" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UtilsKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="org.mth.protractorfx.UtilsKt" />
+      <module name="ProtractorFX" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.HelloApplication (1)" />
+        <item itemvalue="Kotlin.UtilsKt" />
+        <item itemvalue="Kotlin.TestKt" />
+        <item itemvalue="Application.Test (1)" />
+        <item itemvalue="Application.Test" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="d79389df-debf-47ae-a8a9-97d09d9da882" name="Changes" comment="" />
+      <created>1652263282064</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1652263282064</updated>
+    </task>
+    <task id="LOCAL-00001" summary="Shortcuts and cursors">
+      <created>1658484533396</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1658484533396</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Leaf node deletion implemented">
+      <created>1658484568636</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1658484568636</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Chain color customization">
+      <created>1658487720522</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1658487720522</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Angle measured label implementation">
+      <created>1658572614429</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1658572614429</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Fixed zoom behaviour">
+      <created>1658936153230</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1658936153230</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Package name changed">
+      <created>1659265345081</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1659265345081</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Various fix">
+      <created>1660808035848</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1660808035848</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Implemented screenshot acquisition">
+      <created>1660814578461</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1660814578461</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Implemented measure labels font customization">
+      <created>1660827153887</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1660827153887</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Implemented background opacity customization">
+      <created>1660834312694</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1660834312694</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Various fix">
+      <created>1660915450390</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1660915450390</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Measure label menu moved to FXML">
+      <created>1660983088732</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1660983088732</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Implemented the selection capability">
+      <created>1660990620827</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1660990620827</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Dot actions move in a separate Kotlin object">
+      <created>1661165172078</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1661165172078</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Various fix">
+      <created>1661690878554</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1661690878554</updated>
+    </task>
+    <task id="LOCAL-00016" summary="Selection management moved from DotChain.kt to Selection.kt">
+      <created>1661694787306</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1661694787306</updated>
+    </task>
+    <task id="LOCAL-00017" summary="The algorithm for nearest dot detection is moved out of DotChain.kt, in order to search in all chains">
+      <created>1661695603122</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1661695603122</updated>
+    </task>
+    <task id="LOCAL-00018" summary="Various fix">
+      <created>1661701728237</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1661701728237</updated>
+    </task>
+    <task id="LOCAL-00019" summary="Various fix">
+      <created>1661782707663</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1661782707663</updated>
+    </task>
+    <task id="LOCAL-00020" summary="Comments improved">
+      <created>1661782984253</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1661782984253</updated>
+    </task>
+    <task id="LOCAL-00021" summary="Fix tool selection and created an enum for them">
+      <created>1661953188015</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1661953188015</updated>
+    </task>
+    <task id="LOCAL-00022" summary="Fixed some drag bugs">
+      <created>1661955492004</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1661955492004</updated>
+    </task>
+    <task id="LOCAL-00023" summary="Created the tool package">
+      <created>1661955688619</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1661955688619</updated>
+    </task>
+    <task id="LOCAL-00024" summary="Implemented deletion under click">
+      <created>1661958803527</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1661958803527</updated>
+    </task>
+    <task id="LOCAL-00025" summary="Various fix">
+      <created>1662024805698</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1662024805698</updated>
+    </task>
+    <task id="LOCAL-00026" summary="Fixed the creation algorithm of a new chain">
+      <created>1662027723739</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1662027723739</updated>
+    </task>
+    <task id="LOCAL-00027" summary="Added various angle measure units">
+      <created>1662110140796</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1662110140796</updated>
+    </task>
+    <task id="LOCAL-00028" summary="Various fix">
+      <created>1662113799433</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1662113799433</updated>
+    </task>
+    <task id="LOCAL-00029" summary="Fixed the behaviour of the connector line color">
+      <created>1662114683603</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1662114683603</updated>
+    </task>
+    <task id="LOCAL-00030" summary="Various fix">
+      <created>1662134005889</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1662134005890</updated>
+    </task>
+    <task id="LOCAL-00031" summary="Uncommented logs">
+      <created>1662136845198</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1662136845198</updated>
+    </task>
+    <task id="LOCAL-00032" summary="Implemented label for mouse coordinates">
+      <created>1662137588526</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1662137588526</updated>
+    </task>
+    <task id="LOCAL-00033" summary="Various fix">
+      <created>1662137769701</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1662137769701</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ID_WIDTH">
+                <map>
+                  <entry key="Table.Default.Author.ColumnIdWidth" value="45" />
+                  <entry key="Table.Default.Date.ColumnIdWidth" value="58" />
+                  <entry key="Table.Space.CommitStatus.ColumnIdWidth" value="57" />
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="selection_fix" />
+                </option>
+              </RecentGroup>
+            </list>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Shortcuts and cursors" />
+    <MESSAGE value="Leaf node deletion implemented" />
+    <MESSAGE value="Chain color customization" />
+    <MESSAGE value="Angle measured label implementation" />
+    <MESSAGE value="Fixed zoom behaviour" />
+    <MESSAGE value="Package name changed" />
+    <MESSAGE value="Implemented screenshot acquisition" />
+    <MESSAGE value="Implemented measure labels font customization" />
+    <MESSAGE value="Implemented background opacity customization" />
+    <MESSAGE value="Measure label menu moved to FXML" />
+    <MESSAGE value="Implemented the selection capability" />
+    <MESSAGE value="Dot actions move in a separate Kotlin object" />
+    <MESSAGE value="Selection management moved from DotChain.kt to Selection.kt" />
+    <MESSAGE value="The algorithm for nearest dot detection is moved out of DotChain.kt, in order to search in all chains" />
+    <MESSAGE value="Comments improved" />
+    <MESSAGE value="Fix tool selection and created an enum for them" />
+    <MESSAGE value="Fixed some drag bugs" />
+    <MESSAGE value="Created the tool package" />
+    <MESSAGE value="Implemented deletion under click" />
+    <MESSAGE value="Fixed the creation algorithm of a new chain" />
+    <MESSAGE value="Added various angle measure units" />
+    <MESSAGE value="Fixed the behaviour of the connector line color" />
+    <MESSAGE value="Uncommented logs" />
+    <MESSAGE value="Implemented label for mouse coordinates" />
+    <MESSAGE value="Various fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="Various fix" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/ProtractorFX$HelloApplication__1_.ic" NAME="HelloApplication (1) Coverage Results" MODIFIED="1661163616997" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+      <FILTER>org.mth.protractorfx.*</FILTER>
+    </SUITE>
+  </component>
+</project>

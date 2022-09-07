@@ -47,7 +47,7 @@ object DeletionTool : AbstractTool() {
          */
         val deletionList = ArrayList<DotPair>()
 
-        override fun execute() {
+        override fun execute(): Boolean {
             var leaves = Selection.selectedDots().filter { it.isLeaf() }
 
             while (leaves.isNotEmpty()) {
@@ -65,6 +65,8 @@ object DeletionTool : AbstractTool() {
 
             Selection.clear()
             deletionList.trimToSize() // todo remove???
+
+            return true
         }
 
         override fun undo() {
@@ -82,9 +84,11 @@ object DeletionTool : AbstractTool() {
     private class DeleteSingleDotAction(val dot: Dot, override val name: String = "delete-single") : Action {
         lateinit var parent: Dot
 
-        override fun execute() {
+        override fun execute(): Boolean {
             parent = dot.neighbors().first()
             dot.removeFromChain()
+
+            return true
         }
 
         override fun undo() {
