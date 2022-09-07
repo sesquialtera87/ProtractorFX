@@ -28,10 +28,11 @@ public class HelloApplication extends Application {
                 Toolkit.getDefaultToolkit().getScreenSize().height * 0.7);
 
         scene.setFill(Color.rgb(255, 255, 255, 0.1));
-        scene.getStylesheets().add(HelloApplication.class.getResource("style.css").toExternalForm());
 
         JMetro style = new JMetro();
         style.setScene(scene);
+
+        scene.getStylesheets().add(HelloApplication.class.getResource("style.css").toExternalForm());
 
         stage.setTitle("Hello!");
         stage.setScene(scene);

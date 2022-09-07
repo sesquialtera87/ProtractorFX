@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
@@ -13,7 +12,6 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane prefHeight="557.0" prefWidth="916.0" style="-fx-background-color: transparent;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.mth.protractorfx.ImageProtractor">
@@ -39,73 +37,65 @@
     </right>
 
     <top>
-        <StackPane prefHeight="14.0" prefWidth="916.0" BorderPane.alignment="CENTER">
-            <children>
-                <MenuBar fx:id="menuBar" prefHeight="40.0" prefWidth="854.0">
-                    <Menu text="Protractor">
-                        <MenuItem accelerator="Shortcut+Z" onAction="#undo" text="Undo" />
-                        <MenuItem accelerator="Shortcut+W" onAction="#minimizeApp" text="Minimize" />
-                        <MenuItem accelerator="Shortcut+Q" onAction="#closeApp" text="Quit" />
-                    </Menu>
+          <HBox alignment="CENTER_RIGHT" prefHeight="10.0" prefWidth="916.0">
+             <MenuBar fx:id="menuBar" prefHeight="40.0" prefWidth="854.0" HBox.hgrow="ALWAYS">
+                 <Menu text="Protractor">
+                     <MenuItem accelerator="Shortcut+Z" onAction="#undo" text="Undo" />
+                     <MenuItem accelerator="Shortcut+W" onAction="#minimizeApp" text="Minimize" />
+                     <MenuItem accelerator="Shortcut+Q" onAction="#closeApp" text="Quit" />
+                 </Menu>
 
                     <Menu text="Measure">
-                        <!--                        <MenuItem accelerator="Shortcut+M" onAction="#putAngleMeasure" text="Put measure"/>-->
-                        <MenuItem accelerator="Shortcut+N" onAction="#newChain" text="New chain" />
-                        <Menu fx:id="measureUnitMenu" text="Measure unit" />
-                    </Menu>
+                     <!--                        <MenuItem accelerator="Shortcut+M" onAction="#putAngleMeasure" text="Put measure"/>-->
+                     <MenuItem accelerator="Shortcut+N" onAction="#newChain" text="New chain" />
+                     <Menu fx:id="measureUnitMenu" text="Measure unit" />
+                 </Menu>
 
                     <Menu text="Image">
-                        <MenuItem accelerator="Shortcut+P" onAction="#takeScreenshot" text="Screenshot" />
-                        <SeparatorMenuItem />
-                        <MenuItem accelerator="Shortcut+O" onAction="#openImage" text="Open image..." />
-                        <MenuItem accelerator="Shortcut+K" onAction="#showCropArea" text="Crop image" />
-                        <Menu text="Zoom">
-                            <MenuItem accelerator="Shortcut+2" onAction="#zoomIn" text="Zoom in" />
-                            <MenuItem accelerator="Shortcut+1" onAction="#zoomOut" text="Zoom out" />
-                        </Menu>
-                    </Menu>
+                     <MenuItem accelerator="Shortcut+P" onAction="#takeScreenshot" text="Screenshot" />
+                     <SeparatorMenuItem />
+                     <MenuItem accelerator="Shortcut+O" onAction="#openImage" text="Open image..." />
+                     <MenuItem accelerator="Shortcut+K" onAction="#showCropArea" text="Crop image" />
+                     <Menu text="Zoom">
+                         <MenuItem accelerator="Shortcut+2" onAction="#zoomIn" text="Zoom in" />
+                         <MenuItem accelerator="Shortcut+1" onAction="#zoomOut" text="Zoom out" />
+                     </Menu>
+                 </Menu>
 
                     <Menu mnemonicParsing="false" text="View">
-                        <Menu fx:id="chainColorMenu" mnemonicParsing="false" text="Chain color" />
-                        <Menu text="Background opacity">
-                            <MenuItem accelerator="Shortcut+3" onAction="#increaseOpacity" text="increase" />
-                            <MenuItem accelerator="Shortcut+4" onAction="#reduceOpacity" text="reduce" />
-                        </Menu>
-                    </Menu>
+                     <Menu fx:id="chainColorMenu" mnemonicParsing="false" text="Chain color" />
+                     <Menu text="Background opacity">
+                         <MenuItem accelerator="Shortcut+3" onAction="#increaseOpacity" text="increase" />
+                         <MenuItem accelerator="Shortcut+4" onAction="#reduceOpacity" text="reduce" />
+                     </Menu>
+                 </Menu>
 
                 </MenuBar>
-                <HBox alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="916.0">
-                    <Pane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-                    <Button maxHeight="25.0" minHeight="25.0" mnemonicParsing="false" onAction="#minimizeApp" styleClass="window-button" BorderPane.alignment="CENTER">
-                        <graphic>
-                            <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
-                                <Image url="@minimize_x48.png" />
-                            </ImageView>
-                        </graphic>
-                    </Button>
-                    <Button fx:id="maximizeButton" maxHeight="25.0" minHeight="25.0" mnemonicParsing="false" onAction="#maximizeWindow" styleClass="window-button">
-                        <graphic>
-                            <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
-                                <image>
-                                    <Image url="@maximize_x48.png" />
-                                </image>
-                            </ImageView>
-                        </graphic>
-                    </Button>
+              <Button mnemonicParsing="false" onAction="#minimizeApp" styleClass="window-button" BorderPane.alignment="CENTER">
+                  <graphic>
+                      <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                          <Image url="@minimize_x48.png" />
+                      </ImageView>
+                  </graphic>
+              </Button>
+              <Button fx:id="maximizeButton" mnemonicParsing="false" onAction="#maximizeWindow" styleClass="window-button">
+                  <graphic>
+                      <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                          <image>
+                              <Image url="@maximize_x48.png" />
+                          </image>
+                      </ImageView>
+                  </graphic>
+              </Button>
 
-                    <Button maxHeight="25.0" minHeight="25.0" mnemonicParsing="false" onAction="#closeApp" styleClass="window-button" BorderPane.alignment="CENTER">
-                        <graphic>
-                            <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
-                                <Image url="@close_x48.png" />
-                            </ImageView>
-                        </graphic>
-                    </Button>
-                    <StackPane.margin>
-                        <Insets />
-                    </StackPane.margin>
-                </HBox>
-            </children>
-        </StackPane>
+              <Button mnemonicParsing="false" onAction="#closeApp" styleClass="window-button" BorderPane.alignment="CENTER">
+                  <graphic>
+                      <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                          <Image url="@close_x48.png" />
+                      </ImageView>
+                  </graphic>
+              </Button>
+          </HBox>
     </top>
 
 </BorderPane>

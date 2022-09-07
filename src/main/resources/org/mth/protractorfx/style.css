@@ -1,3 +1,4 @@
+/*
 .menu-bar {
     -fx-background-color: burlywood;
 }
@@ -5,21 +6,23 @@
 .menu:hover {
     -fx-background-color: derive(burlywood, 10%);
 }
-
+*/
 .window-button {
     -fx-border-radius: 0;
     -fx-background-radius: 0;
-    -fx-background-color: white;
+    -fx-background-color: #f3f3f3;
+    -fx-background-insets: -2 0 0 0;
 }
-
+/*
 .window-button:hover {
     -fx-background-color: lightgrey;
 }
 
+
 .window-button:pressed {
     -fx-background-color: lightgrey;
 }
-
+*/
 .coordinate-label {
     -fx-background-color: LIGHTGRAY;
     -fx-background-radius: 2;
