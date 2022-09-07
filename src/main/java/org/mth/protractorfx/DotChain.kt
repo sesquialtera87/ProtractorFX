@@ -236,6 +236,7 @@ class DotChain(private val container: Pane, color: Color? = Color.BLACK) :
     override fun iterator() = adjacencyList.keys.iterator()
 
     companion object {
+
         @JvmStatic
         fun standardChain(pane: Pane) =
             DotChain(pane).apply {

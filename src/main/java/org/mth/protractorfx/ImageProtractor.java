@@ -25,6 +25,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.mth.protractorfx.command.Action;
 import org.mth.protractorfx.command.CommandManager;
 import org.mth.protractorfx.log.LogFactory;
 import org.mth.protractorfx.tool.InsertionTool;
@@ -409,7 +410,7 @@ public class ImageProtractor implements Initializable {
 
     @FXML
     void newChain() {
-        UtilsKt.getChains().add(DotChain.randomChain(container));
+        CommandManager.INSTANCE.execute(new NewChainAction());
     }
 
     public static double getImageScalingFactor(ImageView imageView) {
@@ -417,6 +418,28 @@ public class ImageProtractor implements Initializable {
         double scaleY = imageView.getFitHeight() / imageView.getViewport().getMaxY();
 
         return Math.min(scaleX, scaleY);
+    }
+
+    static class NewChainAction implements Action {
+
+        private DotChain chain;
+
+        @Override
+        public boolean execute() {
+            chain = DotChain.randomChain(UtilsKt.getPane());
+            UtilsKt.getChains().add(chain);
+            return true;
+        }
+
+        @Override
+        public void undo() {
+            chain.dispose();
+        }
+
+        @Override
+        public String getName() {
+            return "new-chain";
+        }
     }
 
 }
