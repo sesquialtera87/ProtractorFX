@@ -1,7 +1,5 @@
 package org.mth.protractorfx.tool
 
-import javafx.scene.input.KeyCode
-import javafx.scene.input.KeyEvent.KEY_PRESSED
 import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent.*
 import org.mth.protractorfx.log.LogFactory
@@ -20,6 +18,21 @@ enum class Tool(val tool: AbstractTool) {
 
         private val log: Logger = LogFactory.configureLog(Tool::class.java)
 
+        @JvmStatic
+        fun activate(tool: Tool) {
+            if (tool.tool.active)
+                tool.tool.deactivate()
+            else {
+                values().filter { it != tool }.forEach {
+                    log.finest("Deactivating tool $it")
+                    it.tool.deactivate()
+                }
+                tool.tool.activate()
+
+                log.finest("Activating tool $tool")
+            }
+        }
+
         fun activeTools() = values().filter { it.tool.active }
 
         fun initialize() {
@@ -27,42 +40,38 @@ enum class Tool(val tool: AbstractTool) {
 
             val tools = values().map { it.tool }
 
-            scene.addEventHandler(KEY_PRESSED) { event ->
-//                log.finest("Key pressed: $event")
-
-                when (event.code) {
-                    KeyCode.ESCAPE -> tools.forEach { it.deactivate() }
-                    KeyCode.DELETE -> {
-                        DeletionTool.deleteSelection()
-                        event.consume()
-                    }
-                    else -> {}
-                }
-
-                // find the tool that match the key combination
-                values().filter { it.tool.shortcut.match(event) }
-                    .forEach { tool ->
-//                        log.finest("Shortcut detected for tool $tool")
-
-                        tool.tool.apply {
-                            if (active) {
-                                deactivate()
-
-                                log.finest("Deactivating tool $tool")
-                            } else {
-                                values().filter { it != tool }.forEach {
-                                    log.finest("Deactivating tool $it")
-                                    it.tool.deactivate()
-                                }
-                                activate()
-
-                                log.finest("Activating tool $tool")
-                            }
-                        }
-
-                        event.consume()
-                    }
-            }
+//            scene.addEventHandler(KEY_PRESSED) { event ->
+//                when (event.code) {
+//                    KeyCode.ESCAPE -> tools.forEach { it.deactivate() }
+//                    KeyCode.DELETE -> {
+//                        DeletionTool.deleteSelection()
+//                        event.consume()
+//                    }
+//                    else -> {}
+//                }
+//
+//                // find the tool that match the key combination
+//                values().filter { it.tool.shortcut.match(event) }
+//                    .forEach { tool ->
+//                        tool.tool.apply {
+//                            if (active) {
+//                                deactivate()
+//
+//                                log.finest("Deactivating tool $tool")
+//                            } else {
+//                                values().filter { it != tool }.forEach {
+//                                    log.finest("Deactivating tool $it")
+//                                    it.tool.deactivate()
+//                                }
+//                                activate()
+//
+//                                log.finest("Activating tool $tool")
+//                            }
+//                        }
+//
+//                        event.consume()
+//                    }
+//            }
 
             scene.addEventHandler(MOUSE_PRESSED) { event ->
                 if (event.isPrimaryButtonDown) {

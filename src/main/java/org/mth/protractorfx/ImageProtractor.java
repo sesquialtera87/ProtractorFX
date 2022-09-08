@@ -28,8 +28,10 @@ import javafx.stage.StageStyle;
 import org.mth.protractorfx.command.Action;
 import org.mth.protractorfx.command.CommandManager;
 import org.mth.protractorfx.log.LogFactory;
+import org.mth.protractorfx.tool.DeletionTool;
 import org.mth.protractorfx.tool.InsertionTool;
 import org.mth.protractorfx.tool.MeasureUnit;
+import org.mth.protractorfx.tool.Tool;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -82,8 +84,6 @@ public class ImageProtractor implements Initializable {
     TextField widthField;
     @FXML
     TextField heightField;
-    @FXML
-    Menu chainColorMenu;
     @FXML
     MenuBar menuBar;
     @FXML
@@ -172,15 +172,6 @@ public class ImageProtractor implements Initializable {
         imageScrollPane.maxHeightProperty().
 
                 bind(container.heightProperty());
-
-        // color menu initialization
-        UtilsKt.defaultColors().forEach(color -> {
-            MenuItem colorMenuItem = new MenuItem();
-            colorMenuItem.setGraphic(new Rectangle(14, 14, color));
-            colorMenuItem.setOnAction(evt -> chain.setColor(color));
-            chainColorMenu.getItems().add(colorMenuItem);
-        });
-
 
         ToggleGroup group = new ToggleGroup();
 
@@ -405,7 +396,27 @@ public class ImageProtractor implements Initializable {
     }
 
     @FXML
-    void putAngleMeasure() {
+    void activateMeasureTool() {
+        Tool.activate(Tool.MEASURE);
+    }
+
+    @FXML
+    void activateSelectionTool() {
+        Tool.activate(Tool.SELECTION);
+    }
+
+    @FXML
+    void activateInsertionTool() {
+        Tool.activate(Tool.INSERTION);
+    }
+
+    @FXML
+    void deleteAction() {
+        if (Selection.INSTANCE.isEmpty()) {
+            Tool.activate(Tool.DELETION);
+        } else {
+            CommandManager.INSTANCE.execute(new DeletionTool.DeleteSelectedDotsAction());
+        }
     }
 
     @FXML

@@ -37,7 +37,7 @@ object DeletionTool : AbstractTool() {
     /**
      * Removes the nodes actually selected.
      */
-    private class DeleteSelectedDotsAction(override val name: String = "delete-selection") : Action {
+    class DeleteSelectedDotsAction(override val name: String = "delete-selection") : Action {
 
         data class DotPair(val parent: Dot, val leaf: Dot)
 
@@ -84,6 +84,7 @@ object DeletionTool : AbstractTool() {
         lateinit var parent: Dot
 
         override fun execute(): Boolean {
+            // todo fix single-dot case
             parent = dot.neighbors().first()
             dot.removeFromChain()
 

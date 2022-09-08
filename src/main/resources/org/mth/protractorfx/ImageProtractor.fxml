@@ -49,7 +49,7 @@
                     </Menu>
 
                     <Menu text="Measure">
-                        <MenuItem accelerator="Shortcut+M" onAction="#putAngleMeasure" text="Put measure"/>
+                        <MenuItem accelerator="Shortcut+M" onAction="#activateMeasureTool" text="Put measure"/>
                     </Menu>
 
                     <Menu text="Image">
@@ -59,10 +59,6 @@
                             <MenuItem accelerator="Shortcut+2" onAction="#zoomIn" text="Zoom in"/>
                             <MenuItem accelerator="Shortcut+1" onAction="#zoomOut" text="Zoom out"/>
                         </Menu>
-                    </Menu>
-
-                    <Menu mnemonicParsing="false" text="View">
-                        <Menu fx:id="chainColorMenu" mnemonicParsing="false" text="Chain color"/>
                     </Menu>
 
                 </MenuBar>
