@@ -45,12 +45,12 @@
                 <Menu text="Protractor">
                     <MenuItem accelerator="Shortcut+Z" onAction="#undo" text="Undo">
                         <graphic>
-                            <FontIcon iconColor="black" iconLiteral="fa-undo" iconSize="18"/>
+                            <FontIcon iconColor="black" iconLiteral="fa-undo" iconSize="16"/>
                         </graphic>
                     </MenuItem>
                     <Menu text="Background opacity">
                         <graphic>
-                            <FontIcon iconLiteral="fa-reorder" iconSize="18" iconColor="black"/>
+                            <FontIcon iconLiteral="fa-reorder" iconSize="16" iconColor="black"/>
                         </graphic>
                         <MenuItem accelerator="Shortcut+3" onAction="#increaseOpacity" text="increase"/>
                         <MenuItem accelerator="Shortcut+4" onAction="#reduceOpacity" text="reduce"/>
@@ -62,7 +62,7 @@
                 <Menu text="Measure">
                     <MenuItem accelerator="M" onAction="#activateMeasureTool" text="Put measure">
                         <graphic>
-                            <FontIcon iconLiteral="fa-crosshairs" iconSize="18" iconColor="black"/>
+                            <FontIcon iconLiteral="fa-crosshairs" iconSize="16" iconColor="black"/>
                         </graphic>
                     </MenuItem>
                     <Menu fx:id="measureUnitMenu" text="Measure unit"/>
@@ -71,22 +71,22 @@
                 <Menu text="Chain">
                     <MenuItem accelerator="Shortcut+N" onAction="#newChain" text="New chain">
                         <graphic>
-                            <FontIcon iconColor="BLACK" iconLiteral="fa-code-fork" iconSize="18"/>
+                            <FontIcon iconColor="BLACK" iconLiteral="fa-code-fork" iconSize="16"/>
                         </graphic>
                     </MenuItem>
                     <MenuItem accelerator="S" onAction="#activateSelectionTool" text="Selection">
                         <graphic>
-                            <FontIcon iconColor="black" iconSize="18" iconLiteral="fa-square-o"/>
+                            <FontIcon iconColor="black" iconSize="16" iconLiteral="fa-square-o"/>
                         </graphic>
                     </MenuItem>
                     <MenuItem accelerator="A" onAction="#activateInsertionTool" text="Add node">
                         <graphic>
-                            <FontIcon iconColor="black" iconSize="18" iconLiteral="fa-plus-circle"/>
+                            <FontIcon iconColor="black" iconSize="16" iconLiteral="fa-plus-circle"/>
                         </graphic>
                     </MenuItem>
                     <MenuItem accelerator="DELETE" onAction="#deleteAction" text="Delete">
                         <graphic>
-                            <FontIcon iconLiteral="fa-trash-o" iconSize="18" iconColor="black"/>
+                            <FontIcon iconLiteral="fa-trash-o" iconSize="16" iconColor="black"/>
                         </graphic>
                     </MenuItem>
                 </Menu>
@@ -115,9 +115,7 @@
                     styleClass="window-button">
                 <graphic>
                     <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
-                        <image>
-                            <Image url="@maximize_x48.png"/>
-                        </image>
+                        <Image url="@maximize_x48.png"/>
                     </ImageView>
                 </graphic>
             </Button>
