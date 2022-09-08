@@ -86,7 +86,7 @@ class DotChain(private val container: Pane, color: Color? = Color.BLACK) :
     init {
         if (color == null) {
             // choose a random color from the available ones
-            var availableColors = Companion.availableColors()
+            var availableColors = availableColors()
 
             // if no color is available, choose random from all the colors
             if (availableColors.isEmpty())
@@ -134,10 +134,6 @@ class DotChain(private val container: Pane, color: Color? = Color.BLACK) :
         }
 
         return Point2D(x / size, y / size)
-    }
-
-    fun setColor(color: Color) {
-        chainColor.set(color)
     }
 
     fun neighbors(dot: Dot): HashSet<Dot> = adjacencyList[dot]!!
@@ -227,10 +223,14 @@ class DotChain(private val container: Pane, color: Color? = Color.BLACK) :
 
             // remove the connection lines
             connectors.forEach { container.children.remove(it) }
+            connectors.clear()
 
             // remove all decorators
             dot.angleDecorators.forEach { it.dispose(container) }
+            dot.angleDecorators.clear()
         }
+
+        adjacencyList.clear()
     }
 
     override fun iterator() = adjacencyList.keys.iterator()

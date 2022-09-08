@@ -7,6 +7,7 @@ import javafx.scene.input.KeyCodeCombination
 import javafx.scene.input.MouseEvent
 import org.mth.protractorfx.*
 import org.mth.protractorfx.command.Action
+import java.util.*
 
 object DeletionTool : AbstractTool() {
 
@@ -30,72 +31,85 @@ object DeletionTool : AbstractTool() {
         }
     }
 
-    fun deleteSelection() {
-        execute(DeleteSelectedDotsAction())
-    }
-
     /**
      * Removes the nodes actually selected.
      */
     class DeleteSelectedDotsAction(override val name: String = "delete-selection") : Action {
 
-        data class DotPair(val parent: Dot, val leaf: Dot)
+        data class DotPair(val parent: Optional<Dot>, val leaf: Dot)
 
         /**
          * A list containing the deleted nodes, in order of deletion
          */
-        val deletionList = ArrayList<DotPair>()
+        private val deletionList = Stack<DotPair>()
 
         override fun execute(): Boolean {
             var leaves = Selection.selectedDots().filter { it.isLeaf() }
 
             while (leaves.isNotEmpty()) {
-                leaves.forEach {
-                    deletionList.add(DotPair(
-                        parent = it.neighbors().first(), // it's a leaf, only one neighborhood
-                        leaf = it
-                    ))
-                    it.removeFromChain()
-                    Selection.unselect(it)
+                leaves.forEach { dot ->
+                    val neighbors = dot.neighbors()
+
+                    if (neighbors.isNotEmpty())
+                        deletionList.push(DotPair(
+                            parent = Optional.of(neighbors.first()), // it's a leaf, only one neighborhood
+                            leaf = dot
+                        ))
+                    else deletionList.push(DotPair(parent = Optional.empty(), leaf = dot))
+
+                    dot.removeFromChain()
+                    Selection.unselect(dot)
                 }
 
                 leaves = Selection.selectedDots().filter { it.isLeaf() }
             }
 
             Selection.clear()
-            deletionList.trimToSize() // todo remove???
 
             return true
         }
 
         override fun undo() {
-            deletionList.forEach {
-                val (parent, dot) = it
+            deletionList.forEach { dotPair ->
+                val (parent, dot) = dotPair
 
-                with(parent.chain) {
-                    addDot(dot)
-                    connect(dot, parent)
-                }
+                parent.ifPresentOrElse({
+                    it.chain.run {
+                        addDot(dot)
+                        connect(dot, it)
+                    }
+                }, {
+                    val dotChain = dot.chain
+                    chains.add(dotChain)
+                    dotChain.addDot(dot)
+                })
             }
         }
     }
 
     private class DeleteSingleDotAction(val dot: Dot, override val name: String = "delete-single") : Action {
-        lateinit var parent: Dot
+        var parent: Dot? = null
 
         override fun execute(): Boolean {
-            // todo fix single-dot case
-            parent = dot.neighbors().first()
+            val neighbors = dot.neighbors()
+
+            // if it is not an isolated node, then set the parent node
+            if (neighbors.isNotEmpty())
+                parent = neighbors.first()
+
             dot.removeFromChain()
 
             return true
         }
 
         override fun undo() {
-            with(parent.chain) {
-                addDot(dot)
-                connect(dot, parent)
-            }
+            if (parent == null) {
+
+            } else
+                with(parent!!.chain) {
+                    addDot(dot)
+                    connect(dot, parent!!)
+                }
         }
     }
 }
