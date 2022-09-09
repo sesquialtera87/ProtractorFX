@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jlink" name="unnamed">
+    <output-path>$PROJECT_DIR$/out/artifacts/unnamed</output-path>
+    <properties id="jlink-properties">
+      <options>
+        <option name="verbose" value="true" />
+      </options>
+    </properties>
+    <root id="root" />
+  </artifact>
+</component>

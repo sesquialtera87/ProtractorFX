@@ -1,8 +1,5 @@
 package org.mth.protractorfx
 
-import animatefx.animation.FadeIn
-import animatefx.animation.FadeOut
-import animatefx.util.ParallelAnimationFX
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
@@ -12,6 +9,9 @@ import javafx.scene.paint.Color
 import javafx.scene.shape.Line
 import javafx.scene.text.FontWeight
 import javafx.scene.transform.Translate
+import org.mth.protractorfx.animation.FadeIn
+import org.mth.protractorfx.animation.FadeOut
+import org.mth.protractorfx.animation.ParallelAnimationFX
 import java.util.*
 import kotlin.math.PI
 

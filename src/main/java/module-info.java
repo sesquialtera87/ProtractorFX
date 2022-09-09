@@ -2,8 +2,8 @@ module com.mth.protractorfx {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.swing;
-    requires AnimateFX;
     requires org.jfxtras.styles.jmetro;
+
 
     requires org.controlsfx.controls;
     requires org.kordamp.ikonli.javafx;
@@ -12,5 +12,8 @@ module com.mth.protractorfx {
     requires java.logging;
 
     opens org.mth.protractorfx to javafx.fxml;
+
     exports org.mth.protractorfx;
+    exports org.mth.protractorfx.command;
+
 }

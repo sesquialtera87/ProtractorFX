@@ -55,7 +55,7 @@
                         <MenuItem accelerator="Shortcut+3" onAction="#increaseOpacity" text="increase"/>
                         <MenuItem accelerator="Shortcut+4" onAction="#reduceOpacity" text="reduce"/>
                     </Menu>
-                    <MenuItem accelerator="Shortcut+W" onAction="#minimizeApp" text="Minimize"/>
+<!--                    <MenuItem accelerator="Shortcut+W" onAction="#minimizeApp" text="Minimize"/>-->
                     <MenuItem accelerator="Shortcut+Q" onAction="#closeApp" text="Quit"/>
                 </Menu>
 
@@ -91,7 +91,7 @@
                     </MenuItem>
                 </Menu>
 
-                <Menu text="Image">
+                <Menu text="Image" visible="false">
                     <MenuItem accelerator="Shortcut+P" onAction="#takeScreenshot" text="Screenshot"/>
                     <SeparatorMenuItem/>
                     <MenuItem accelerator="Shortcut+O" onAction="#openImage" text="Open image..."/>
